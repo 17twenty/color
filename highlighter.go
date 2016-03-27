@@ -61,7 +61,7 @@ func scanText(h *highlighter) stateFn {
 		case 'h':
 			h.pos -= 2 // backup to %
 			h.start = h.pos
-			h.pos += 3 // skip the %h#
+			h.pos += 3 // skip the %h[
 			return scanHighlight
 		case eof:
 			return nil
@@ -83,7 +83,7 @@ func scanHighlight(h *highlighter) stateFn {
 		switch {
 		case r == eof:
 			return nil
-		case r == '#':
+		case r == ']':
 			if h.codes != "" {
 				h.replace(h.pos - h.start)
 			}

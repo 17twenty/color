@@ -4,6 +4,11 @@ This package adds color verbs to fmt.Printf. All three printf functions are wrap
 
 Use `color.NewLogger()` to wrap the `Printf` functions of `*log.Logger`
 
+## Why?
+
+The API of similar packages requires calling a function everytime to color some text differently.  
+It gets very verbose, I much prefer the succinctness of using verbs.
+
 ##Usage
 
 `%h#color#text` is the highlighting verb. The text between the `##` is used as the color.  

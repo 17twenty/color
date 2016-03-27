@@ -2,7 +2,15 @@
 
 This package adds color verbs to fmt.Printf. All three printf functions are wrapped in this package.
 
-There is also a wrapper for the `Printf` functions of `*log.Logger`, create one with `color.NewLogger()`
+Use `color.NewLogger()` to wrap the `Printf` functions of `*log.Logger`
+
+##Usage
+
+`%h#color#text` is the highlighting verb. The text between the `#`s is used as the color.  
+Everything after it is highlighted.  
+Note that the next highlighting verb will not reset the highlighting first, it will just add onto the first.
+
+`%r` is the reset verb. It resets all highlighting.
 
 ##Examples:
 ```go

@@ -6,7 +6,7 @@
 		%h[attrs]		uses the attrs to highlight the following text
 		%r			an abbreviation for %h[reset]
 	
-	attrs is a plus sign separated list of Colors (fgRed) or Attributes (bold).
+	attrs is a + separated list of Colors (fgRed) or Attributes (bold).
 
 	Multiple highlight verbs do not reset preceeding verbs, they add onto them.
 	For example, if you set the foreground to green in the first verb, then set the background to red in the second, any text following the second will have a green foreground and a red background.

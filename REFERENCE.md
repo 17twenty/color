@@ -1,5 +1,5 @@
 # Reference
-See [this](http://invisible-island.net/xterm/ctlseqs/ctlseqs.html) for explanations
+See [this](http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Functions-using-CSI-_-ordered-by-the-final-character_s_) for an explanation of the colors and attributes. Scroll down to the SGR section.
 
 ## 16 Foreground Colors
 ```

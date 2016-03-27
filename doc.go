@@ -13,6 +13,8 @@
 
 	The syntax reference is here: https://github.com/nhooyr/color/blob/master/REFERENCE.md
 
+	Examples
+
 	Standard Colors:
 		// "panic:" with a red foreground then normal "rip"
 		color.Printf("%h[fgRed]panic:%r rip\n")

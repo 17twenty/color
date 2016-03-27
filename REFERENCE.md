@@ -1,6 +1,6 @@
 # Reference
+## 16 Foreground Colors
 ```
-16 Foreground Colors:
 %h[fgBlack]
 %h[fgRed]
 %h[fgGreen]
@@ -18,8 +18,10 @@
 %h[fgBrightMagenta]
 %h[fgBrightCyan]
 %h[fgBrightWhite]
+```
 
-16 Background Colors:
+## 16 Background Colors
+```
 %h[bgBlack]
 %h[bgRed]
 %h[bgGreen]
@@ -37,13 +39,17 @@
 %h[bgBrightMagenta]
 %h[bgBrightCyan]
 %h[bgBrightWhite]
+```
 
-256 Colors:
+## 256 Colors
+```
 %h[fgxxx]
 %h[bgxxx]
+```
 Where xxx is any number from 0-255
 
-Attributes:
+## Attributes
+```
 %h[reset] or the %r verb
 %h[bold]
 %h[faint]
@@ -61,8 +67,10 @@ Attributes:
 %h[positive]
 %h[visible]
 %h[notCrossedOut]
+```
 
-To combine:
+## Mixing
+```
 %h[fgBlue+bgRed+bold]
 ```
 

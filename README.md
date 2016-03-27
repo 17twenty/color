@@ -5,7 +5,9 @@ All it does is replace the verbs with the appropiate terminal escape sequence.
 
 ## Install
 
-`go get github.com/nhooyr/color`
+```
+go get github.com/nhooyr/color
+```
 
 ## Usage
 
@@ -72,8 +74,12 @@ color.Printf("%r")
 ### `*log.Logger` wrapper
 ```go
 logger := color.NewLogger(os.Stderr, "", 0)
+
 // prints hi in red
 logger.Printf("%h[fgRed]hi%r")
+
+// prints hi in red and then exits
+logger.Fatalf("%h[fgRed]hi%r")
 ```
 
 ## Reference

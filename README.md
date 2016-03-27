@@ -1,7 +1,7 @@
 # color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
 Color extends `fmt.Printf` with verbs for terminal color highlighting.  
-All it does is replace the verbs with the appropiate terminal escape sequence.
+All it does is replace the verbs with the appropriate terminal escape sequence.
 
 ## Install
 

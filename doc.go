@@ -1,5 +1,5 @@
 /*
-	Package color extends fmt.Printf with verbs for terminal color highlighting. All it does is replace the verbs with the appropiate terminal escape sequence.
+	Package color extends fmt.Printf with verbs for terminal color highlighting. All it does is replace the verbs with the appropriate terminal escape sequence.
 
 	Highlight verbs:
 
@@ -11,7 +11,7 @@
 	Multiple highlight verbs do not reset preceeding verbs, they add onto them.
 	For example, if you set the foreground to green in the first verb, then set the background to red in the second, any text following the second will have a green foreground and a red background.
 
-	The syntax reference is included in REFERENCE.md but here are some examples
+	The syntax reference is included in REFERENCE.md.
 
 	Standard Colors:
 		// "panic:" with a red foreground then normal "rip"

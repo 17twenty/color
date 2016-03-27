@@ -9,7 +9,10 @@ All it does is replace the verbs with the appropiate terminal escape sequence.
 go get github.com/nhooyr/color
 ```
 
-## Examples:
+## Docs
+Please see [godoc](https://godoc.org/github.com/nhooyr/color)
+
+## Examples
 ### Standard Colors
 ```go
 // "panic:" with a red foreground then normal "rip"

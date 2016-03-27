@@ -6,14 +6,14 @@ import (
 	"os"
 )
 
-func Sprint(format string) string {
-	h := &highlighter{s: format}
+func Scolorf(s string) string {
+	h := &highlighter{s: s}
 	h.run()
 	return h.s
 }
 
 func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(w, Sprint(format), a...)
+	return fmt.Fprintf(w, Scolorf(format), a...)
 }
 
 func Printf(format string, a ...interface{}) (n int, err error) {
@@ -21,5 +21,5 @@ func Printf(format string, a ...interface{}) (n int, err error) {
 }
 
 func Sprintf(format string, a ...interface{}) string {
-	return fmt.Sprintf(Sprint(format), a...)
+	return fmt.Sprintf(Scolorf(format), a...)
 }

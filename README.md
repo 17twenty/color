@@ -9,8 +9,14 @@ All it does is replace the verbs with the appropiate terminal escape sequence.
 go get github.com/nhooyr/color
 ```
 
-## Docs
-Please see [godoc](https://godoc.org/github.com/nhooyr/color)
+## Usage
+
+```
+%h[attrs]	uses attrs to highlight the following text
+%r		an abbreviation for %h[reset]
+```
+
+See [godoc](https://godoc.org/github.com/nhooyr/color) for more information
 
 ## Examples
 ### Standard Colors

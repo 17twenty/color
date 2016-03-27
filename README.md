@@ -11,7 +11,7 @@ It gets very verbose, I much prefer the succinctness of using verbs.
 
 ##Usage
 
-`%h[color]text` is the highlighting verb. The text between the `##` is used as the color.  
+`%h[color]text` is the highlighting verb. The text between the `[]` is used as the color.  
 Everything after it is highlighted.  
 Note: that the next highlighting verb will not reset the highlighting first, it will just add onto the first.
 
@@ -27,16 +27,16 @@ import (
 
 func main() {
 	// bolded red "panic:" and then normal "rip"
-	color.Printf("%h[bold+fgRed]panic:%r rip\n")
+	color.Printf("%h[fgRed+bold]panic:%r rip\n")
 
 	// bolded red with bright black background "panic:" and then cyan "rip"
-	color.Printf("%h[bold+fgRed+bgBrightBlack]panic:%r %h[fgCyan]rip%r\n")
+	color.Printf("%h[fgRed+bgBrightBlack+bold]panic:%r %h[fgCyan]rip%r\n")
 
 	// underlined red with bright black background "panic:" and then normal "rip"
-	color.Printf("%h[underline+fgRed+bgBrightBlack]panic:%r rip\n")
+	color.Printf("%h[fgRed+bgBrightBlack+underline]panic:%r rip\n")
 
 	// red with black background "panic:" and then normal "rip"
-	color.Printf("%h[underline+bold+fg1+bg0]panic:%r rip\n")
+	color.Printf("%h[fg1+bg0+underline+bold]panic:%r rip\n")
 
 	// green "panic:" and then green with bright black background "rip"
 	color.Printf("%h[fg2]panic: %h[bg8]rip%r\n")

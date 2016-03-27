@@ -2,46 +2,48 @@
 
 This package adds color verbs to fmt.Printf
 
-Foreground Colors:
+16 Colors:
 %h#fgBlack#
 %h#fgRed#
 %h#fgGreen#
+%h#fgYellow#
 %h#fgBlue#
 %h#fgMagenta#
 %h#fgCyan#
 %h#fgWhite#
-%h#fgBrighBlack#
-%h#fgBrightRed#
-%h#fgBrightGreen#
-%h#fgBrightBlue#
-%h#fgBrightMagenta#
-%h#fgBrightCyan#
-%h#fgBrightWhite#
-
-Background Colors:
+%h#fgDefault#
 %h#bgBlack#
 %h#bgRed#
 %h#bgGreen#
+%h#bgYellow#
 %h#bgBlue#
 %h#bgMagenta#
 %h#bgCyan#
 %h#bgWhite#
+%h#bgDefault#
+%h#fgBrighBlack#
+%h#fgBrightRed#
+%h#fgBrightGreen#
+%h#fgBrightYellow#
+%h#fgBrightBlue#
+%h#fgBrightMagenta#
+%h#fgBrightCyan#
+%h#fgBrightWhite#
 %h#bgBrighBlack#
 %h#bgBrightRed#
 %h#bgBrightGreen#
+%h#bgBrightYellow#
 %h#bgBrightBlue#
 %h#bgBrightMagenta#
 %h#bgBrightCyan#
 %h#bgBrightWhite#
 
 256 Colors:
-%h#144#
-
-For true color:
-%h#rgb(144,155,166)#
+%h#fg144#
+%h#bg144#
 
 Attributes:
-%h#reset#
+%h#reset# or just %r
 %h#bold#
 %h#faint#
 %h#italic#
@@ -50,6 +52,16 @@ Attributes:
 %h#inverse#
 %h#invisible#
 %h#crossedOut#
+%h#doubleUnderline#
+%h#normal#
+%h#notItalic#
+%h#notUnderlined#
+%h#steady#
+%h#positive#
+%h#visible#
+%h#notCrossedOut#
 
 To combine:
 %h#fgBlue+bgRed+bold#
+
+TODO: True color support, just not sure on the schema

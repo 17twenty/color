@@ -63,7 +63,7 @@
 		// prints hi in red and then exits
 		logger.Fatalf("%h[fgRed]hi%r")
 
-	Reference
+	Syntax Reference
 
 		16 Foreground Colors:
 			%h[fgBlack]

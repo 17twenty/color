@@ -11,7 +11,7 @@ It gets very verbose, I much prefer the succinctness of using verbs.
 
 ##Usage
 
-`%h[color]text` is the highlighting verb. The text between the `[]` is used as the color.  
+`%h[color]text` is the highlighting verb. The text between the `[]` is used to describe the highlighting  
 Everything after it is highlighted.  
 Note: that the next highlighting verb will not reset the highlighting first, it will just add onto the first.
 

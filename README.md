@@ -6,9 +6,9 @@ Use `color.NewLogger()` to wrap the `Printf` functions of `*log.Logger`
 
 ##Usage
 
-`%h#color#text` is the highlighting verb. The text between the `#`s is used as the color.  
+`%h#color#text` is the highlighting verb. The text between the `##` is used as the color.  
 Everything after it is highlighted.  
-Note that the next highlighting verb will not reset the highlighting first, it will just add onto the first.
+Note: that the next highlighting verb will not reset the highlighting first, it will just add onto the first.
 
 `%r` is the reset verb. It resets all highlighting.
 

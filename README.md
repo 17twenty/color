@@ -1,6 +1,6 @@
 # color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
-Package color extends fmt.Printf with verbs for terminal color highlighting.
+Package color extends `fmt.Printf` with verbs for terminal color highlighting.
 
 ## Install
 

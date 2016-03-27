@@ -13,6 +13,8 @@
 
 	Syntax Reference
 
+	See http://goo.gl/LRLA7o to understand the organization of the reference. Scroll down to the SGR section.
+
 	16 Foreground Colors:
 		%h[fgBlack]
 		%h[fgRed]
@@ -77,8 +79,6 @@
 
 	Mixing:
 		%h[fgBlue+bgRed+bold]
-
-	See http://goo.gl/LRLA7o to understand the organization of the attributes. Scroll down to the SGR section.
 
 	Examples
 

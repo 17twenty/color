@@ -10,11 +10,11 @@ const eof = -1
 type stateFn func(*highlighter) stateFn
 
 type highlighter struct {
-	s              string
-	pos            int
-	width          int
-	startHighlight int
-	codes          string
+	s     string // string to search and replace the verbs
+	pos   int    // position in s
+	width int    // width of last rune read from s
+	start int    // start position of current highlight verb
+	codes string // codes of current highlight verb
 }
 
 func (h *highlighter) run() {
@@ -38,10 +38,11 @@ func (h *highlighter) backup() {
 	h.pos -= h.width
 }
 
+// replaces previous back characters with h.codes[1:] (remove first semicolon)
 func (h *highlighter) replace(back int) {
-	h.s = h.s[:h.pos-back] + csi + h.codes[:len(h.codes)-1] + "m" + h.s[h.pos:]
-	h.pos -= back
+	h.s = h.s[:h.pos-back] + csi + h.codes[1:] + "m" + h.s[h.pos:]
 	h.codes = ""
+	h.pos -= back
 }
 
 // scans until the next highlight or reset verb
@@ -59,7 +60,7 @@ func scanText(h *highlighter) stateFn {
 			return verbReset
 		case 'h':
 			h.pos -= 2 // backup to %
-			h.startHighlight = h.pos
+			h.start = h.pos
 			h.pos += 3 // skip the %h#
 			return scanHighlight
 		case eof:
@@ -70,7 +71,7 @@ func scanText(h *highlighter) stateFn {
 
 // replaces the reset verb with the reset control sequence
 func verbReset(h *highlighter) stateFn {
-	h.codes = attrs["reset"]
+	h.codes = ";" + attrs["reset"]
 	h.replace(2)
 	return scanText
 }
@@ -84,7 +85,7 @@ func scanHighlight(h *highlighter) stateFn {
 			return nil
 		case r == '#':
 			if h.codes != "" {
-				h.replace(h.pos - h.startHighlight)
+				h.replace(h.pos - h.start)
 			}
 			return scanText
 		case r == '+':
@@ -93,6 +94,7 @@ func scanHighlight(h *highlighter) stateFn {
 			h.backup()
 			return scanAttribute
 		default:
+			h.backup()
 			return scanText
 		}
 	}
@@ -112,7 +114,7 @@ func scanAttribute(h *highlighter) stateFn {
 			return scanColor256
 		default:
 			if a, ok := attrs[b]; ok {
-				h.codes += a + ";"
+				h.codes += ";" + a
 			}
 			h.backup()
 			return scanHighlight
@@ -122,12 +124,13 @@ func scanAttribute(h *highlighter) stateFn {
 
 func scanColor256(h *highlighter) stateFn {
 	var b, pre string
-	switch string(h.next()) + string(h.next()) {
-	case "fg":
+	switch h.next() {
+	case 'f':
 		pre = "3"
-	case "bg":
+	case 'b':
 		pre = "4"
 	}
+	h.next() // skip the g, in "fg" or "bg"
 	for {
 		r := h.next()
 		switch {
@@ -137,7 +140,7 @@ func scanColor256(h *highlighter) stateFn {
 			b += string(r)
 		default:
 			if b != "" {
-				h.codes += pre + "8;5;" + b + ";"
+				h.codes += ";" + pre + "8;5;" + b
 			}
 			h.backup()
 			return scanHighlight

@@ -13,6 +13,8 @@
 
 	Syntax Reference
 
+	See http://goo.gl/LRLA7o for an explanation of the colors/attributes. Scroll down to the SGR section.
+
 	16 Foreground Colors:
 		%h[fgBlack]
 		%h[fgRed]
@@ -77,7 +79,5 @@
 
 	Mixing:
 		%h[fgBlue+bgRed+bold]
-
-	See http://goo.gl/LRLA7o for an explanation of these colors/attributes. Scroll down to the SGR section.
 */
 package color

@@ -13,8 +13,6 @@
 
 	Syntax Reference
 
-	See http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Functions-using-CSI-_-ordered-by-the-final-character_s_ for more info. Scroll down to the SGR section.
-
 	16 Foreground Colors:
 		%h[fgBlack]
 		%h[fgRed]
@@ -79,6 +77,8 @@
 
 	Mixing:
 		%h[fgBlue+bgRed+bold]
+
+	See http://goo.gl/LRLA7o to understand the organization of the attributes. Scroll down to the SGR section.
 
 	Examples
 

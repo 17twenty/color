@@ -64,6 +64,7 @@
 		logger.Fatalf("%h[fgRed]hi%r")
 
 	Syntax Reference
+
 		16 Foreground Colors:
 			%h[fgBlack]
 			%h[fgRed]

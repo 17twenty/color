@@ -7,22 +7,26 @@ import (
 
 const eof = -1
 
+// stateFn represents the state of the scanner as a function that returns the next state.
 type stateFn func(*highlighter) stateFn
 
+// highlighter holds the state of the scanner.
 type highlighter struct {
-	s     string // string to search and replace the verbs
+	s     string // string being scanned
 	pos   int    // position in s
 	width int    // width of last rune read from s
-	start int    // start position of current highlight verb
+	start int    // start position of current verb
 	codes string // codes of current highlight verb
 }
 
+// run runs the state machine for the highlighter.
 func (h *highlighter) run() {
 	for state := scanText; state != nil; {
 		state = state(h)
 	}
 }
 
+// next returns the next rune in the input.
 func (h *highlighter) next() rune {
 	if h.pos >= len(h.s) {
 		h.width = 0
@@ -34,18 +38,20 @@ func (h *highlighter) next() rune {
 	return r
 }
 
+// backup steps back one rune. Can only be called once per call of next.
 func (h *highlighter) backup() {
 	h.pos -= h.width
 }
 
-// replaces previous back characters with h.codes[1:] (remove first semicolon)
-func (h *highlighter) replace(back int) {
+// replaces the verb with a control sequence derived from h.codes[1:].
+func (h *highlighter) replace() {
+	back := h.pos - h.start
 	h.s = h.s[:h.pos-back] + csi + h.codes[1:] + "m" + h.s[h.pos:]
 	h.codes = ""
 	h.pos -= back
 }
 
-// scans until the next highlight or reset verb
+// scans until the next highlight or reset verb.
 func scanText(h *highlighter) stateFn {
 	for {
 		switch h.next() {
@@ -57,11 +63,11 @@ func scanText(h *highlighter) stateFn {
 		}
 		switch h.next() {
 		case 'r':
+			h.start = h.pos - 2
 			return verbReset
 		case 'h':
-			h.pos -= 2 // backup to %
-			h.start = h.pos
-			h.pos += 3 // skip the %h[
+			h.start = h.pos - 2
+			h.pos++ // skip the [
 			return scanHighlight
 		case eof:
 			return nil
@@ -72,11 +78,12 @@ func scanText(h *highlighter) stateFn {
 // replaces the reset verb with the reset control sequence
 func verbReset(h *highlighter) stateFn {
 	h.codes = ";" + attrs["reset"]
-	h.replace(2)
+	h.replace()
 	return scanText
 }
 
-// replaces the highlight verb with the appropiate control sequence
+// scans the highlight verb for attributes
+// then replaces the verb with a control sequence derived from the attributes
 func scanHighlight(h *highlighter) stateFn {
 	for {
 		r := h.next()
@@ -85,7 +92,7 @@ func scanHighlight(h *highlighter) stateFn {
 			return nil
 		case r == ']':
 			if h.codes != "" {
-				h.replace(h.pos - h.start)
+				h.replace()
 			}
 			return scanText
 		case r == '+':
@@ -100,6 +107,7 @@ func scanHighlight(h *highlighter) stateFn {
 	}
 }
 
+// scans a single attribute and adds it to h.codes
 func scanAttribute(h *highlighter) stateFn {
 	var b string
 	for {
@@ -122,6 +130,7 @@ func scanAttribute(h *highlighter) stateFn {
 	}
 }
 
+// scans a single 256 color and adds it to h.codes
 func scanColor256(h *highlighter) stateFn {
 	var b, pre string
 	switch h.next() {
@@ -139,9 +148,7 @@ func scanColor256(h *highlighter) stateFn {
 		case unicode.IsNumber(r):
 			b += string(r)
 		default:
-			if b != "" {
-				h.codes += ";" + pre + "8;5;" + b
-			}
+			h.codes += ";" + pre + "8;5;" + b
 			h.backup()
 			return scanHighlight
 		}

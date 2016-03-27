@@ -2,6 +2,8 @@ package color
 
 const csi = "\033["
 
+// maps attributes to their values.
+// see REFERENCE.md for more information.
 var attrs = map[string]string{
 	"reset":           "0",
 	"bold":            "1",

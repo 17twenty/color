@@ -12,7 +12,7 @@ go get github.com/nhooyr/color
 ## Usage
 
 ```
-%h[attrs]		uses the attrs to highlight the following text
+%h[attrs]	uses the attrs to highlight the following text
 %r			an abbreviation for %h[reset]
 ```
 

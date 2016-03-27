@@ -3,9 +3,6 @@
 Color extends `fmt.Printf` with verbs for terminal color highlighting.  
 All it does is replace the verbs with the appropiate terminal escape sequence.
 
-It also provides a wrapper around `*log.Logger`'s `Printf` functions to make use of the new verbs.  
-See `color.NewLogger`.
-
 ## Install
 
 `go get github.com/nhooyr/color`
@@ -17,7 +14,6 @@ That approach gets very verbose, I prefer the succinctness of using verbs.
 
 ## Usage
 
-### Verbs
 ```
 %h[attrs]		uses the attrs to highlight the following text
 %r			an abbreviation for %h[reset]

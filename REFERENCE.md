@@ -1,6 +1,6 @@
 # Reference
 ```
-16 Colors:
+16 Foreground Colors:
 %h[fgBlack]
 %h[fgRed]
 %h[fgGreen]
@@ -10,6 +10,16 @@
 %h[fgCyan]
 %h[fgWhite]
 %h[fgDefault]
+%h[fgBrighBlack]
+%h[fgBrightRed]
+%h[fgBrightGreen]
+%h[fgBrightYellow]
+%h[fgBrightBlue]
+%h[fgBrightMagenta]
+%h[fgBrightCyan]
+%h[fgBrightWhite]
+
+16 Background Colors:
 %h[bgBlack]
 %h[bgRed]
 %h[bgGreen]
@@ -19,14 +29,6 @@
 %h[bgCyan]
 %h[bgWhite]
 %h[bgDefault]
-%h[fgBrighBlack]
-%h[fgBrightRed]
-%h[fgBrightGreen]
-%h[fgBrightYellow]
-%h[fgBrightBlue]
-%h[fgBrightMagenta]
-%h[fgBrightCyan]
-%h[fgBrightWhite]
 %h[bgBrighBlack]
 %h[bgBrightRed]
 %h[bgBrightGreen]
@@ -37,8 +39,9 @@
 %h[bgBrightWhite]
 
 256 Colors:
-%h[fg144]
-%h[bg144]
+%h[fgxxx]
+%h[bgxxx]
+Where xxx is any number from 0-255
 
 Attributes:
 %h[reset] or the %r verb

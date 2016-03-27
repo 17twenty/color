@@ -82,8 +82,7 @@ logger.Fatalf("%h[fgRed]hi%r")
 ## Reference
 A syntax reference is [included](REFERENCE.md)
 
-TODO:
------
+## TODO
 - [ ] True color support
 - [ ] Windows support
 

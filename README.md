@@ -7,21 +7,21 @@ This package adds color verbs to fmt.Printf. All three printf functions are wrap
 package main
 
 import (
-		"github.com/nhooyr/color"
-	  )
+	"github.com/nhooyr/color"
+)
 
 func main() {
 	// bolded red "panic:" and then normal "rip"
 	color.Printf("%h#bold+fgRed#panic:%r rip\n")
 
-		// bolded red with bright black background "panic:" and then cyan "rip"
-		color.Printf("%h#bold+fgRed+bgBrightBlack#panic:%r %h#fgCyan#rip%r\n")
+	// bolded red with bright black background "panic:" and then cyan "rip"
+	color.Printf("%h#bold+fgRed+bgBrightBlack#panic:%r %h#fgCyan#rip%r\n")
 
-		// underlined red with bright black background "panic:" and then normal "rip"
-		color.Printf("%h#underline+fgRed+bgBrightBlack#panic:%r rip\n")
+	// underlined red with bright black background "panic:" and then normal "rip"
+	color.Printf("%h#underline+fgRed+bgBrightBlack#panic:%r rip\n")
 
-		// red with black background "panic:" and then normal "rip"
-		color.Printf("%h#underline+bold+fg1+bg0#panic:%r rip\n")
+	// red with black background "panic:" and then normal "rip"
+	color.Printf("%h#underline+bold+fg1+bg0#panic:%r rip\n")
 }
 ```
 

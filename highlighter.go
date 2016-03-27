@@ -83,7 +83,10 @@ func scanHighlight(h *highlighter) stateFn {
 		case r == eof:
 			return nil
 		case r == '#':
-			h.replace(h.pos - h.startHighlight)
+			if h.codes != "" {
+				h.replace(h.pos - h.startHighlight)
+			}
+			return scanText
 		case r == '+':
 			continue
 		case unicode.IsLetter(r):

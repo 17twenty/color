@@ -19,7 +19,7 @@ go get github.com/nhooyr/color
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
 ## Examples
-### Standard Colors
+### 16 Colors
 ```go
 // "panic:" with a red foreground then normal "rip"
 color.Printf("%h[fgRed]panic:%r rip\n")

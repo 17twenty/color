@@ -17,11 +17,10 @@ That approach gets very verbose, I prefer the succinctness of using verbs.
 
 ## Usage
 
-Highlight verbs:
-
+### Verbs
 ```
-	%h[attrs]		uses the attrs to highlight the following text
-	%r			an abbreviation for %h[reset]
+%h[attrs]		uses the attrs to highlight the following text
+%r			an abbreviation for %h[reset]
 ```
 
 attrs is a `+`  separated list of Colors (e.g. `fgRed`) or Attributes (e.g. `bold`).

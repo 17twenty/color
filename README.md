@@ -28,15 +28,6 @@ color.Printf("%h[fgRed]panic:%r rip\n")
 color.Printf("%h[bgBrightRed]panic:%r rip\n")
 ```
 
-### Attributes
-```go
-// bold "panic:" then normal "rip"
-color.Printf("%h[bold]panic:%r rip\n")
-
-// underlined "panic:" with then normal "rip"
-color.Printf("%h[underline]panic:%r rip\n")
-```
-
 ### 256 Colors
 ```go
 // "panic:" with a green foreground then normal "rip"
@@ -46,7 +37,16 @@ color.Printf("%h[fg2]panic:%r rip\n")
 color.Printf("%h[bg10]panic:%r rip\n")
 ```
 
-### Mixing Colors and Attributes
+### Other Attributes
+```go
+// bold "panic:" then normal "rip"
+color.Printf("%h[bold]panic:%r rip\n")
+
+// underlined "panic:" with then normal "rip"
+color.Printf("%h[underline]panic:%r rip\n")
+```
+
+### Mixing Attributes
 ```go
 // bolded "panic:" with a green foreground then normal "rip"
 color.Printf("%h[fgGreen+bold]panic:%r rip\n")

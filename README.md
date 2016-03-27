@@ -1,8 +1,29 @@
 # color
 
-This package adds color verbs to fmt.Printf
+This package adds color verbs to fmt.Printf. All three printf functions are wrapped in this package.
 
-TODO: True color support, just not sure on the schema
+##Examples:
+```go
+package main
+
+import (
+		"github.com/nhooyr/color"
+	  )
+
+func main() {
+	// bolded red "panic:" and then normal "rip"
+	color.Printf("%h#bold+fgRed#panic:%r rip\n")
+
+		// bolded red with bright black background "panic:" and then cyan "rip"
+		color.Printf("%h#bold+fgRed+bgBrightBlack#panic:%r %h#fgCyan#rip%r\n")
+
+		// underlined red with bright black background "panic:" and then normal "rip"
+		color.Printf("%h#underline+fgRed+bgBrightBlack#panic:%r rip\n")
+
+		// red with black background "panic:" and then normal "rip"
+		color.Printf("%h#underline+bold+fg1+bg0#panic:%r rip\n")
+}
+```
 
 ##Reference:
 ```
@@ -68,3 +89,7 @@ Attributes:
 To combine:
 %h#fgBlue+bgRed+bold#
 ```
+
+TODO:
+-----
+- [ ] True color support, just not sure on the schema

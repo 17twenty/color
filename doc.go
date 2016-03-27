@@ -57,7 +57,7 @@
 		%h[bgxxx]
 	Where xxx is any number from 0-255
 
-	The Rest:
+	Others:
 		%h[reset] or the %r verb
 		%h[bold]
 		%h[faint]

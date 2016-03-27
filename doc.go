@@ -3,7 +3,7 @@
 
 	Highlight verbs:
 
-		%h[attr...]	replaces itself with a SGR code that sets all of the attributes in []
+		%h[attr...]		replaces itself with a SGR code that sets all of the attributes in []
 					multiple attributes are + separated
 		%r			an abbreviation for %h[reset]
 

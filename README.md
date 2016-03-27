@@ -32,6 +32,9 @@ func main() {
 
 	// red with black background "panic:" and then normal "rip"
 	color.Printf("%h#underline+bold+fg1+bg0#panic:%r rip\n")
+
+	// green "panic:" and then green with bright black background "rip"
+	color.Printf("%h#fg2#panic: %h#bg8#rip%r\n")
 }
 ```
 

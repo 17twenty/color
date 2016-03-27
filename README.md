@@ -2,6 +2,9 @@
 
 This package adds color verbs to fmt.Printf
 
+TODO: True color support, just not sure on the schema
+
+##Reference:
 ```
 16 Colors:
 %h#fgBlack#
@@ -65,5 +68,3 @@ Attributes:
 To combine:
 %h#fgBlue+bgRed+bold#
 ```
-
-TODO: True color support, just not sure on the schema

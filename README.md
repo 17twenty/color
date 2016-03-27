@@ -16,7 +16,9 @@ go get github.com/nhooyr/color
 %r			an abbreviation for %h[reset]
 ```
 
-See [godoc](https://godoc.org/github.com/nhooyr/color) for more information
+A syntax reference is [included](REFERENCE.md).
+
+See [godoc](https://godoc.org/github.com/nhooyr/color) for more information on the internals.
 
 ## Examples
 ### Standard Colors
@@ -78,9 +80,6 @@ logger.Printf("%h[fgRed]hi%r")
 // prints hi in red and then exits
 logger.Fatalf("%h[fgRed]hi%r")
 ```
-
-## Reference
-A syntax reference is [included](REFERENCE.md)
 
 ## TODO
 - [ ] True color support

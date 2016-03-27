@@ -41,6 +41,7 @@ func (h *highlighter) backup() {
 func (h *highlighter) replace(back int) {
 	h.s = h.s[:h.pos-back] + csi + h.codes[:len(h.codes)-1] + "m" + h.s[h.pos:]
 	h.pos -= back
+	h.codes = ""
 }
 
 // scans until the next highlight or reset verb
@@ -54,17 +55,24 @@ func scanText(h *highlighter) stateFn {
 		case '%':
 		}
 		switch h.next() {
+		case 'r':
+			return verbReset
 		case 'h':
 			h.pos -= 2 // backup to %
 			h.startHighlight = h.pos
 			h.pos += 3 // skip the %h#
 			return scanHighlight
-		case 'r':
-			return verbReset
 		case eof:
 			return nil
 		}
 	}
+}
+
+// replaces the reset verb with the reset control sequence
+func verbReset(h *highlighter) stateFn {
+	h.codes = attrs["reset"]
+	h.replace(2)
+	return scanText
 }
 
 // replaces the highlight verb with the appropiate control sequence
@@ -101,7 +109,7 @@ func scanAttribute(h *highlighter) stateFn {
 			return scanColor256
 		default:
 			if a, ok := attrs[b]; ok {
-				h.codes += a
+				h.codes += a + ";"
 			}
 			h.backup()
 			return scanHighlight
@@ -110,12 +118,12 @@ func scanAttribute(h *highlighter) stateFn {
 }
 
 func scanColor256(h *highlighter) stateFn {
-	var b, prefix string
+	var b, pre string
 	switch string(h.next()) + string(h.next()) {
 	case "fg":
-		prefix = "3"
+		pre = "3"
 	case "bg":
-		prefix = "4"
+		pre = "4"
 	}
 	for {
 		r := h.next()
@@ -126,17 +134,10 @@ func scanColor256(h *highlighter) stateFn {
 			b += string(r)
 		default:
 			if b != "" {
-				h.codes += prefix + "8;5;" + b + ";"
+				h.codes += pre + "8;5;" + b + ";"
 			}
 			h.backup()
 			return scanHighlight
 		}
 	}
-}
-
-// replaces the reset verb with the reset control sequence
-func verbReset(h *highlighter) stateFn {
-	h.codes = attrs["reset"]
-	h.replace(2)
-	return scanText
 }

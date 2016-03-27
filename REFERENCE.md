@@ -1,4 +1,6 @@
 # Reference
+See [this](http://invisible-island.net/xterm/ctlseqs/ctlseqs.html) for explanations
+
 ## 16 Foreground Colors
 ```
 %h[fgBlack]
@@ -73,5 +75,3 @@ Where xxx is any number from 0-255
 ```
 %h[fgBlue+bgRed+bold]
 ```
-
-See [this](http://invisible-island.net/xterm/ctlseqs/ctlseqs.html) for explanations

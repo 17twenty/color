@@ -1,7 +1,6 @@
 # color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
-Color extends `fmt.Printf` with verbs for terminal color highlighting.  
-All it does is replace the verbs with the appropriate terminal escape sequence.
+Package color extends fmt.Printf with verbs for terminal color highlighting.
 
 ## Install
 
@@ -12,7 +11,8 @@ go get github.com/nhooyr/color
 ## Usage
 
 ```
-%h[attrs]	uses attrs to highlight the following text
+%h[attr...]	replaces itself with a SGR code that sets all of the attributes in []
+			multiple attributes are + separated
 %r			an abbreviation for %h[reset]
 ```
 
@@ -82,4 +82,3 @@ logger.Fatalf("%h[fgRed]hi%r")
 ## TODO
 - [ ] True color support
 - [ ] Windows support
-

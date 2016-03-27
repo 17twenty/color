@@ -1,21 +1,20 @@
 /*
-	Package color extends fmt.Printf with verbs for terminal color highlighting. All it does is replace the verbs with the appropriate terminal escape sequence.
+	Package color extends fmt.Printf with verbs for terminal color highlighting.
 
 	Highlight verbs:
 
-		%h[attrs]		uses the attrs to highlight the following text
+		%h[attr...]	replaces itself with a SGR code that sets all of the attributes in []
+					multiple attributes are + separated
 		%r			an abbreviation for %h[reset]
-
-	attrs is a + separated list of Colors (e.g. fgRed) or Attributes (e.g. bold).
 
 	Multiple highlight verbs do not reset preceeding verbs, they add onto them.
 	For example, if you set the foreground to green in the first verb, then set the background to red in the second, any text following the second will have a green foreground and a red background.
 
-	Syntax Reference
+	Attributes Reference
 
-	See http://goo.gl/LRLA7o for an explanation of the colors/attributes. Scroll down to the SGR section.
+	See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section
 
-	16 Foreground Colors:
+	Standard Colors:
 		%h[fgBlack]
 		%h[fgRed]
 		%h[fgGreen]
@@ -25,16 +24,6 @@
 		%h[fgCyan]
 		%h[fgWhite]
 		%h[fgDefault]
-		%h[fgBrighBlack]
-		%h[fgBrightRed]
-		%h[fgBrightGreen]
-		%h[fgBrightYellow]
-		%h[fgBrightBlue]
-		%h[fgBrightMagenta]
-		%h[fgBrightCyan]
-		%h[fgBrightWhite]
-
-	16 Background Colors:
 		%h[bgBlack]
 		%h[bgRed]
 		%h[bgGreen]
@@ -44,6 +33,8 @@
 		%h[bgCyan]
 		%h[bgWhite]
 		%h[bgDefault]
+
+	Bright Colors:
 		%h[bgBrighBlack]
 		%h[bgBrightRed]
 		%h[bgBrightGreen]
@@ -52,13 +43,21 @@
 		%h[bgBrightMagenta]
 		%h[bgBrightCyan]
 		%h[bgBrightWhite]
+		%h[fgBrighBlack]
+		%h[fgBrightRed]
+		%h[fgBrightGreen]
+		%h[fgBrightYellow]
+		%h[fgBrightBlue]
+		%h[fgBrightMagenta]
+		%h[fgBrightCyan]
+		%h[fgBrightWhite]
 
 	256 Colors:
 		%h[fgxxx]
 		%h[bgxxx]
 	Where xxx is any number from 0-255
 
-	Attributes:
+	The Rest:
 		%h[reset] or the %r verb
 		%h[bold]
 		%h[faint]
@@ -76,8 +75,5 @@
 		%h[positive]
 		%h[visible]
 		%h[notCrossedOut]
-
-	Mixing:
-		%h[fgBlue+bgRed+bold]
 */
 package color

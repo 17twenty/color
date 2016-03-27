@@ -9,18 +9,6 @@ All it does is replace the verbs with the appropiate terminal escape sequence.
 go get github.com/nhooyr/color
 ```
 
-## Usage
-
-```
-%h[attrs]	uses the attrs to highlight the following text
-%r			an abbreviation for %h[reset]
-```
-
-attrs is a `+`  separated list of Colors (e.g. `fgRed`) or Attributes (e.g. `bold`).
-
-Multiple highlight verbs do not reset preceeding verbs, they add onto them.  
-For example, if you set the foreground to green in the first verb, then set the background to red in the second, any text following the second will have a green foreground and a red background.
-
 ## Examples:
 ### Standard Colors
 ```go

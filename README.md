@@ -7,11 +7,6 @@ All it does is replace the verbs with the appropiate terminal escape sequence.
 
 `go get github.com/nhooyr/color`
 
-## Why?
-
-The API of similar packages requires calling a function everytime to color some text in a different color. E.g. once for red, then for yellow, and so on.  
-That approach gets very verbose, I prefer the succinctness of using verbs.
-
 ## Usage
 
 ```

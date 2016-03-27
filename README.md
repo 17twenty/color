@@ -1,8 +1,10 @@
 # color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
-Color extends `fmt.Printf` with verbs for terminal color highlighting. All it does is replace the verbs with the appropiate terminal escape sequence.
+Color extends `fmt.Printf` with verbs for terminal color highlighting.  
+All it does is replace the verbs with the appropiate terminal escape sequence.
 
-It also provides a wrapper around `*log.Logger`'s `Printf` functions to make use of the new verbs. See `color.NewLogger`.
+It also provides a wrapper around `*log.Logger`'s `Printf` functions to make use of the new verbs.  
+See `color.NewLogger`.
 
 ## Install
 
@@ -60,7 +62,7 @@ color.Printf("%r")
 ```
 
 ## Reference
-A syntax reference is [included](REFERENCE)
+A syntax reference is [included](REFERENCE.md)
 
 TODO:
 -----

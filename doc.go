@@ -1,7 +1,7 @@
 /*
 	Package color extends fmt.Printf with verbs for terminal color highlighting. All it does is replace the verbs with the appropriate terminal escape sequence.
 
-	Highlight Verbs
+	Highlight verbs:
 
 		%h[attrs]		uses the attrs to highlight the following text
 		%r			an abbreviation for %h[reset]

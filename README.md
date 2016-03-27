@@ -16,9 +16,7 @@ go get github.com/nhooyr/color
 %r			an abbreviation for %h[reset]
 ```
 
-A syntax reference is [included](REFERENCE.md).
-
-See [godoc](https://godoc.org/github.com/nhooyr/color) for more information on the internals.
+See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
 ## Examples
 ### Standard Colors

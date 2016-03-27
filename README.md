@@ -2,6 +2,8 @@
 
 This package adds color verbs to fmt.Printf. All three printf functions are wrapped in this package.
 
+There is also a wrapper for the `Printf` functions of `*log.Logger`, create one with `color.NewLogger()`
+
 ##Examples:
 ```go
 package main

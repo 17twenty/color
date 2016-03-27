@@ -1,49 +1,66 @@
-# color
+# color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
-This package adds color verbs to fmt.Printf. All three printf functions are wrapped in this package.
+Color extends `fmt.Printf` with verbs for terminal color highlighting. All it does is replace the verbs with the appropiate terminal escape sequence.
 
-Use `color.NewLogger()` to wrap the `Printf` functions of `*log.Logger`
+It also provides a wrapper around `*log.Logger`'s `Printf` functions to make use of the new verbs. See `color.NewLogger`.
+
+## Install
+
+`go get github.com/nhooyr/color`
 
 ## Why?
 
-The API of similar packages requires calling a function everytime to color some text differently.  
-It gets very verbose, I much prefer the succinctness of using verbs.
+The API of similar packages requires calling a function everytime to color some text in a different color. E.g. once for red, then for yellow, and so on.  
+That approach gets very verbose, I prefer the succinctness of using verbs.
 
-##Usage
+## Usage
 
-`%h[color]text` is the highlighting verb. The text between the `[]` is used to describe the highlighting  
-Everything after it is highlighted.  
-Note: that the next highlighting verb will not reset the highlighting first, it will just add onto the first.
+`%h[colors+attributes]text`
+Highlights text with the `colors+attributes` in `[]`.
+Subsquent highlighting verbs will not reset the highlighting first, they will just add onto it.
 
-`%r` is the reset verb. It resets all highlighting.
+You can also use the `%r` verb as an abbreviation for `%h[reset]`
 
-##Examples:
+## Examples:
+### Standard Colors
 ```go
-package main
+// red "panic:" and then normal "rip"
+color.Printf("%h[fgRed]panic:%r rip\n")
 
-import (
-	"github.com/nhooyr/color"
-)
-
-func main() {
-	// bolded red "panic:" and then normal "rip"
-	color.Printf("%h[fgRed+bold]panic:%r rip\n")
-
-	// bolded red with bright black background "panic:" and then cyan "rip"
-	color.Printf("%h[fgRed+bgBrightBlack+bold]panic:%r %h[fgCyan]rip%r\n")
-
-	// underlined red with bright black background "panic:" and then normal "rip"
-	color.Printf("%h[fgRed+bgBrightBlack+underline]panic:%r rip\n")
-
-	// red with black background "panic:" and then normal "rip"
-	color.Printf("%h[fg1+bg0+underline+bold]panic:%r rip\n")
-
-	// green "panic:" and then green with bright black background "rip"
-	color.Printf("%h[fg2]panic: %h[bg8]rip%r\n")
-}
+// "panic:" with brightRed background and then normal "rip"
+color.Printf("%h[bgBrightRed]panic:%r rip\n")
 ```
 
-##Reference:
+### Attributes
+```go
+// bold "panic:" and then underlined "rip"
+color.Printf("%h[bold]panic:%r %h[underline]rip%r\n")
+```
+
+### 256 Colors
+```go
+// red "panic:" and then "rip" with a cyan background
+color.Printf("%h[fg1]panic:%r %h[bg6]rip\n")
+```
+
+### Mixing Colors and Attributes
+```go
+// bolded green "panic:" and then underlined "rip" with bright black background
+color.Printf("%h[fgGreen+bold]panic:%r %h[bg8+underline]rip%r\n")
+```
+
+### How does reset behave?
+```go
+// bolded green "panic:" and then bolded green "rip" with bright black background
+color.Printf("%h[fgGreen+bold]panic: %h[bg8]rip\n")
+// bolded green "hi" with bright black background
+fmt.Printf("hi")
+// finally resets the highlighting
+color.Printf("%r")
+```
+
+## Reference
+See [this](http://invisible-island.net/xterm/ctlseqs/ctlseqs.html) for explanations
 ```
 16 Colors:
 %h[fgBlack]
@@ -86,7 +103,7 @@ func main() {
 %h[bg144]
 
 Attributes:
-%h[reset] or use the %r verb
+%h[reset] or the %r verb
 %h[bold]
 %h[faint]
 %h[italic]
@@ -110,4 +127,6 @@ To combine:
 
 TODO:
 -----
-- [ ] True color support, just not sure on the schema
+- [ ] True color support
+- [ ] Windows support
+

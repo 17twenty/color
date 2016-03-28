@@ -12,8 +12,6 @@
 
 	Attributes Reference
 
-	See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section
-
 	Standard Colors:
 		%h[fgBlack]
 		%h[fgRed]
@@ -75,5 +73,7 @@
 		%h[positive]
 		%h[visible]
 		%h[notCrossedOut]
+
+	See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section
 */
 package color

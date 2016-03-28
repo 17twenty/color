@@ -33,14 +33,6 @@
 		%h[bgDefault]
 
 	Bright Colors:
-		%h[bgBrighBlack]
-		%h[bgBrightRed]
-		%h[bgBrightGreen]
-		%h[bgBrightYellow]
-		%h[bgBrightBlue]
-		%h[bgBrightMagenta]
-		%h[bgBrightCyan]
-		%h[bgBrightWhite]
 		%h[fgBrighBlack]
 		%h[fgBrightRed]
 		%h[fgBrightGreen]
@@ -49,6 +41,14 @@
 		%h[fgBrightMagenta]
 		%h[fgBrightCyan]
 		%h[fgBrightWhite]
+		%h[bgBrighBlack]
+		%h[bgBrightRed]
+		%h[bgBrightGreen]
+		%h[bgBrightYellow]
+		%h[bgBrightBlue]
+		%h[bgBrightMagenta]
+		%h[bgBrightCyan]
+		%h[bgBrightWhite]
 
 	256 Colors:
 		%h[fgxxx]

@@ -58,7 +58,7 @@ color.Printf("%h[bg8+underline]panic:%r rip\n")
 ### How does reset behave?
 ```go
 // bolded "panic:" with a blue foreground
-// then bolded "rip" with a green foreground and bright black background
+// then bolded "rip" with a blue foreground and bright black background
 color.Printf("%h[fgBlue+bold]panic: %h[bg8]rip\n")
 
 // bolded "hi" with a green foreground and bright black background

@@ -1,6 +1,6 @@
 # color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
-Color extends `fmt.Printf` with verbs that produce colored output.
+Color extends `fmt.Printf` with verbs for producing colored output.
 
 ## Install
 

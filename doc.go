@@ -1,9 +1,9 @@
 /*
-	Package color extends fmt.Printf with verbs for producing colored output.
+	Package color extends fmt.Printf with verbs that produce colored output.
 
 	Highlight verbs:
 
-		%h[attr...]		replaces itself with a SGR code that sets all of the attributes in []
+		%h[attr...]		replaced with a SGR code that sets all of the attributes in []
 					multiple attributes are + separated
 		%r			an abbreviation for %h[reset]
 

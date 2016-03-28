@@ -1,6 +1,6 @@
 # color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
-Color extends `fmt.Printf` with verbs for producing colored output.
+Color extends `fmt.Printf` with verbs that produce colored output.
 
 ## Install
 
@@ -11,7 +11,7 @@ go get github.com/nhooyr/color
 ## Usage
 
 ```
-%h[attr...]	replaces itself with a SGR code that sets all of the attributes in []
+%h[attr...]	replaced with a SGR code that sets all of the attributes in []
 			multiple attributes are + separated
 %r			an abbreviation for %h[reset]
 ```

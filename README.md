@@ -65,7 +65,7 @@ color.Printf("%h[fgBlue+bold]panic: %h[bg8]rip\n")
 fmt.Printf("hi")
 
 // finally resets the highlighting
-color.Printf("%r")
+color.Printf("%rhello")
 ```
 
 ### `*log.Logger` wrapper

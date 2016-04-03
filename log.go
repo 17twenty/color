@@ -13,17 +13,17 @@ type ColorLogger struct {
 // Printf calls l.Logger.Printf to print to the logger.
 // Arguments are handled in the manner of fmt.Printf.
 func (l *ColorLogger) Printf(format string, v ...interface{}) {
-	l.Logger.Printf(scolorf(format), v...)
+	l.Logger.Printf(Highlight(format), v...)
 }
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
 func (l *ColorLogger) Fatalf(format string, v ...interface{}) {
-	l.Logger.Fatalf(scolorf(format), v...)
+	l.Logger.Fatalf(Highlight(format), v...)
 }
 
 // Panicf is equivalent to l.Printf() followed by a call to panic().
 func (l *ColorLogger) Panicf(format string, v ...interface{}) {
-	l.Logger.Panicf(scolorf(format), v...)
+	l.Logger.Panicf(Highlight(format), v...)
 }
 
 // New creates a new ColorLogger. The out variable sets the

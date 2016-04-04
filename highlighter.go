@@ -128,46 +128,69 @@ func scanHighlight(h *highlighter) stateFn {
 
 // scans a attribute and adds it to h.attrs.
 func scanAttribute(h *highlighter) stateFn {
-	var b string
-	for {
-		r := h.next()
-		switch {
-		case r == eof:
-			return nil
-		case unicode.IsLetter(r):
-			b += string(r)
-		case unicode.IsNumber(r) && (b == "fg" || b == "bg"):
-			h.pos -= 3
-			return scanColor256
-		default:
-			if a, ok := attr[b]; ok {
-				h.attrs = append(h.attrs, []byte(a)...)
+	r := h.next()
+	switch {
+	case r == eof:
+		return nil
+	case r == 'f' || r == 'b':
+		if h.next() == 'g' {
+			if unicode.IsNumber(h.next()) {
+				h.pos -= 3
+				return scanColor256
 			}
-			h.backup()
-			return scanHighlight
+			h.pos--
 		}
+		h.backup()
+		fallthrough
+	case unicode.IsLetter(r):
+		start := h.pos - 1
+		for {
+			r := h.next()
+			switch {
+			case r == eof:
+				return nil
+			case unicode.IsLetter(r):
+			default:
+				if a, ok := attr[string(h.b[start:h.pos-h.width])]; ok {
+					h.attrs = append(h.attrs, []byte(a)...)
+				}
+				h.backup()
+				return scanHighlight
+			}
+		}
+	default:
+		h.backup()
+		return scanHighlight
 	}
 }
 
 // scans a 256 color attribute and adds it to h.attrs.
 func scanColor256(h *highlighter) stateFn {
-	var b, pre string
+	var pre byte
 	switch h.next() {
 	case 'f':
-		pre = "3"
+		pre = '3'
 	case 'b':
-		pre = "4"
+		pre = '4'
 	}
 	h.next() // skip the g, in "fg" or "bg"
+	// can set here because already know it is a number
+	h.next()
+	start := h.pos - 1
 	for {
 		r := h.next()
 		switch {
 		case r == eof:
 			return nil
 		case unicode.IsNumber(r):
-			b += string(r)
 		default:
-			h.attrs = append(h.attrs, []byte(";"+pre+"8;5;"+b)...)
+			b := make([]byte, len(h.attrs)+6+(h.pos-start))
+			copy(b, h.attrs)
+			l := len(h.attrs)
+			copy(b[l:], []byte{';', pre, '8', ';', '5', ';'})
+			l += 6
+			copy(b[l:], h.b[start:h.pos-1])
+			h.attrs = b
 			h.backup()
 			return scanHighlight
 		}

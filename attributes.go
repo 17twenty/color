@@ -1,6 +1,6 @@
 package color
 
-var csi = []byte("\033[")
+var csi = "\033["
 
 // maps attributes names to their values.
 var attr = map[string]string{

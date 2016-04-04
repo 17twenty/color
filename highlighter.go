@@ -12,19 +12,19 @@ type stateFn func(*highlighter) stateFn
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
-	b     []byte // string being scanned
+	b     string // string being scanned
 	pos   int    // position in s
 	width int    // width of last rune read from s
 	start int    // start position of current verb
-	attrs []byte // attributes of current highlight verb
+	attrs string // attributes of current highlight verb
 }
 
 // Highlight replaces the highlight verbs in s with their appropriate
 // control sequences and then returns the resulting string
 func Highlight(s string) string {
-	h := &highlighter{b: []byte(s)}
+	h := &highlighter{b: s}
 	h.run()
-	return string(h.b)
+	return h.b
 }
 
 // run runs the state machine for the highlighter.
@@ -40,7 +40,7 @@ func (h *highlighter) next() rune {
 		h.width = 0
 		return eof
 	}
-	r, w := utf8.DecodeRune(h.b[h.pos:])
+	r, w := utf8.DecodeRuneInString(h.b[h.pos:])
 	h.pos += w
 	h.width = w
 	return r
@@ -53,21 +53,14 @@ func (h *highlighter) backup() {
 
 // replaces the verb with a control sequence derived from h.attrs[1:].
 func (h *highlighter) replace() {
+	if h.attrs == "" {
+		return
+	}
 	back := h.pos - h.start
 	h.attrs = h.attrs[1:]
-	b := make([]byte, len(h.b)-back+len(csi)+len(h.attrs)+1) // one more for the 'm'
-	l := h.pos - back
-	copy(b, h.b[:l])
-	copy(b[l:], csi)
-	l += len(csi)
-	copy(b[l:], h.attrs)
-	l += len(h.attrs)
-	h.attrs = nil
-	b[l] = 'm'
-	l++
-	copy(b[l:], h.b[h.pos:])
-	h.pos = l
-	h.b = b
+	h.b = h.b[:h.pos-back] + csi + h.attrs + "m" + h.b[h.pos:]
+	h.pos += len(csi) + len(h.attrs) - back
+	h.attrs = ""
 }
 
 // scans until the next highlight or reset verb.
@@ -96,7 +89,7 @@ func scanText(h *highlighter) stateFn {
 
 // verbReset replaces the reset verb with the reset control sequence.
 func verbReset(h *highlighter) stateFn {
-	h.attrs = []byte(attr["reset"])
+	h.attrs = attr["reset"]
 	h.replace()
 	return scanText
 }
@@ -110,9 +103,7 @@ func scanHighlight(h *highlighter) stateFn {
 		case r == eof:
 			return nil
 		case r == ']':
-			if h.attrs != nil {
-				h.replace()
-			}
+			h.replace()
 			return scanText
 		case r == '+':
 			continue
@@ -151,8 +142,8 @@ func scanAttribute(h *highlighter) stateFn {
 				return nil
 			case unicode.IsLetter(r):
 			default:
-				if a, ok := attr[string(h.b[start:h.pos-h.width])]; ok {
-					h.attrs = append(h.attrs, []byte(a)...)
+				if a, ok := attr[h.b[start:h.pos-h.width]]; ok {
+					h.attrs += a
 				}
 				h.backup()
 				return scanHighlight
@@ -166,12 +157,12 @@ func scanAttribute(h *highlighter) stateFn {
 
 // scans a 256 color attribute and adds it to h.attrs.
 func scanColor256(h *highlighter) stateFn {
-	var pre byte
+	var pre string
 	switch h.next() {
 	case 'f':
-		pre = '3'
+		pre = "3"
 	case 'b':
-		pre = '4'
+		pre = "4"
 	}
 	h.next() // skip the g, in "fg" or "bg"
 	// can set here because already know it is a number
@@ -184,13 +175,7 @@ func scanColor256(h *highlighter) stateFn {
 			return nil
 		case unicode.IsNumber(r):
 		default:
-			b := make([]byte, len(h.attrs)+6+(h.pos-start))
-			copy(b, h.attrs)
-			l := len(h.attrs)
-			copy(b[l:], []byte{';', pre, '8', ';', '5', ';'})
-			l += 6
-			copy(b[l:], h.b[start:h.pos-1])
-			h.attrs = b
+			h.attrs += ";" + pre + "8;5;" + h.b[start:h.pos-h.width]
 			h.backup()
 			return scanHighlight
 		}

@@ -55,19 +55,19 @@ func (h *highlighter) backup() {
 func (h *highlighter) replace() {
 	back := h.pos - h.start
 	h.attrs = h.attrs[1:]
-	b := make([]byte, len(h.b)-back+lenCSI+len(h.attrs)+1) // one more for the "m"
+	b := make([]byte, len(h.b)-back+len(csi)+len(h.attrs)+1) // one more for the 'm'
 	l := h.pos - back
 	copy(b, h.b[:l])
 	copy(b[l:], csi)
-	l += lenCSI
+	l += len(csi)
 	copy(b[l:], h.attrs)
 	l += len(h.attrs)
+	h.attrs = nil
 	b[l] = 'm'
 	l++
 	copy(b[l:], h.b[h.pos:])
 	h.pos = l
 	h.b = b
-	h.attrs = nil
 }
 
 // scans until the next highlight or reset verb.

@@ -42,10 +42,8 @@ func (h *highlighter) next() {
 		h.r = eof
 		return
 	}
-	r, w := utf8.DecodeRuneInString(h.s[h.pos:])
-	h.pos += w
-	h.width = w
-	h.r = r
+	h.r, h.width = utf8.DecodeRuneInString(h.s[h.pos:])
+	h.pos += h.width
 }
 
 // replaces the verb with a control sequence derived from h.attrs[1:].

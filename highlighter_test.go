@@ -56,8 +56,7 @@ var edgeCases = map[string]string{
 	"%h][fgRed+%#bgBlue]": "%h][fgRed+%#bgBlue]",
 	"%h[fgRed+":           "%h[fgRed+",
 	"%%h%h[fgRed]%%":      "%%h\x1b[31m%%",
-	// make sure h.attrs is flushed even when not parsed correctly
-	// only bgBlue should count here
+	"%h[fgsadas]":         "%h[fgsadas]",
 	"%h[fgRed+%h[bgBlue]": "%h[fgRed+\x1b[44m",
 }
 
@@ -81,17 +80,14 @@ func BenchmarkHighlight(b *testing.B) {
 	%h[bold]hi%r
 	%h[underline]hi%r
 	%h[italic]hi%r
-	%h[blink]hi%r`+
-	// 256 colors
-	`%h[fg22]hi%r
+	%h[blink]hi%r
+	%h[fg22]hi%r
 	%h[fg233]hi%r
 	%h[bg3]hi%r
-	%h[bg102]hi%r`+
-	// combinations
-	`%h[fgWhite+bgBrightCyan+bold+underline+fg32+bg69]hi%r
+	%h[bg102]hi%r
+	%h[fgWhite+bgBrightCyan+bold+underline+fg32+bg69]hi%r
 	%h[fg32+bg123+bold+underline+bgBlue+fgBrighGreen+bgBrightWhite]hi%r`
 	for i := 0; i < b.N; i++ {
-		// attributes
 		Highlight(s)
 	}
 }

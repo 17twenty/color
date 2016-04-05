@@ -50,7 +50,7 @@ func (h *highlighter) next() {
 func (h *highlighter) replace() {
 	h.attrs = h.attrs[1:]
 	h.s = h.s[:h.start] + csi + h.attrs + "m" + h.s[h.pos:]
-	h.pos += len(csi) + len(h.attrs) - (h.pos-h.start)
+	h.pos += len(csi) + len(h.attrs) - (h.pos - h.start)
 }
 
 // scans until the next highlight or reset verb.

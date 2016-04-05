@@ -36,7 +36,7 @@ func (h *highlighter) run() {
 	}
 }
 
-// next gets the next rune in the input.
+// next gets the next rune in the string.
 func (h *highlighter) next() {
 	if h.pos >= len(h.s) {
 		h.r = eof
@@ -50,9 +50,6 @@ func (h *highlighter) next() {
 
 // replaces the verb with a control sequence derived from h.attrs[1:].
 func (h *highlighter) replace() {
-	if h.attrs == "" {
-		return
-	}
 	h.attrs = h.attrs[1:]
 	back := h.pos - h.start
 	h.s = h.s[:h.pos-back] + csi + h.attrs + "m" + h.s[h.pos:]
@@ -89,7 +86,7 @@ func scanText(h *highlighter) stateFn {
 
 // verbReset replaces the reset verb with the reset control sequence.
 func verbReset(h *highlighter) stateFn {
-	h.attrs = attr["reset"]
+	h.attrs = attrs["reset"]
 	h.replace()
 	return scanText
 }
@@ -110,7 +107,9 @@ func scanHighlight(h *highlighter) stateFn {
 		case h.r == '+':
 			// skip
 		case h.r == ']':
-			h.replace()
+			if h.attrs != "" {
+				h.replace()
+			}
 			h.next()
 			fallthrough
 		default:
@@ -119,6 +118,7 @@ func scanHighlight(h *highlighter) stateFn {
 	}
 }
 
+// scanAttribute scans a named attribute
 func scanAttribute(h *highlighter) stateFn {
 	start := h.pos - h.width
 	for {
@@ -129,7 +129,7 @@ func scanAttribute(h *highlighter) stateFn {
 		case unicode.IsLetter(h.r):
 			// continue
 		default:
-			if a, ok := attr[h.s[start:h.pos-h.width]]; ok {
+			if a, ok := attrs[h.s[start:h.pos-h.width]]; ok {
 				h.attrs += a
 			}
 			return scanHighlight
@@ -137,6 +137,7 @@ func scanAttribute(h *highlighter) stateFn {
 	}
 }
 
+// scanColor256 scans a 256 color attribute
 func scanColor256(h *highlighter, pre string) stateFn {
 	h.next()
 	if h.r != 'g' {

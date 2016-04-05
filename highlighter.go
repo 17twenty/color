@@ -49,9 +49,8 @@ func (h *highlighter) next() {
 // replaces the verb with a control sequence derived from h.attrs[1:].
 func (h *highlighter) replace() {
 	h.attrs = h.attrs[1:]
-	back := h.pos - h.start
-	h.s = h.s[:h.pos-back] + csi + h.attrs + "m" + h.s[h.pos:]
-	h.pos += len(csi) + len(h.attrs) - back
+	h.s = h.s[:h.start] + csi + h.attrs + "m" + h.s[h.pos:]
+	h.pos += len(csi) + len(h.attrs) - (h.pos-h.start)
 }
 
 // scans until the next highlight or reset verb.

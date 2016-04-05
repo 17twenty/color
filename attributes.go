@@ -2,6 +2,11 @@ package color
 
 var csi = "\033["
 
+const (
+	preFg256 = ";38;5;"
+	preBg256 = ";48;5;"
+)
+
 // maps attributes names to their values.
 var attr = map[string]string{
 	"reset":           ";0",

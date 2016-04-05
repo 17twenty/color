@@ -54,7 +54,6 @@ func (h *highlighter) replace() {
 	back := h.pos - h.start
 	h.s = h.s[:h.pos-back] + csi + h.attrs + "m" + h.s[h.pos:]
 	h.pos += len(csi) + len(h.attrs) - back
-	h.attrs = ""
 }
 
 // scans until the next highlight or reset verb.
@@ -113,6 +112,7 @@ func scanHighlight(h *highlighter) stateFn {
 			h.next()
 			fallthrough
 		default:
+			h.attrs = ""
 			return scanText
 		}
 	}

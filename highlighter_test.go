@@ -44,17 +44,21 @@ func TestCombinations(t *testing.T) {
 }
 
 var edgeCases = map[string]string{
-	"%h[dsadadssadas]":   "%h[dsadadssadas]",
-	"%h[":                "%h[",
-	"%h{":                "%h{",
-	"%%h[fgRed]":         "%%h[fgRed]",
-	"%[fgRed]":           "%[fgRed]",
-	"%h[fgRed":           "%h[fgRed",
-	"%h[fgRed[]":         "%h[fgRed[]",
-	"%h[fgRed+lold[]":    "%h[fgRed+lold[]",
-	"%h[fgRed+%#bgBlue]": "%h[fgRed+%#bgBlue]",
-	"%h[fgRed+":          "%h[fgRed+",
-	"%%h%h[fgRed]%%":     "%%h\x1b[31m%%",
+	"%h[dsadadssadas]":    "%h[dsadadssadas]",
+	"%h[":                 "%h[",
+	"%h{":                 "%h{",
+	"%%h[fgRed]":          "%%h[fgRed]",
+	"%[fgRed]":            "%[fgRed]",
+	"%h[fgRed":            "%h[fgRed",
+	"%h[fgRed[]":          "%h[fgRed[]",
+	"%h[fgRed+lold[]":     "%h[fgRed+lold[]",
+	"%h[fgRed+%#bgBlue]":  "%h[fgRed+%#bgBlue]",
+	"%h][fgRed+%#bgBlue]": "%h][fgRed+%#bgBlue]",
+	"%h[fgRed+":           "%h[fgRed+",
+	"%%h%h[fgRed]%%":      "%%h\x1b[31m%%",
+	// make sure h.attrs is flushed even when not parsed correctly
+	// only bgBlue should count here
+	"%h[fgRed+%h[bgBlue]": "%h[fgRed+\x1b[44m",
 }
 
 func TestEdgeCases(t *testing.T) {

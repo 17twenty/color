@@ -1,6 +1,6 @@
 package color
 
-var csi = "\033["
+var csi = "\x1b["
 
 const (
 	preFg256 = ";38;5;"

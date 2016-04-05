@@ -5,8 +5,6 @@ import (
 	"unicode/utf8"
 )
 
-const eof = -1
-
 // stateFn represents the state of the scanner as a function that returns the next state.
 type stateFn func(*highlighter) stateFn
 
@@ -36,7 +34,9 @@ func (h *highlighter) run() {
 	}
 }
 
-// next gets the next rune in the string.
+const eof = -1
+
+// next gets the next rune in the string and puts it h.r.
 func (h *highlighter) next() {
 	if h.pos >= len(h.s) {
 		h.r = eof
@@ -53,7 +53,7 @@ func (h *highlighter) replace() {
 	h.pos += len(csi) + len(h.attrs) - (h.pos - h.start)
 }
 
-// scans until the next highlight or reset verb.
+// scanText scans until the next highlight or reset verb.
 func scanText(h *highlighter) stateFn {
 	for ; ; h.next() {
 		switch h.r {

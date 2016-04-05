@@ -6,7 +6,6 @@ const (
 	preBg256 = ";48;5;"
 )
 
-// maps attributes names to their values.
 var attrs = map[string]string{
 	"reset":           ";0",
 	"bold":            ";1",

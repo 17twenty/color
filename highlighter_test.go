@@ -84,16 +84,14 @@ func BenchmarkHighlight(b *testing.B) {
 		%h[bold]hi%r
 		%h[underline]hi%r
 		%h[italic]hi%r
-		%h[blink]hi%r`)
+		%h[blink]hi%r`+
 		// 256 colors
-		Highlight(`
-		%h[fg22]hi%r
+		`%h[fg22]hi%r
 		%h[fg233]hi%r
 		%h[bg3]hi%r
-		%h[bg102]hi%r`)
+		%h[bg102]hi%r`+
 		// combinations
-		Highlight(`
-		%h[fgWhite+bgBrightCyan+bold+underline+fg32+bg69]hi%r
+		`%h[fgWhite+bgBrightCyan+bold+underline+fg32+bg69]hi%r
 		%h[fg32+bg123+bold+underline+bgBlue+fgBrighGreen+bgBrightWhite]hi%r`)
 	}
 }

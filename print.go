@@ -5,14 +5,6 @@ import (
 	"io"
 )
 
-// Highlight replaces the highlight verbs in s with their appropriate
-// control sequences and then returns the resulting string
-func Highlight(s string) string {
-	h := &highlighter{s: s}
-	h.run()
-	return h.s
-}
-
 // Fprintf formats according to a format specifier and writes to w.
 // It returns the number of bytes written and any write error encountered.
 func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {

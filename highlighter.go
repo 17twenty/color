@@ -5,15 +5,32 @@ import (
 	"unicode"
 )
 
+const (
+	commaSpaceBytes  = ", "
+	nilAngleBytes    = "<nil>"
+	nilParenBytes    = "(nil)"
+	nilBytes         = "nil"
+	mapBytes         = "map["
+	percentBangBytes = "%!"
+	missingBytes     = "(MISSING)"
+	badIndexBytes    = "(BADINDEX)"
+	panicBytes       = "(PANIC="
+	extraBytes       = "%!(EXTRA "
+	irparenBytes     = "i)"
+	bytesBytes       = "[]byte{"
+	badWidthBytes    = "%!(BADWIDTH)"
+	badPrecBytes     = "%!(BADPREC)"
+	noVerbBytes      = "%!(NOVERB)"
+)
+
 // stateFn represents the state of the highlighter as a function that returns the next state.
 type stateFn func(*highlighter) stateFn
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
 	s     string // string being scanned
-	buf   []byte
+	buf   []byte // buffer for result
 	pos   int    // position in buf
-	last  int    // position after last verb
 	attrs []byte // attributes of current highlight verb
 }
 
@@ -24,23 +41,23 @@ var hlPool = sync.Pool{
 // Highlight replaces the highlight verbs in s with their appropriate
 // control sequences and then returns the resulting string.
 func Highlight(s string) string {
-	h := get(s)
-	h.run()
-	return h.free()
+	hl := getHighlighter(s)
+	hl.run()
+	return hl.free()
 }
 
-func get(s string) (hl *highlighter) {
+func getHighlighter(s string) (hl *highlighter) {
 	hl = hlPool.Get().(*highlighter)
 	hl.s = s
 	return
 }
 
-func (hl *highlighter) free() string {
-	s := string(hl.buf)
+func (hl *highlighter) free() (s string) {
+	s = string(hl.buf)
 	hl.buf = hl.buf[:0]
 	hl.pos = 0
 	hlPool.Put(hl)
-	return s
+	return
 }
 
 // run runs the state machine for the highlighter.
@@ -50,8 +67,13 @@ func (hl *highlighter) run() {
 	}
 }
 
+const eof = -1
+
 // get returns the current rune.
 func (hl *highlighter) get() rune {
+	if hl.pos >= len(hl.s) {
+		return eof
+	}
 	return rune(hl.s[hl.pos])
 }
 
@@ -64,18 +86,19 @@ func (hl *highlighter) appendAttrs() {
 
 // scanText scans until the next highlight or reset verb.
 func scanText(hl *highlighter) stateFn {
-	hl.last = hl.pos
-	for ; hl.pos < len(hl.s); hl.pos++ {
-		if hl.get() != '%' {
+	last := hl.pos
+	for ; ; hl.pos++ {
+		switch hl.get() {
+		case '%':
+		case eof:
+			return nil
+		default:
 			continue
 		}
-		if hl.last < hl.pos {
-			hl.buf = append(hl.buf, hl.s[hl.last:hl.pos]...)
+		if last < hl.pos {
+			hl.buf = append(hl.buf, hl.s[last:hl.pos]...)
 		}
 		hl.pos++
-		if hl.pos >= len(hl.s) {
-			return nil
-		}
 		switch hl.get() {
 		case 'r':
 			hl.pos++
@@ -83,12 +106,16 @@ func scanText(hl *highlighter) stateFn {
 		case 'h':
 			hl.pos += 2
 			return scanHighlight
+		case eof:
+			hl.buf = append(hl.buf, noVerbBytes...)
+			return nil
+		default:
+			last = hl.pos
 		}
 	}
-	return nil
 }
 
-// verbReset appen the reset verb with the reset control sequence.
+// verbReset appends the reset verb with the reset control sequence.
 func verbReset(hl *highlighter) stateFn {
 	hl.attrs = append(hl.attrs, attrs["reset"]...)
 	hl.appendAttrs()
@@ -99,7 +126,7 @@ func verbReset(hl *highlighter) stateFn {
 // scanHighlight scans the highlight verb for attributes,
 // then replaces it with a control sequence derived from said attributes.
 func scanHighlight(hl *highlighter) stateFn {
-	for ; hl.pos < len(hl.s); hl.pos++ {
+	for ; ; hl.pos++ {
 		r := hl.get()
 		switch {
 		case r == 'f':
@@ -109,34 +136,28 @@ func scanHighlight(hl *highlighter) stateFn {
 		case unicode.IsLetter(r):
 			return scanAttribute(hl, 0)
 		case r == '+':
-			// skip
+			continue
 		case r == ']':
 			if len(hl.attrs) != 0 {
 				hl.appendAttrs()
 			}
 			hl.pos++
-			fallthrough
-		default:
-			// reuse this buffer
-			hl.attrs = hl.attrs[:0]
-			return scanText
 		}
+		hl.attrs = hl.attrs[:0]
+		return scanText
 	}
-	return nil
 }
 
 // scanAttribute scans a named attribute
 func scanAttribute(hl *highlighter, off int) stateFn {
 	start := hl.pos - off
-	for ; hl.pos < len(hl.s); hl.pos++ {
-		if !unicode.IsLetter(hl.get()) {
-			if a, ok := attrs[hl.s[start:hl.pos]]; ok {
-				hl.attrs = append(hl.attrs, a...)
-			}
-			return scanHighlight
-		}
+	for unicode.IsLetter(hl.get()) {
+		hl.pos++
 	}
-	return nil
+	if a, ok := attrs[hl.s[start:hl.pos]]; ok {
+		hl.attrs = append(hl.attrs, a...)
+	}
+	return scanHighlight
 }
 
 // scanColor256 scans a 256 color attribute
@@ -150,12 +171,11 @@ func scanColor256(hl *highlighter, pre string) stateFn {
 		return scanAttribute(hl, 2)
 	}
 	start := hl.pos
-	for ; hl.pos < len(hl.s); hl.pos++ {
-		if !unicode.IsNumber(hl.get()) {
-			hl.attrs = append(hl.attrs, pre...)
-			hl.attrs = append(hl.attrs, hl.s[start:hl.pos]...)
-			return scanHighlight
-		}
+	hl.pos++
+	for unicode.IsNumber(hl.get()) {
+		hl.pos++
 	}
-	return nil
+	hl.attrs = append(hl.attrs, pre...)
+	hl.attrs = append(hl.attrs, hl.s[start:hl.pos]...)
+	return scanHighlight
 }

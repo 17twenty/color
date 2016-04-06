@@ -34,8 +34,7 @@ func (h *highlighter) get() rune {
 
 // replaces the verb with a control sequence derived from h.attrs[1:].
 func (h *highlighter) replace() {
-	h.attrs = h.attrs[1:]
-	h.s = h.s[:h.start] + csi + h.attrs + "m" + h.s[h.pos:]
+	h.s = h.s[:h.start] + csi + h.attrs[1:] + "m" + h.s[h.pos:]
 	h.pos += len(csi) + len(h.attrs) - (h.pos - h.start)
 }
 
@@ -102,11 +101,7 @@ func scanHighlight(h *highlighter) stateFn {
 func scanAttribute(h *highlighter) stateFn {
 	start := h.pos
 	for ; h.pos < len(h.s); h.pos++ {
-		r := h.get()
-		switch {
-		case unicode.IsLetter(r):
-			// continue
-		default:
+		if !unicode.IsLetter(h.get()) {
 			if a, ok := attrs[h.s[start:h.pos]]; ok {
 				h.attrs += a
 			}
@@ -130,10 +125,8 @@ func scanColor256(h *highlighter, pre string) stateFn {
 	}
 	start := h.pos
 	for ; h.pos < len(h.s); h.pos++ {
-		switch {
-		case unicode.IsNumber(h.get()):
-			// continue
-		default:
+		if !unicode.IsNumber(h.get()) {
+
 			h.attrs += pre + h.s[start:h.pos]
 			return scanHighlight
 		}

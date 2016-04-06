@@ -6,7 +6,7 @@ import (
 )
 
 func TestAttributes(t *testing.T) {
-	for k, v := range attr {
+	for k, v := range attrs {
 		s := fmt.Sprintf("%%h[%s]hi%%r", k)
 		exp := fmt.Sprintf("\x1b[%smhi\x1b[0m", v[1:])
 		if r := Highlight(s); r != exp {

@@ -126,23 +126,24 @@ func verbReset(hl *highlighter) stateFn {
 // scanHighlight scans the highlight verb for attributes,
 // then replaces it with a control sequence derived from said attributes.
 func scanHighlight(hl *highlighter) stateFn {
-	for ; ; hl.pos++ {
-		r := hl.get()
-		switch {
-		case r == 'f':
-			return scanColor256(hl, preFg256)
-		case r == 'b':
-			return scanColor256(hl, preBg256)
-		case unicode.IsLetter(r):
-			return scanAttribute(hl, 0)
-		case r == '+':
-			continue
-		case r == ']':
-			if len(hl.attrs) != 0 {
-				hl.appendAttrs()
-			}
-			hl.pos++
+	r := hl.get()
+	switch {
+	case r == 'f':
+		return scanColor256(hl, preFg256)
+	case r == 'b':
+		return scanColor256(hl, preBg256)
+	case unicode.IsLetter(r):
+		return scanAttribute(hl, 0)
+	case r == '+':
+		hl.pos++
+		return scanHighlight
+	case r == ']':
+		if len(hl.attrs) != 0 {
+			hl.appendAttrs()
 		}
+		hl.pos++
+		fallthrough
+	default:
 		hl.attrs = hl.attrs[:0]
 		return scanText
 	}

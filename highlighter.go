@@ -2,7 +2,7 @@ package color
 
 import "unicode"
 
-// stateFn represents the state of the scanner as a function that returns the next state.
+// stateFn represents the state of the highlighter as a function that returns the next state.
 type stateFn func(*highlighter) stateFn
 
 // highlighter holds the state of the scanner.
@@ -28,11 +28,12 @@ func (h *highlighter) run() {
 	}
 }
 
+// get returns current rune
 func (h *highlighter) get() rune {
 	return rune(h.s[h.pos])
 }
 
-// replaces the verb with a control sequence derived from h.attrs[1:].
+// replace replaces the verb with a control sequence derived from h.attrs[1:].
 func (h *highlighter) replace() {
 	h.s = h.s[:h.start] + csi + h.attrs[1:] + "m" + h.s[h.pos:]
 	h.pos += len(csi) + len(h.attrs) - (h.pos - h.start)

@@ -80,7 +80,7 @@ func scanHighlight(h *highlighter) stateFn {
 		case r == 'b':
 			return scanColor256(h, preBg256)
 		case unicode.IsLetter(r):
-			return scanAttribute
+			return scanAttribute(h, 0)
 		case r == '+':
 			// skip
 		case r == ']':
@@ -98,8 +98,8 @@ func scanHighlight(h *highlighter) stateFn {
 }
 
 // scanAttribute scans a named attribute
-func scanAttribute(h *highlighter) stateFn {
-	start := h.pos
+func scanAttribute(h *highlighter, off int) stateFn {
+	start := h.pos - off
 	for ; h.pos < len(h.s); h.pos++ {
 		if !unicode.IsLetter(h.get()) {
 			if a, ok := attrs[h.s[start:h.pos]]; ok {
@@ -115,18 +115,15 @@ func scanAttribute(h *highlighter) stateFn {
 func scanColor256(h *highlighter, pre string) stateFn {
 	h.pos++
 	if h.get() != 'g' {
-		h.pos--
-		return scanAttribute
+		return scanAttribute(h, 1)
 	}
 	h.pos++
 	if !unicode.IsNumber(h.get()) {
-		h.pos -= 2
-		return scanAttribute
+		return scanAttribute(h, 2)
 	}
 	start := h.pos
 	for ; h.pos < len(h.s); h.pos++ {
 		if !unicode.IsNumber(h.get()) {
-
 			h.attrs += pre + h.s[start:h.pos]
 			return scanHighlight
 		}

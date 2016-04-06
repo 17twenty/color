@@ -8,17 +8,18 @@ type stateFn func(*highlighter) stateFn
 // highlighter holds the state of the scanner.
 type highlighter struct {
 	s     string // string being scanned
+	buf   []byte
 	pos   int    // position in buf
-	start int    // start position of current verb
-	attrs string // attributes of current highlight verb
+	last  int    // position after last verb
+	attrs []byte // attributes of current highlight verb
 }
 
 // Highlight replaces the highlight verbs in s with their appropriate
-// control sequences and then returns the resulting string
+// control sequences and then returns the resulting string.
 func Highlight(s string) string {
 	h := &highlighter{s: s}
 	h.run()
-	return h.s
+	return string(h.buf)
 }
 
 // run runs the state machine for the highlighter.
@@ -28,22 +29,27 @@ func (h *highlighter) run() {
 	}
 }
 
-// get returns current rune
+// get returns the current rune.
 func (h *highlighter) get() rune {
 	return rune(h.s[h.pos])
 }
 
-// replace replaces the verb with a control sequence derived from h.attrs[1:].
-func (h *highlighter) replace() {
-	h.s = h.s[:h.start] + csi + h.attrs[1:] + "m" + h.s[h.pos:]
-	h.pos += len(csi) + len(h.attrs) - (h.pos - h.start)
+// appends a control sequence derived from h.attrs[1:] to h.buf.
+func (h *highlighter) appendAttrs() {
+	h.buf = append(h.buf, csi...)
+	h.buf = append(h.buf, h.attrs[1:]...)
+	h.buf = append(h.buf, 'm')
 }
 
 // scanText scans until the next highlight or reset verb.
 func scanText(h *highlighter) stateFn {
+	h.last = h.pos
 	for ; h.pos < len(h.s); h.pos++ {
 		if h.get() != '%' {
 			continue
+		}
+		if h.last < h.pos {
+			h.buf = append(h.buf, h.s[h.last:h.pos]...)
 		}
 		h.pos++
 		if h.pos >= len(h.s) {
@@ -51,11 +57,9 @@ func scanText(h *highlighter) stateFn {
 		}
 		switch h.get() {
 		case 'r':
-			h.start = h.pos - 1
 			h.pos++
 			return verbReset
 		case 'h':
-			h.start = h.pos - 1
 			h.pos += 2
 			return scanHighlight
 		}
@@ -63,10 +67,10 @@ func scanText(h *highlighter) stateFn {
 	return nil
 }
 
-// verbReset replaces the reset verb with the reset control sequence.
+// verbReset appen the reset verb with the reset control sequence.
 func verbReset(h *highlighter) stateFn {
-	h.attrs = attrs["reset"]
-	h.replace()
+	h.attrs = append(h.attrs, attrs["reset"]...)
+	h.appendAttrs()
 	return scanText
 }
 
@@ -85,13 +89,14 @@ func scanHighlight(h *highlighter) stateFn {
 		case r == '+':
 			// skip
 		case r == ']':
-			h.pos++
-			if h.attrs != "" {
-				h.replace()
+			if len(h.attrs) != 0 {
+				h.appendAttrs()
 			}
+			h.pos++
 			fallthrough
 		default:
-			h.attrs = ""
+			// reuse this buffer
+			h.attrs = h.attrs[0:0]
 			return scanText
 		}
 	}
@@ -104,7 +109,7 @@ func scanAttribute(h *highlighter, off int) stateFn {
 	for ; h.pos < len(h.s); h.pos++ {
 		if !unicode.IsLetter(h.get()) {
 			if a, ok := attrs[h.s[start:h.pos]]; ok {
-				h.attrs += a
+				h.attrs = append(h.attrs, a...)
 			}
 			return scanHighlight
 		}
@@ -125,7 +130,8 @@ func scanColor256(h *highlighter, pre string) stateFn {
 	start := h.pos
 	for ; h.pos < len(h.s); h.pos++ {
 		if !unicode.IsNumber(h.get()) {
-			h.attrs += pre + h.s[start:h.pos]
+			h.attrs = append(h.attrs, pre...)
+			h.attrs = append(h.attrs, h.s[start:h.pos]...)
 			return scanHighlight
 		}
 	}

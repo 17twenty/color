@@ -44,8 +44,6 @@ func TestCombinations(t *testing.T) {
 }
 
 var edgeCases = map[string]string{
-	"%h[dsadadssadas]": "%!h(BADATTR)",
-	"%":                "%!(NOVERB)",
 	"%h[fgRed+%h[fgBlue]": "%!h(INVALID)",
 	"%h[":                 "%!h(INVALID)",
 	"%h{":                 "%!h(INVALID)",
@@ -59,6 +57,8 @@ var edgeCases = map[string]string{
 	"%h][fgRed+%#bgBlue]": "%!h(INVALID)",
 	"%h[fgRed+":           "%!h(INVALID)",
 	"%%h%h[fgRed]%%":      "%%h\x1b[31m%%",
+	"%h[dsadadssadas]":    "%!h(BADATTR)",
+	"%":                   "%",
 	"%h[fgsadas]":         "%!h(BADATTR)",
 	"%h[fgRed+%h[bgBlue]": "%!h(INVALID)",
 	"lmaokai":             "lmaokai",

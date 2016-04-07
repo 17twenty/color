@@ -5,11 +5,11 @@ import (
 	"unicode"
 )
 
+// see doc.go for an explanation of these
 const (
-	errInvalid = "%!h(INVALID)" // something unexpected
-	errMissing = "%!h(MISSING)" // no attrs
-	errBadAttr = "%!h(BADATTR)" // one attr isn't a color or in the map
-	errNoVerb  = "%!(NOVERB)"   // no verb
+	errInvalid = "%!h(INVALID)"
+	errMissing = "%!h(MISSING)"
+	errBadAttr = "%!h(BADATTR)"
 )
 
 // highlighter holds the state of the scanner.
@@ -114,7 +114,7 @@ func scanText(hl *highlighter) stateFn {
 		hl.pos += 2
 		return scanHighlight
 	case eof:
-		hl.buf.writeString(errNoVerb)
+		hl.writePrev(hl.pos - 1)
 		return nil
 	}
 	hl.pos++

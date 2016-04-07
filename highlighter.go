@@ -6,11 +6,10 @@ import (
 )
 
 const (
-	missingBytes     = "%!h(MISSING)"
-	invalidBytes     = "%!h(INVALID)"
-	noAttrsBytes     = "%!h(NOATTRS)"
-	invalidAttrBytes = "%!h(BADATTR)"
-	noVerbBytes      = "%!(NOVERB)"
+	errInvalid = "%!h(INVALID)"
+	errMissing = "%!h(MISSING)"
+	errBadAttr = "%!h(BADATTR)"
+	errNoVerb  = "%!(NOVERB)"
 )
 
 // stateFn represents the state of the highlighter as a function that returns the next state.
@@ -99,7 +98,7 @@ func scanText(hl *highlighter) stateFn {
 		hl.pos += 2
 		return scanHighlight
 	case eof:
-		hl.buf = append(hl.buf, noVerbBytes...)
+		hl.buf = append(hl.buf, errNoVerb...)
 		return nil
 	}
 	hl.pos++
@@ -133,13 +132,13 @@ func scanHighlight(hl *highlighter) stateFn {
 		if len(hl.attrs) != 0 {
 			hl.appendAttrs()
 		} else {
-			hl.buf = append(hl.buf, noAttrsBytes...)
+			hl.buf = append(hl.buf, errMissing...)
 		}
 		hl.attrs = hl.attrs[:0]
 		hl.pos++
 		return scanText
 	default:
-		hl.buf = append(hl.buf, invalidBytes...)
+		hl.buf = append(hl.buf, errInvalid...)
 		return abortHighlight
 	}
 }
@@ -153,7 +152,7 @@ func scanAttribute(hl *highlighter, off int) stateFn {
 	if a, ok := attrs[hl.s[start:hl.pos]]; ok {
 		hl.attrs = append(hl.attrs, a...)
 	} else {
-		hl.buf = append(hl.buf, invalidAttrBytes...)
+		hl.buf = append(hl.buf, errBadAttr...)
 		return abortHighlight
 	}
 	return scanHighlight

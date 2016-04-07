@@ -49,7 +49,7 @@ var edgeCases = map[string]string{
 	"%h[fgRed+%h[fgBlue]": "%!h(INVALID)",
 	"%h[":                 "%!h(INVALID)",
 	"%h{":                 "%!h(INVALID)",
-	"%h[]":                "%!h(NOATTRS)",
+	"%h[]":                "%!h(MISSING)",
 	"%%h[fgRed]":          "%%h[fgRed]",
 	"%[bg232]":            "%[bg232]",
 	"%h[fg132":            "%!h(INVALID)",

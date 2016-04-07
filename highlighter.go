@@ -23,6 +23,7 @@ type highlighter struct {
 	attrs buffer // attributes of current verb
 }
 
+// highlighter pool, no need to reallocate all the buffers.
 var hlPool = sync.Pool{
 	New: func() interface{} {
 		hl := new(highlighter)
@@ -40,14 +41,14 @@ func Highlight(s string) string {
 	return string(hl.free())
 }
 
-// getHighlighter returns a new initialized highlighter
+// getHighlighter returns a new initialized highlighter.
 func getHighlighter(s string) (hl *highlighter) {
 	hl = hlPool.Get().(*highlighter)
 	hl.s = s
 	return
 }
 
-// free resets the highlighter and returns the buffer
+// free resets the highlighter and returns the buffer.
 func (hl *highlighter) free() (b []byte) {
 	b = hl.buf
 	hl.buf.reset()
@@ -73,14 +74,14 @@ func (hl *highlighter) get() rune {
 	return rune(hl.s[hl.pos])
 }
 
-// appends a control sequence derived from h.attrs[1:] to h.buf.
+// writeAttrs appends a control sequence derived from h.attrs[1:] to h.buf.
 func (hl *highlighter) writeAttrs() {
 	hl.buf.writeString(csi)
 	hl.buf.write(hl.attrs[1:])
 	hl.buf.writeByte('m')
 }
 
-// writes n of the previous characters to the buffer
+// writePrev writes n previous characters to the buffer.
 func (hl *highlighter) writePrev(n int) {
 	hl.buf.writeString(hl.s[n:hl.pos])
 }
@@ -170,7 +171,8 @@ func scanAttribute(hl *highlighter, off int) stateFn {
 	return scanHighlight
 }
 
-// appends a error to the buffer and then eats until the end of the highlight verb
+// abortHighlight appends a error to the buffer and
+// then eats until the end of the highlight verb.
 func abortHighlight(hl *highlighter, msg string) stateFn {
 	hl.buf.writeString(msg)
 	hl.attrs.reset()

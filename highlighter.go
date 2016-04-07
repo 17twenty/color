@@ -14,10 +14,11 @@ const (
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
-	s     string // string being scanned
-	pos   int    // position in s
-	buf   buffer // result
-	attrs buffer // attributes of current verb
+	s       string // string being scanned
+	pos     int    // position in s
+	buf     buffer // result
+	attrs   buffer // attributes of current verb
+	enabled bool
 }
 
 // Highlight replaces the highlight verbs in s with their appropriate
@@ -27,6 +28,15 @@ type highlighter struct {
 // which handle the rest. Only use this for performance reasons.
 func Highlight(s string) string {
 	hl := getHighlighter(s)
+	hl.enabled = true
+	hl.run()
+	return string(hl.free())
+}
+
+// RemoveVerbs removes all highlight verbs in s
+func RemoveVerbs(s string) string {
+	hl := getHighlighter(s)
+	hl.enabled = false
 	hl.run()
 	return string(hl.free())
 }
@@ -80,6 +90,9 @@ func (hl *highlighter) get() rune {
 
 // writeAttrs writes a control sequence derived from h.attrs[1:] to h.buf.
 func (hl *highlighter) writeAttrs() {
+	if !hl.enabled {
+		return
+	}
 	hl.buf.writeString(csi)
 	hl.buf.write(hl.attrs[1:])
 	hl.buf.writeByte('m')

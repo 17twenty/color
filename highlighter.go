@@ -22,9 +22,9 @@ type highlighter struct {
 
 // Highlight replaces the highlight verbs in s with their appropriate
 // control sequences and then returns the resulting string.
-// please note that color.Sprintf is the intended method of highlighting a string as
-// this package does not do everything fmt.Sprintf does, such as adding the "%!h(NOVERB)"
-// error or compressing "%%" down to a single '%'
+// This is a low-level function that only scans highlight verbs. The color.Printf functions
+// are the intended user functions as they wrap around fmt.Printf, which handles the rest.
+// Only use this for performance reasons.
 func Highlight(s string) string {
 	hl := getHighlighter(s)
 	hl.run()

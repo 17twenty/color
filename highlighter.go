@@ -12,15 +12,20 @@ const (
 	errNoVerb  = "%!(NOVERB)"   // no verb
 )
 
-// stateFn represents the state of the scanner as a function that returns the next state.
-type stateFn func(*highlighter) stateFn
-
 // highlighter holds the state of the scanner.
 type highlighter struct {
 	s     string // string being scanned
 	pos   int    // position in s
 	buf   buffer // result
 	attrs buffer // attributes of current verb
+}
+
+// Highlight replaces the highlight verbs in s with their appropriate
+// control sequences and then returns the resulting string.
+func Highlight(s string) string {
+	hl := getHighlighter(s)
+	hl.run()
+	return string(hl.free())
 }
 
 // highlighterPool reuses highlighter objects to avoid allocations per invocation.
@@ -32,14 +37,6 @@ var highlighterPool = sync.Pool{
 		hl.attrs = make([]byte, 0, 10)
 		return hl
 	},
-}
-
-// Highlight replaces the highlight verbs in s with their appropriate
-// control sequences and then returns the resulting string.
-func Highlight(s string) string {
-	hl := getHighlighter(s)
-	hl.run()
-	return string(hl.free())
 }
 
 // getHighlighter returns a new initialized highlighter from the pool.
@@ -57,6 +54,9 @@ func (hl *highlighter) free() (b []byte) {
 	highlighterPool.Put(hl)
 	return
 }
+
+// stateFn represents the state of the scanner as a function that returns the next state.
+type stateFn func(*highlighter) stateFn
 
 // run runs the state machine for the highlighter.
 func (hl *highlighter) run() {

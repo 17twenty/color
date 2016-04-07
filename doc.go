@@ -15,7 +15,7 @@
 		%!h(MISSING)	no attributes in this highlight verb
 		%!h(BADATTR)	unknown attribute in this highlight verb
 
-	Other errors are handled by fmt.Printf, e.g. "%!h(NOVERB)", which occurs when the last character is '%'.
+	Other errors are handled by fmt.Printf.
 
 	Attributes Reference
 

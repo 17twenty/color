@@ -5,7 +5,6 @@
 
 		%h[attr...]		replaced with a SGR code that sets all of the attributes in []
 					multiple attributes are + separated
-
 		%r			an abbreviation for %h[reset]
 
 	Multiple highlight verbs do not reset preceeding verbs, they add onto them.

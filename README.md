@@ -13,7 +13,6 @@ go get github.com/nhooyr/color
 ```
 %h[attr...]	replaced with a SGR code that sets all of the attributes in []
 			multiple attributes are + separated
-
 %r			an abbreviation for %h[reset]
 ```
 
@@ -84,4 +83,4 @@ logger.Fatalf("%h[fgRed]hi%r")
 - [ ] True color support
 - [ ] Windows support
 - [ ] Respect $TERM
-- [ ] no colors if output isn't a terminal
+- [ ] No colors if output isn't a terminal

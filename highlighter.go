@@ -23,10 +23,11 @@ type highlighter struct {
 	attrs buffer // attributes of current verb
 }
 
-// hlPool manages the highlighters to avoid a allocation per invocation.
-var hlPool = sync.Pool{
+// highlighterPool reuses highlighter objects to avoid allocations per invocation.
+var highlighterPool = sync.Pool{
 	New: func() interface{} {
 		hl := new(highlighter)
+		// initial capacities avoid constant reallocation during growth.
 		hl.buf = make([]byte, 0, 30)
 		hl.attrs = make([]byte, 0, 10)
 		return hl
@@ -41,9 +42,9 @@ func Highlight(s string) string {
 	return string(hl.free())
 }
 
-// getHighlighter returns a new initialized highlighter.
+// getHighlighter returns a new initialized highlighter from the pool.
 func getHighlighter(s string) (hl *highlighter) {
-	hl = hlPool.Get().(*highlighter)
+	hl = highlighterPool.Get().(*highlighter)
 	hl.s = s
 	return
 }
@@ -53,7 +54,7 @@ func (hl *highlighter) free() (b []byte) {
 	b = hl.buf
 	hl.buf.reset()
 	hl.pos = 0
-	hlPool.Put(hl)
+	highlighterPool.Put(hl)
 	return
 }
 

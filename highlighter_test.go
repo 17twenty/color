@@ -44,20 +44,24 @@ func TestCombinations(t *testing.T) {
 }
 
 var edgeCases = map[string]string{
-	"%h[dsadadssadas]":    "%h[dsadadssadas]",
-	"%h[":                 "%h[",
-	"%h{":                 "%h{",
+	"%h[fgRed+%h[fgBlue]": "%!h(INVALID)",
+	"%h[":                 "%!h(INVALID)",
+	"%h{":                 "%!h(INVALID)",
+	"%h[]":                "%!h(MISSING)",
 	"%%h[fgRed]":          "%%h[fgRed]",
-	"%[fgRed]":            "%[fgRed]",
-	"%h[fgRed":            "%h[fgRed",
-	"%h[fgRed[]":          "%h[fgRed[]",
-	"%h[fgRed+lold[]":     "%h[fgRed+lold[]",
-	"%h[fgRed+%#bgBlue]":  "%h[fgRed+%#bgBlue]",
-	"%h][fgRed+%#bgBlue]": "%h][fgRed+%#bgBlue]",
-	"%h[fgRed+":           "%h[fgRed+",
+	"%[bg232]":            "%[bg232]",
+	"%h[fg132":            "%!h(INVALID)",
+	"%h[fgRed[]":          "%!h(INVALID)",
+	"%h[fgRed+lold[]":     "%!h(BADATTR)",
+	"%h[fgRed+%#bgBlue]":  "%!h(INVALID)",
+	"%h][fgRed+%#bgBlue]": "%!h(INVALID)",
+	"%h[fgRed+":           "%!h(INVALID)",
 	"%%h%h[fgRed]%%":      "%%h\x1b[31m%%",
-	"%h[fgsadas]":         "%h[fgsadas]",
-	"%h[fgRed+%h[bgBlue]": "%h[fgRed+\x1b[44m",
+	"%h[dsadadssadas]":    "%!h(BADATTR)",
+	"%":                   "%",
+	"%h[fgsadas]":         "%!h(BADATTR)",
+	"%h[fgRed+%h[bgBlue]": "%!h(INVALID)",
+	"lmaokai":             "lmaokai",
 }
 
 func TestEdgeCases(t *testing.T) {

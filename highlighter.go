@@ -87,32 +87,31 @@ func (hl *highlighter) appendAttrs() {
 // scanText scans until the next highlight or reset verb.
 func scanText(hl *highlighter) stateFn {
 	last := hl.pos
-	for ; ; hl.pos++ {
-		switch hl.get() {
-		case '%':
-		case eof:
+	for {
+		if r := hl.get(); r == eof {
 			return nil
-		default:
-			continue
-		}
-		if last < hl.pos {
-			hl.buf = append(hl.buf, hl.s[last:hl.pos]...)
+		} else if r == '%' {
+			break
 		}
 		hl.pos++
-		switch hl.get() {
-		case 'r':
-			hl.pos++
-			return verbReset
-		case 'h':
-			hl.pos += 2
-			return scanHighlight
-		case eof:
-			hl.buf = append(hl.buf, noVerbBytes...)
-			return nil
-		default:
-			last = hl.pos
-		}
 	}
+	if last < hl.pos {
+		hl.buf = append(hl.buf, hl.s[last:hl.pos]...)
+	}
+	hl.pos++
+	switch hl.get() {
+	case 'r':
+		hl.pos++
+		return verbReset
+	case 'h':
+		hl.pos += 2
+		return scanHighlight
+	case eof:
+		hl.buf = append(hl.buf, noVerbBytes...)
+		return nil
+	}
+	hl.pos++
+	return scanText
 }
 
 // verbReset appends the reset verb with the reset control sequence.

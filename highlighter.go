@@ -138,8 +138,7 @@ func scanHighlight(hl *highlighter) stateFn {
 		hl.pos++
 		return scanText
 	default:
-		hl.buf = append(hl.buf, errInvalid...)
-		return abortHighlight
+		return abortHighlight(hl, errInvalid)
 	}
 }
 
@@ -152,13 +151,13 @@ func scanAttribute(hl *highlighter, off int) stateFn {
 	if a, ok := attrs[hl.s[start:hl.pos]]; ok {
 		hl.attrs = append(hl.attrs, a...)
 	} else {
-		hl.buf = append(hl.buf, errBadAttr...)
-		return abortHighlight
+		return abortHighlight(hl, errBadAttr)
 	}
 	return scanHighlight
 }
 
-func abortHighlight(hl *highlighter) stateFn {
+func abortHighlight(hl *highlighter, msg string) stateFn {
+	hl.buf = append(hl.buf, msg...)
 	hl.attrs = hl.attrs[:0]
 	for {
 		switch hl.get() {

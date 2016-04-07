@@ -61,6 +61,7 @@ var edgeCases = map[string]string{
 	"%%h%h[fgRed]%%":      "%%h\x1b[31m%%",
 	"%h[fgsadas]":         "%!h(BADATTR)",
 	"%h[fgRed+%h[bgBlue]": "%!h(INVALID)",
+	"lmaokai":             "lmaokai",
 }
 
 func TestEdgeCases(t *testing.T) {

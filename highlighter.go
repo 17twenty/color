@@ -33,8 +33,8 @@ func Highlight(s string) string {
 	return string(hl.free())
 }
 
-// RemoveVerbs removes all highlight verbs in s
-func RemoveVerbs(s string) string {
+// removeVerbs removes all highlight verbs in s
+func removeVerbs(s string) string {
 	hl := getHighlighter(s)
 	hl.enabled = false
 	hl.run()

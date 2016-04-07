@@ -114,7 +114,8 @@ func scanText(hl *highlighter) stateFn {
 		hl.pos += 2
 		return scanHighlight
 	case eof:
-		hl.writePrev(hl.pos - 1)
+		// no need to writePrev, we know it was '%
+		hl.buf.writeByte('%')
 		return nil
 	}
 	hl.pos++

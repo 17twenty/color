@@ -1,5 +1,5 @@
 /*
-	Package color extends fmt.Printf with verbs for producing colored output.
+	Package color wraps the fmt.Printf functions with verbs for producing colored output.
 
 	Highlight verbs:
 
@@ -15,7 +15,7 @@
 		%!h(MISSING)	no attributes in this highlight verb
 		%!h(BADATTR)	unknown attribute in this highlight verb
 
-	Other errors are handled by fmt.Printf.
+	Everything else is handled by the wrapped fmt.Printf functions.
 
 	Attributes Reference
 

@@ -23,8 +23,8 @@ type highlighter struct {
 // Highlight replaces the highlight verbs in s with their appropriate
 // control sequences and then returns the resulting string.
 // This is a low-level function that only scans highlight verbs. The color.Printf functions
-// are the intended user functions as they wrap around fmt.Printf, which handles the rest.
-// Only use this for performance reasons.
+// are the intended user functions as they wrap around the fmt.Printf functions,
+// which handle the rest. Only use this for performance reasons.
 func Highlight(s string) string {
 	hl := getHighlighter(s)
 	hl.run()

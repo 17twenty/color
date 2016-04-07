@@ -8,19 +8,19 @@ import (
 const (
 	errInvalid = "%!h(INVALID)" // something unexpected
 	errMissing = "%!h(MISSING)" // no attrs
-	errBadAttr = "%!h(BADATTR)" // attr isn't a color or in the map
+	errBadAttr = "%!h(BADATTR)" // one attr isn't a color or in the map
 	errNoVerb  = "%!(NOVERB)"   // no verb
 )
 
-// stateFn represents the state of the highlighter as a function that returns the next state.
+// stateFn represents the state of the scanner as a function that returns the next state.
 type stateFn func(*highlighter) stateFn
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
 	s     string // string being scanned
-	buf   buffer // buffer for result
-	pos   int    // position in buf
-	attrs buffer // attributes of current highlight verb
+	pos   int    // position in s
+	buf   buffer // result
+	attrs buffer // attributes of current verb
 }
 
 var hlPool = sync.Pool{
@@ -37,17 +37,19 @@ var hlPool = sync.Pool{
 func Highlight(s string) string {
 	hl := getHighlighter(s)
 	hl.run()
-	return hl.free()
+	return string(hl.free())
 }
 
+// getHighlighter returns a new initialized highlighter
 func getHighlighter(s string) (hl *highlighter) {
 	hl = hlPool.Get().(*highlighter)
 	hl.s = s
 	return
 }
 
-func (hl *highlighter) free() (s string) {
-	s = string(hl.buf)
+// free resets the highlighter and returns the buffer
+func (hl *highlighter) free() (b []byte) {
+	b = hl.buf
 	hl.buf.reset()
 	hl.pos = 0
 	hlPool.Put(hl)
@@ -78,6 +80,7 @@ func (hl *highlighter) writeAttrs() {
 	hl.buf.writeByte('m')
 }
 
+// writes n of the previous characters to the buffer
 func (hl *highlighter) writePrev(n int) {
 	hl.buf.writeString(hl.s[n:hl.pos])
 }
@@ -126,7 +129,7 @@ func verbReset(hl *highlighter) stateFn {
 }
 
 // scanHighlight scans the highlight verb for attributes,
-// then replaces it with a control sequence derived from said attributes.
+// then appends a control sequence derived from said attributes to the buffer.
 func scanHighlight(hl *highlighter) stateFn {
 	r := hl.get()
 	switch {
@@ -167,6 +170,7 @@ func scanAttribute(hl *highlighter, off int) stateFn {
 	return scanHighlight
 }
 
+// appends a error to the buffer and then eats until the end of the highlight verb
 func abortHighlight(hl *highlighter, msg string) stateFn {
 	hl.buf.writeString(msg)
 	hl.attrs.reset()

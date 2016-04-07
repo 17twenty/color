@@ -44,31 +44,31 @@ func TestCombinations(t *testing.T) {
 }
 
 var edgeCases = map[string]string{
-	"%h[dsadadssadas]":    "%h[dsadadssadas]",
+	"%h[dsadadssadas]":    "%!h(INVALID)",
 	"%":                   "%!(NOVERB)",
-	"%h[fgRed+%h[fgBlue]": "swag",
-	"%h[":                 "%h[",
-	"%h{":                 "%h{",
+	"%h[fgRed+%h[fgBlue]": "%!h(INVALID)",
+	"%h[":                 "%!h(INVALID)",
+	"%h{":                 "%!h(INVALID)",
 	"%%h[fgRed]":          "%%h[fgRed]",
 	"%[fgRed]":            "%[fgRed]",
-	"%h[fgRed":            "%h[fgRed",
-	"%h[fgRed[]":          "%h[fgRed[]",
-	"%h[fgRed+lold[]":     "%h[fgRed+lold[]",
-	"%h[fgRed+%#bgBlue]":  "%h[fgRed+%#bgBlue]",
-	"%h][fgRed+%#bgBlue]": "%h][fgRed+%#bgBlue]",
-	"%h[fgRed+":           "%h[fgRed+",
+	"%h[fgRed":            "%!h(INVALID)",
+	"%h[fgRed[]":          "%!h(INVALID)",
+	"%h[fgRed+lold[]":     "%!h(INVALID)",
+	"%h[fgRed+%#bgBlue]":  "%!h(INVALID)",
+	"%h][fgRed+%#bgBlue]": "%!h(INVALID)",
+	"%h[fgRed+":           "%!h(INVALID)",
 	"%%h%h[fgRed]%%":      "%%h\x1b[31m%%",
-	"%h[fgsadas]":         "%h[fgsadas]",
-	"%h[fgRed+%h[bgBlue]": "%h[fgRed+\x1b[44m",
+	"%h[fgsadas]":         "%!h(INVALID)",
+	"%h[fgRed+%h[bgBlue]": "%!h(INVALID)",
 }
 
-// func TestEdgeCases(t *testing.T) {
-// 	for k, v := range edgeCases {
-// 		if r := Highlight(k); r != v {
-// 			t.Errorf("Expected %q but result was %q", v, r)
-// 		}
-// 	}
-// }
+func TestEdgeCases(t *testing.T) {
+	for k, v := range edgeCases {
+		if r := Highlight(k); r != v {
+			t.Errorf("Expected %q but result was %q", v, r)
+		}
+	}
+}
 
 func BenchmarkHighlight(b *testing.B) {
 	s := `%h[fgBlack]hi%r

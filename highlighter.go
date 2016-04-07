@@ -6,21 +6,9 @@ import (
 )
 
 const (
-	commaSpaceBytes  = ", "
-	nilAngleBytes    = "<nil>"
-	nilParenBytes    = "(nil)"
-	nilBytes         = "nil"
-	mapBytes         = "map["
-	percentBangBytes = "%!"
-	missingBytes     = "(MISSING)"
-	badIndexBytes    = "(BADINDEX)"
-	panicBytes       = "(PANIC="
-	extraBytes       = "%!(EXTRA "
-	irparenBytes     = "i)"
-	bytesBytes       = "[]byte{"
-	badWidthBytes    = "%!(BADWIDTH)"
-	badPrecBytes     = "%!(BADPREC)"
-	noVerbBytes      = "%!(NOVERB)"
+	missingBytes = "%!h(MISSING)"
+	invalidBytes = "%!h(INVALID)"
+	noVerbBytes  = "%!(NOVERB)"
 )
 
 // stateFn represents the state of the highlighter as a function that returns the next state.
@@ -89,6 +77,7 @@ func scanText(hl *highlighter) stateFn {
 	last := hl.pos
 	for {
 		if r := hl.get(); r == eof {
+			hl.buf = append(hl.buf, hl.s[last:hl.pos]...)
 			return nil
 		} else if r == '%' {
 			break
@@ -97,6 +86,7 @@ func scanText(hl *highlighter) stateFn {
 	}
 	if last < hl.pos {
 		hl.buf = append(hl.buf, hl.s[last:hl.pos]...)
+		last = hl.pos
 	}
 	hl.pos++
 	switch hl.get() {
@@ -111,6 +101,7 @@ func scanText(hl *highlighter) stateFn {
 		return nil
 	}
 	hl.pos++
+	hl.buf = append(hl.buf, hl.s[last:hl.pos]...)
 	return scanText
 }
 
@@ -139,12 +130,29 @@ func scanHighlight(hl *highlighter) stateFn {
 	case r == ']':
 		if len(hl.attrs) != 0 {
 			hl.appendAttrs()
+		} else {
+			hl.buf = append(hl.buf, invalidBytes...)
+		}
+		hl.attrs = hl.attrs[:0]
+		hl.pos++
+		return scanText
+	default:
+		return abortHighlight
+	}
+}
+
+func abortHighlight(hl *highlighter) stateFn {
+	hl.buf = append(hl.buf, invalidBytes...)
+	hl.attrs = hl.attrs[:0]
+	for {
+		switch hl.get() {
+		case ']':
+			hl.pos++
+			return scanText
+		case eof:
+			return nil
 		}
 		hl.pos++
-		fallthrough
-	default:
-		hl.attrs = hl.attrs[:0]
-		return scanText
 	}
 }
 
@@ -156,6 +164,8 @@ func scanAttribute(hl *highlighter, off int) stateFn {
 	}
 	if a, ok := attrs[hl.s[start:hl.pos]]; ok {
 		hl.attrs = append(hl.attrs, a...)
+	} else {
+		return abortHighlight
 	}
 	return scanHighlight
 }

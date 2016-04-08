@@ -8,9 +8,9 @@ import (
 
 // see doc.go for an explanation of these
 const (
-	errInvalid = "%!h(INVALID)"
-	errMissing = "%!h(MISSING)"
-	errBadAttr = "%!h(BADATTR)"
+	errInvalid = "%%!h(INVALID)"
+	errMissing = "%%!h(MISSING)"
+	errBadAttr = "%%!h(BADATTR)"
 )
 
 // highlighter holds the state of the scanner.
@@ -240,19 +240,23 @@ func stripVerbs(s string) string {
 			buf.writeString(s[pi:i])
 		}
 		i++
-		switch s[i] {
-		case 'r':
+		if i >= len(s) {
+			buf.writeByte('%')
+			break
+		}
+		if c := s[i]; c == 'r' {
 			// strip reset verb
 			pi = i + 1
-		case 'h':
+		} else if c == 'h' {
 			// strip inside highlight verb
 			j := strings.IndexByte(s[i+1:], ']')
 			if j == -1 {
+				buf.writeString(errInvalid)
 				break
 			}
 			i += j + 1
 			pi = i + 1
-		default:
+		} else {
 			// include this verb
 			pi = i - 1
 		}

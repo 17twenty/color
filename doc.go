@@ -11,9 +11,9 @@ Multiple highlight verbs do not reset preceeding verbs, they add onto them.
 For example, if you set the foreground to green in the first verb, then set the background to red in the second, any text following the second will have a green foreground and a red background.
 
 Errors:
-	%!h(INVALID)	invalid character in this highlight verb
-	%!h(MISSING)	no attributes in this highlight verb
-	%!h(BADATTR)	unknown attribute in this highlight verb
+	%!h(INVALID)	invalid character in the highlight verb
+	%!h(MISSING)	no attributes in the highlight verb
+	%!h(BADATTR)	unknown attribute in the highlight verb
 
 Everything else is handled by the wrapped fmt.Printf functions.
 

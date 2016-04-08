@@ -95,17 +95,20 @@ func (hl *highlighter) writePrev(n int) {
 func scanText(hl *highlighter) stateFn {
 	// previous position
 	ppos := hl.pos
+LOOP:
 	for {
-		if r := hl.get(); r == eof {
+		switch hl.get() {
+		case eof:
 			if hl.pos > ppos {
 				hl.writePrev(ppos)
 			}
 			return nil
-		} else if r == '%' {
+		case '%':
 			if hl.pos > ppos {
 				hl.writePrev(ppos)
 			}
-			break
+			break LOOP
+
 		}
 		hl.pos++
 	}
@@ -118,7 +121,7 @@ func scanText(hl *highlighter) stateFn {
 		hl.pos += 2
 		return scanHighlight
 	case eof:
-		// let fmt handle this NOVERB
+		// let fmt handle NOVERB
 		hl.buf.writeByte('%')
 		return nil
 	}
@@ -242,16 +245,16 @@ LOOP:
 		}
 		i++
 		if i >= len(s) {
-			// let fmt handle this NOVERB
+			// let fmt handle NOVERB
 			buf.writeByte('%')
 			break
 		}
 		switch s[i] {
 		case 'r':
-			// strip reset verb
+			// strip the reset verb
 			pi = i + 1
 		case 'h':
-			// strip inside highlight verb
+			// strip inside the highlight verb
 			j := strings.IndexByte(s[i+1:], ']')
 			if j == -1 {
 				buf.writeString(errInvalid)
@@ -260,7 +263,7 @@ LOOP:
 			i += j + 1
 			pi = i + 1
 		default:
-			// include this verb
+			// include the verb
 			pi = i - 1
 		}
 	}

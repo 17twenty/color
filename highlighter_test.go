@@ -74,8 +74,8 @@ func TestEdgeCases(t *testing.T) {
 
 var stripEdgeCases = map[string]string{
 	"%h[fgRed]%smao%r": "%smao",
-	"%": "%",
-	"%c": "%c",
+	"%":                "%",
+	"%c":               "%c",
 }
 
 func TestStripEdgeCases(t *testing.T) {

@@ -118,7 +118,8 @@ func scanText(hl *highlighter) stateFn {
 		hl.pos += 2
 		return scanHighlight
 	case eof:
-		// no need to writePrev, we know it was '%
+		// let fmt handle this NOVERB
+		// no need to writePrev, we know it was '%'
 		hl.buf.writeByte('%')
 		return nil
 	}
@@ -242,7 +243,8 @@ P:
 		}
 		i++
 		if i >= len(s) {
-			// let fmt handle this
+			// let fmt handle this NOVERB
+			// no need to check s, we know it was '%'
 			buf.writeByte('%')
 			break
 		}

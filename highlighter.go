@@ -227,6 +227,7 @@ func stripVerbs(s string) string {
 	buf := bufferPool.Get().(buffer)
 	// pi is the index after last verb
 	var pi, i int
+P:
 	for ; ; i++ {
 		if i >= len(s) {
 			if i > pi {
@@ -245,19 +246,20 @@ func stripVerbs(s string) string {
 			buf.writeByte('%')
 			break
 		}
-		if c := s[i]; c == 'r' {
+		switch s[i] {
+		case 'r':
 			// strip reset verb
 			pi = i + 1
-		} else if c == 'h' {
+		case 'h':
 			// strip inside highlight verb
 			j := strings.IndexByte(s[i+1:], ']')
 			if j == -1 {
 				buf.writeString(errInvalid)
-				break
+				break P
 			}
 			i += j + 1
 			pi = i + 1
-		} else {
+		default:
 			// include this verb
 			pi = i - 1
 		}

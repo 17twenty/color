@@ -83,3 +83,4 @@ logger.Fatalf("%h[fgRed]hi%r")
 - [ ] True color support
 - [ ] Windows support
 - [ ] Respect $TERM
+- [ ] Better interface to detect terminal

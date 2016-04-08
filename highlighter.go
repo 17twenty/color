@@ -241,6 +241,7 @@ func stripVerbs(s string) string {
 		}
 		i++
 		if i >= len(s) {
+			// let fmt handle this
 			buf.writeByte('%')
 			break
 		}

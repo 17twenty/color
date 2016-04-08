@@ -84,3 +84,4 @@ logger.Fatalf("%h[fgRed]hi%r")
 - [ ] Windows support
 - [ ] Respect $TERM
 - [ ] Better interface to detect terminal
+- [ ] TODO fully wrap \*log.Logger, perhaps a format string that declares the prefix, date , content and other stuff. Maybe another package for this?

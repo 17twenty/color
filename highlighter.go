@@ -166,7 +166,7 @@ func scanHighlight(hl *highlighter) stateFn {
 	}
 }
 
-// scanAttribute scans a named attribute
+// scanAttribute scans a named attribute.
 func scanAttribute(hl *highlighter, off int) stateFn {
 	start := hl.pos - off
 	for unicode.IsLetter(hl.get()) {
@@ -197,7 +197,7 @@ func abortHighlight(hl *highlighter, msg string) stateFn {
 	}
 }
 
-// scanColor256 scans a 256 color attribute
+// scanColor256 scans a 256 color attribute.
 func scanColor256(hl *highlighter, pre string) stateFn {
 	hl.pos++
 	if hl.get() != 'g' {
@@ -228,7 +228,7 @@ var bufferPool = sync.Pool{
 // stripVerbs removes all highlight verbs in s.
 func stripVerbs(s string) string {
 	buf := bufferPool.Get().(buffer)
-	// pi is the index after last verb
+	// pi is the index after last verb.
 	var pi, i int
 LOOP:
 	for ; ; i++ {

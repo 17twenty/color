@@ -4,17 +4,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 // Fprintf formats according to a format specifier and writes to w.
 // It returns the number of bytes written and any write error encountered.
 func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	if f, ok := w.(*os.File); ok {
-		if terminal.IsTerminal(int(f.Fd())) {
-			return fmt.Fprintf(w, Highlight(format), a...)
-		}
+	if isTerminal(w) {
+		return fmt.Fprintf(w, Highlight(format), a...)
 	}
 	return fmt.Fprintf(w, stripVerbs(format), a...)
 }

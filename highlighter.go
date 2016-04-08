@@ -240,19 +240,22 @@ func stripVerbs(s string) string {
 			buf.writeString(s[pi:i])
 		}
 		i++
-		if c := s[i]; c == 'r' {
+		switch s[i] {
+		case 'r':
+			// strip reset verb
 			pi = i + 1
-			continue
-		} else if s[i] != 'h' {
+		case 'h':
+			// strip inside highlight verb
+			j := strings.IndexByte(s[i+1:], ']')
+			if j == -1 {
+				break
+			}
+			i += j + 1
+			pi = i + 1
+		default:
+			// include this verb
 			pi = i - 1
-			continue
 		}
-		j := strings.IndexByte(s[i+1:], ']')
-		if j == -1 {
-			break
-		}
-		i += j + 1
-		pi = i + 1
 	}
 	s = string(buf)
 	buf.reset()

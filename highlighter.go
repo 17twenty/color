@@ -119,7 +119,6 @@ func scanText(hl *highlighter) stateFn {
 		return scanHighlight
 	case eof:
 		// let fmt handle this NOVERB
-		// no need to writePrev, we know it was '%'
 		hl.buf.writeByte('%')
 		return nil
 	}
@@ -228,6 +227,7 @@ func stripVerbs(s string) string {
 	buf := bufferPool.Get().(buffer)
 	// pi is the index after last verb
 	var pi, i int
+LOOP:
 	for ; ; i++ {
 		if i >= len(s) {
 			if i > pi {
@@ -243,23 +243,23 @@ func stripVerbs(s string) string {
 		i++
 		if i >= len(s) {
 			// let fmt handle this NOVERB
-			// no need to check s, we know it was '%'
 			buf.writeByte('%')
 			break
 		}
-		if c := s[i]; c == 'r' {
+		switch s[i] {
+		case 'r':
 			// strip reset verb
 			pi = i + 1
-		} else if c == 'h' {
+		case 'h':
 			// strip inside highlight verb
 			j := strings.IndexByte(s[i+1:], ']')
 			if j == -1 {
 				buf.writeString(errInvalid)
-				break
+				break LOOP
 			}
 			i += j + 1
 			pi = i + 1
-		} else {
+		default:
 			// include this verb
 			pi = i - 1
 		}

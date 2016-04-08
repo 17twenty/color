@@ -1,6 +1,7 @@
 package color
 
 import (
+	"strings"
 	"sync"
 	"unicode"
 )
@@ -14,11 +15,10 @@ const (
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
-	s       string // string being scanned
-	pos     int    // position in s
-	buf     buffer // result
-	attrs   buffer // attributes of current verb
-	enabled bool
+	s     string // string being scanned
+	pos   int    // position in s
+	buf   buffer // result
+	attrs buffer // attributes of current verb
 }
 
 // Highlight replaces the highlight verbs in s with their appropriate
@@ -28,20 +28,11 @@ type highlighter struct {
 // which handle the rest. Only use this for performance reasons.
 func Highlight(s string) string {
 	hl := getHighlighter(s)
-	hl.enabled = true
 	hl.run()
 	return string(hl.free())
 }
 
-// removeVerbs removes all highlight verbs in s
-func removeVerbs(s string) string {
-	hl := getHighlighter(s)
-	hl.enabled = false
-	hl.run()
-	return string(hl.free())
-}
-
-// highlighterPool reuses highlighter objects to avoid allocations per invocation.
+// highlighterPool reuses highlighter objects to avoid an allocation per invocation.
 var highlighterPool = sync.Pool{
 	New: func() interface{} {
 		hl := new(highlighter)
@@ -90,9 +81,6 @@ func (hl *highlighter) get() rune {
 
 // writeAttrs writes a control sequence derived from h.attrs[1:] to h.buf.
 func (hl *highlighter) writeAttrs() {
-	if !hl.enabled {
-		return
-	}
 	hl.buf.writeString(csi)
 	hl.buf.write(hl.attrs[1:])
 	hl.buf.writeByte('m')
@@ -109,12 +97,12 @@ func scanText(hl *highlighter) stateFn {
 	ppos := hl.pos
 	for {
 		if r := hl.get(); r == eof {
-			if ppos < hl.pos {
+			if hl.pos > ppos {
 				hl.writePrev(ppos)
 			}
 			return nil
 		} else if r == '%' {
-			if ppos < hl.pos {
+			if hl.pos > ppos {
 				hl.writePrev(ppos)
 			}
 			break
@@ -224,4 +212,50 @@ func scanColor256(hl *highlighter, pre string) stateFn {
 	hl.attrs.writeString(pre)
 	hl.attrs.writeString(hl.s[start:hl.pos])
 	return scanHighlight
+}
+
+// bufferPool reuses buffers to avoid an allocation per invocation.
+var bufferPool = sync.Pool{
+	New: func() interface{} {
+		// initial capacity avoids constant reallocation during growth.
+		return buffer(make([]byte, 0, 30))
+	},
+}
+
+// stripVerbs removes all highlight verbs in s.
+func stripVerbs(s string) string {
+	buf := bufferPool.Get().(buffer)
+	// pi is the index after last verb
+	var pi, i int
+	for ; ; i++ {
+		if i >= len(s) {
+			if i > pi {
+				buf.writeString(s[pi:i])
+			}
+			break
+		} else if s[i] != '%' {
+			continue
+		}
+		if i > pi {
+			buf.writeString(s[pi:i])
+		}
+		i++
+		if c := s[i]; c == 'r' {
+			pi = i + 1
+			continue
+		} else if s[i] != 'h' {
+			pi = i - 1
+			continue
+		}
+		j := strings.IndexByte(s[i+1:], ']')
+		if j == -1 {
+			break
+		}
+		i += j + 1
+		pi = i + 1
+	}
+	s = string(buf)
+	buf.reset()
+	bufferPool.Put(buf)
+	return s
 }

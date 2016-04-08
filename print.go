@@ -16,7 +16,7 @@ func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
 			return fmt.Fprintf(w, Highlight(format), a...)
 		}
 	}
-	return fmt.Fprintf(w, RemoveVerbs(format), a...)
+	return fmt.Fprintf(w, stripVerbs(format), a...)
 }
 
 // Printf formats according to a format specifier and writes to standard output.

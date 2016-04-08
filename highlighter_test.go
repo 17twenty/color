@@ -72,26 +72,45 @@ func TestEdgeCases(t *testing.T) {
 	}
 }
 
+var stripEdgeCases = map[string]string{
+	"%h[fgRed]%smao%r": "%smao",
+}
+
+func TestStripEdgeCases(t *testing.T) {
+	for k, v := range stripEdgeCases {
+		if r := stripVerbs(k); r != v {
+			t.Errorf("Expected %q but result was %q", v, r)
+		}
+	}
+}
+
+var s = `%h[fgBlack]hi%r
+%h[fgRed]hi%r
+%h[bgGreen]hi%r
+%h[bgYellow]hi%r
+%h[fgBrightBlue]hi%r
+%h[fgBrightMagenta]hi%r
+%h[bgBrightCyan]hi%r
+%h[bgBrightWhite]hi%r
+%h[bold]hi%r
+%h[underline]hi%r
+%h[italic]hi%r
+%h[blink]hi%r
+%h[fg22]hi%r
+%h[fg233]hi%r
+%h[bg3]hi%r
+%h[bg102]hi%r
+%h[fgWhite+bgBrightCyan+bold+underline+fg32+bg69]hi%r
+%h[fg32+bg123+bold+underline+bgBlue+fgBrighGreen+bgBrightWhite]hi%r`
+
 func BenchmarkHighlight(b *testing.B) {
-	s := `%h[fgBlack]hi%r
-	%h[fgRed]hi%r
-	%h[bgGreen]hi%r
-	%h[bgYellow]hi%r
-	%h[fgBrightBlue]hi%r
-	%h[fgBrightMagenta]hi%r
-	%h[bgBrightCyan]hi%r
-	%h[bgBrightWhite]hi%r
-	%h[bold]hi%r
-	%h[underline]hi%r
-	%h[italic]hi%r
-	%h[blink]hi%r
-	%h[fg22]hi%r
-	%h[fg233]hi%r
-	%h[bg3]hi%r
-	%h[bg102]hi%r
-	%h[fgWhite+bgBrightCyan+bold+underline+fg32+bg69]hi%r
-	%h[fg32+bg123+bold+underline+bgBlue+fgBrighGreen+bgBrightWhite]hi%r`
 	for i := 0; i < b.N; i++ {
 		Highlight(s)
+	}
+}
+
+func BenchmarkStripVerbs(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		stripVerbs(s)
 	}
 }

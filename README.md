@@ -106,4 +106,4 @@ l.Fatalf("%h[fgRed]hi%r")
 - [ ] True color support
 - [ ] Windows support
 - [ ] Respect $TERM
-- [ ] TODO fully wrap \*log.Logger, perhaps a format string that declares the prefix, date , content and other stuff. Maybe another package for this?
+- [ ] Fully wrap \*log.Logger, perhaps a format string that defines the prefix, date, content etc. Perhaps another package?

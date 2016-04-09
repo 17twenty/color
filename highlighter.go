@@ -224,7 +224,7 @@ var bufferPool = sync.Pool{
 	},
 }
 
-// sstrip removes all highlight verbs in s.
+// sstripf removes all highlight verbs in s and then returns the resulting string.
 func sstripf(s string) string {
 	buf := bufferPool.Get().(buffer)
 	// pi is the index after the last verb.

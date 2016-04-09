@@ -59,8 +59,8 @@ color.Printf("%h[bg8+underline]panic:%r rip\n")
 // bolded "rip" with a blue foreground and bright black background.
 color.Printf("%h[fgBlue+bold]panic: %h[bg8]rip\n")
 
-// Bolded "hi" with a blue foreground and bright black background because
-// we did not reset the highlighting above.
+// We did not reset the highlighting so the following will be the same as above.
+// Bolded "hi" with a blue foreground and bright black background.
 fmt.Printf("hi")
 
 // Resets the highlighting and then prints "hello" normally.

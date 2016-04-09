@@ -41,7 +41,8 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.Logger.Panicf(l.highlight(format), v...)
 }
 
-// SetOutput first checks if color output is necessary, then sets the output.
+// SetOutput checks if the writer is a terminal and sets the color output accordingly.
+// Then it sets the underlying loggers output to the writer.
 func (l *Logger) SetOutput(w io.Writer) {
 	l.isTerminal(w)
 	l.Logger.SetOutput(w)
@@ -83,7 +84,7 @@ func (l *Logger) isTerminal(w io.Writer) {
 // The prefix appears at the beginning of each generated log line
 // and it can contain highlighting verbs.
 // The flag argument defines the logging properties.
-// It checks if out is a terminal and enables color output accordingly.
+// It checks if the writer is a terminal and enables color output accordingly.
 func NewLogger(out io.Writer, prefix string, flag int) (l *Logger) {
 	l = &Logger{Logger: log.New(out, "", flag), prefix: prefix}
 	l.isTerminal(out)

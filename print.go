@@ -11,8 +11,7 @@ import (
 // It returns the number of bytes written and any write error encountered.
 // It only prints in color if the writer is a terminal, otherwise it prints normally.
 // Use a color.Printer if you want full control over when to print in color or you want
-// to avoid the repetitive terminal checks. Printer only checks if the writer is a terminal
-// when it is created.
+// to avoid the repetitive terminal checks.
 func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
 	if isTerminal(w) {
 		return fmt.Fprintf(w, Highlight(format), a...)
@@ -34,7 +33,7 @@ func Sprintf(format string, a ...interface{}) string {
 // Printer prints to a writer. It is exactly like color.Fprintf except use this when
 // you want full control over when to color the output or you want to avoid the repetitive
 // terminal checks done by color.Fprinf. Printer only checks if the writer is a terminal
-// when it is created.
+// when it is created and enables color output accordingly.
 type Printer struct {
 	w     io.Writer
 	color bool // dictates if highlight verbs are applied
@@ -71,8 +70,8 @@ func (p *Printer) DisableColor() {
 	p.color = false
 }
 
-// NewPrinter creates a new Printer. It checks if out is a terminal, and enables
-// color output accordingly.
+// NewPrinter creates a new Printer. It checks if the writer is a terminal,
+// and enables color output accordingly.
 func NewPrinter(out io.Writer) (p *Printer) {
 	p = &Printer{w: out}
 	if isTerminal(out) {

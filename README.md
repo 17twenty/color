@@ -53,15 +53,18 @@ color.Printf("%h[fgGreen+bold]panic:%r rip\n")
 color.Printf("%h[bg8+underline]panic:%r rip\n")
 ```
 
-### Reset's Behavior
+### How does reset behave?
 ```go
-// Bolded "panic:" with a blue foreground then
+// Bolded "panic:" with a blue foreground and black background, then
 // bolded "rip" with a blue foreground and bright black background.
-color.Printf("%h[fgBlue+bold]panic: %h[bg8]rip\n")
+color.Printf("%h[fgBlue+bgBlack+bold]panic: %h[bg8]rip\n")
 
-// We did not reset the highlighting so the following will be the same as above.
+// Notice how the attributes carried on because we never reset the highlighting
+// after "panic:"? "rip" was not just in a bright black background,
+// but also in the attributes carried on from "panic:".
+
 // Bolded "hi" with a blue foreground and bright black background.
-fmt.Printf("hi")
+fmt.Printf("rip")
 
 // Resets the highlighting and then prints "hello" normally.
 color.Printf("%rhello")

@@ -2,6 +2,8 @@
 
 Color wraps the `fmt.Printf` functions with verbs for producing colored output.
 
+__note: this is still a WIP and things may change__
+
 ## Install
 ```
 go get github.com/nhooyr/color

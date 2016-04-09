@@ -86,20 +86,20 @@ p.Printf("%h[fgRed]hi%r\n")
 
 ### `*log.Logger` wrapper
 ```go
-logger := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0)
+l := color.Newl(os.Stderr, "%h[bold]color:%r ", 0)
 
 // Prints bold "color:" and then "hi" with red foreground.
-logger.Printf("%h[fgRed]hi%r")
+l.Printf("%h[fgRed]hi%r")
 
-logger.DisableColor()
+l.DisableColor()
 
 // Prints "color: hi" normally.
-logger.Printf("%h[fgRed]hi%r")
+l.Printf("%h[fgRed]hi%r")
 
-logger.EnableColor()
+l.EnableColor()
 
 // Prints bold "color:" and then "hi" with red foreground.
-logger.Fatalf("%h[fgRed]hi%r")
+l.Fatalf("%h[fgRed]hi%r")
 ```
 
 ## TODO

@@ -6,18 +6,17 @@ import (
 	"unicode"
 )
 
-// see doc.go for an explanation of these
 const (
-	errInvalid = "%%!h(INVALID)"
-	errMissing = "%%!h(MISSING)"
-	errBadAttr = "%%!h(BADATTR)"
+	errInvalid = "%%!h(INVALID)" // invalid character in the highlight verb
+	errMissing = "%%!h(MISSING)" // no attributes in the highlight verb
+	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the highlight verb
 )
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
 	s     string // string being scanned
 	pos   int    // position in s
-	buf   buffer // result
+	buf   buffer // where result is built
 	attrs buffer // attributes of current verb
 }
 
@@ -28,15 +27,17 @@ type highlighter struct {
 // which handle the rest. Only use this for performance reasons.
 func Highlight(s string) string {
 	hl := getHighlighter(s)
+	defer hl.free()
 	hl.run()
-	return string(hl.free())
+	s = string(hl.buf)
+	return s
 }
 
-// highlighterPool reuses highlighter objects to avoid an allocation per invocation.
+// highlighterPool allows the reuse of highlighters to avoid allocations.
 var highlighterPool = sync.Pool{
 	New: func() interface{} {
 		hl := new(highlighter)
-		// initial capacities avoid constant reallocation during growth.
+		// The initial capacities avoid constant reallocation during growth.
 		hl.buf = make([]byte, 0, 30)
 		hl.attrs = make([]byte, 0, 10)
 		return hl
@@ -50,13 +51,11 @@ func getHighlighter(s string) (hl *highlighter) {
 	return
 }
 
-// free resets the highlighter and returns the buffer.
-func (hl *highlighter) free() (b []byte) {
-	b = hl.buf
+// free resets the highlighter.
+func (hl *highlighter) free() {
 	hl.buf.reset()
 	hl.pos = 0
 	highlighterPool.Put(hl)
-	return
 }
 
 // stateFn represents the state of the scanner as a function that returns the next state.
@@ -93,18 +92,20 @@ func (hl *highlighter) writePrev(n int) {
 
 // scanText scans until the next highlight or reset verb.
 func scanText(hl *highlighter) stateFn {
-	// previous position
 	ppos := hl.pos
 LOOP:
+	// Find next verb.
 	for {
 		switch hl.get() {
 		case eof:
 			if hl.pos > ppos {
+				// Append remaining characters.
 				hl.writePrev(ppos)
 			}
 			return nil
 		case '%':
 			if hl.pos > ppos {
+				// Append the characters after the last verb.
 				hl.writePrev(ppos)
 			}
 			break LOOP
@@ -113,6 +114,7 @@ LOOP:
 		hl.pos++
 	}
 	hl.pos++
+	// At the verb.
 	switch hl.get() {
 	case 'r':
 		hl.pos++
@@ -121,7 +123,7 @@ LOOP:
 		hl.pos += 2
 		return scanHighlight
 	case eof:
-		// let fmt handle NOVERB
+		// Let fmt handle "%!h(NOVERB)".
 		hl.buf.writeByte('%')
 		return nil
 	}
@@ -217,10 +219,10 @@ func scanColor256(hl *highlighter, pre string) stateFn {
 	return scanHighlight
 }
 
-// bufferPool reuses buffers to avoid an allocation per invocation.
+// bufferPool allows the reuse of buffers to avoid allocations.
 var bufferPool = sync.Pool{
 	New: func() interface{} {
-		// initial capacity avoids constant reallocation during growth.
+		// The initial capacity avoids constant reallocation during growth.
 		return buffer(make([]byte, 0, 30))
 	},
 }
@@ -228,7 +230,7 @@ var bufferPool = sync.Pool{
 // stripVerbs removes all highlight verbs in s.
 func stripVerbs(s string) string {
 	buf := bufferPool.Get().(buffer)
-	// pi is the index after last verb.
+	// pi is the index after the last verb.
 	var pi, i int
 LOOP:
 	for ; ; i++ {
@@ -245,16 +247,16 @@ LOOP:
 		}
 		i++
 		if i >= len(s) {
-			// let fmt handle NOVERB
+			// Let fmt handle "%!h(NOVERB)".
 			buf.writeByte('%')
 			break
 		}
 		switch s[i] {
 		case 'r':
-			// strip the reset verb
+			// Strip the reset verb.
 			pi = i + 1
 		case 'h':
-			// strip inside the highlight verb
+			// Strip inside the highlight verb.
 			j := strings.IndexByte(s[i+1:], ']')
 			if j == -1 {
 				buf.writeString(errInvalid)
@@ -263,7 +265,7 @@ LOOP:
 			i += j + 1
 			pi = i + 1
 		default:
-			// include the verb
+			// Include the verb.
 			pi = i - 1
 		}
 	}

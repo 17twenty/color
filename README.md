@@ -3,13 +3,11 @@
 Color wraps the `fmt.Printf` functions with verbs for producing colored output.
 
 ## Install
-
 ```
 go get github.com/nhooyr/color
 ```
 
 ## Usage
-
 ```
 %h[attr...]	replaced with a SGR code that sets all of the attributes in []
 			multiple attributes are + separated
@@ -21,61 +19,86 @@ See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 ## Examples
 ### 16 Colors
 ```go
-// "panic:" with a red foreground then normal "rip"
+// "panic:" with a red foreground then normal "rip".
 color.Printf("%h[fgRed]panic:%r rip\n")
 
-// "panic:" with a brightRed background then normal "rip"
+// "panic:" with a brightRed background then normal "rip".
 color.Printf("%h[bgBrightRed]panic:%r rip\n")
 ```
 
 ### 256 Colors
 ```go
-// "panic:" with a green foreground then normal "rip"
+// "panic:" with a green foreground then normal "rip".
 color.Printf("%h[fg2]panic:%r rip\n")
 
-// "panic:" with a bright green background then normal "rip"
+// "panic:" with a bright green background then normal "rip".
 color.Printf("%h[bg10]panic:%r rip\n")
 ```
 
 ### Other Attributes
 ```go
-// bold "panic:" then normal "rip"
+// Bold "panic:" then normal "rip".
 color.Printf("%h[bold]panic:%r rip\n")
 
-// underlined "panic:" with then normal "rip"
+// Underlined "panic:" with then normal "rip".
 color.Printf("%h[underline]panic:%r rip\n")
 ```
 
 ### Mixing Attributes
 ```go
-// bolded "panic:" with a green foreground then normal "rip"
+// Bolded "panic:" with a green foreground then normal "rip".
 color.Printf("%h[fgGreen+bold]panic:%r rip\n")
 
-// underlined "panic:" with a bright black background then normal "rip"
+// Underlined "panic:" with a bright black background then normal "rip".
 color.Printf("%h[bg8+underline]panic:%r rip\n")
 ```
 
 ### How does reset behave?
 ```go
-// bolded "panic:" with a blue foreground
-// then bolded "rip" with a blue foreground and bright black background
+// Bolded "panic:" with a blue foreground then
+// bolded "rip" with a blue foreground and bright black background.
 color.Printf("%h[fgBlue+bold]panic: %h[bg8]rip\n")
 
-// bolded "hi" with a blue foreground and bright black background
+// Bolded "hi" with a blue foreground and bright black background.
 fmt.Printf("hi")
 
-// finally resets the highlighting
+// Resets the highlighting.
 color.Printf("%rhello")
+```
+
+### Printer
+```go
+p := color.NewPrinter(os.Stderr)
+
+// Prints "hi" with red foreground.
+p.Printf("%h[fgRed]hi%r\n")
+
+p.DisableColor()
+
+// Prints "hi" normally.
+p.Printf("%h[fgRed]hi%r\n")
+
+p.EnableColor()
+
+// Prints "hi" with red foreground.
+p.Printf("%h[fgRed]hi%r\n")
 ```
 
 ### `*log.Logger` wrapper
 ```go
-logger := color.NewLogger(os.Stderr, "", 0)
+logger := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0)
 
-// prints hi in red
+// Prints bold "color:" and then "hi" with red foreground.
 logger.Printf("%h[fgRed]hi%r")
 
-// prints hi in red and then exits
+logger.DisableColor()
+
+// Prints "color: hi" normally.
+logger.Printf("%h[fgRed]hi%r")
+
+logger.EnableColor()
+
+// Prints bold "color:" and then "hi" with red foreground.
 logger.Fatalf("%h[fgRed]hi%r")
 ```
 
@@ -83,5 +106,4 @@ logger.Fatalf("%h[fgRed]hi%r")
 - [ ] True color support
 - [ ] Windows support
 - [ ] Respect $TERM
-- [ ] Better interface to detect terminal
 - [ ] TODO fully wrap \*log.Logger, perhaps a format string that declares the prefix, date , content and other stuff. Maybe another package for this?

@@ -14,6 +14,8 @@ type Logger struct {
 	mu     sync.Mutex
 }
 
+// highlight is a convenience function for highlighting strings according to
+// whether color output is set.
 func (l *Logger) highlight(s string) string {
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -39,36 +41,42 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.Logger.Panicf(l.highlight(format), v...)
 }
 
-// SetOutput first checks if w is a terminal, then sets the output.
+// SetOutput first checks if color output is necessary, then sets the output.
 func (l *Logger) SetOutput(w io.Writer) {
 	l.isTerminal(w)
 	l.Logger.SetOutput(w)
 }
 
+// SetPrefix sets the output prefix for the logger.
 func (l *Logger) SetPrefix(prefix string) {
 	l.prefix = prefix
 	l.Logger.SetPrefix(l.highlight(prefix))
 }
 
-// SetColor sets whether the Logger should output in color.
-func (l *Logger) SetColor(b bool) {
+// EnableColor enables color output.
+// It also corrects the prefix.
+func (l *Logger) EnableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	// fix underlying logger prefix.
-	if b {
-		l.Logger.SetPrefix(Highlight(l.prefix))
-	} else {
-		l.Logger.SetPrefix(stripVerbs(l.prefix))
-	}
-	l.color = b
+	l.color = true
+	l.Logger.SetPrefix(Highlight(l.prefix))
+}
+
+// DisableColor disables color output.
+// It also corrects the prefix.
+func (l *Logger) DisableColor() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.color = false
+	l.Logger.SetPrefix(stripVerbs(l.prefix))
 }
 
 // isTerminal turns on color output if w is a terminal.
 func (l *Logger) isTerminal(w io.Writer) {
 	if isTerminal(w) {
-		l.SetColor(true)
+		l.EnableColor()
 	} else {
-		l.SetColor(false)
+		l.DisableColor()
 	}
 }
 

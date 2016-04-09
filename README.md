@@ -100,10 +100,11 @@ color.Printf("%h[fgBlue+bgBlack+bold]panic: %h[bg8]rip\n")
 // after "panic:"? "rip" was not just in a bright black background,
 // but also in the attributes carried on from "panic:".
 
-// Attributes are set at the terminal, anything else printed to the terminal
-// will stay in those attributes if not reset.
 // Bolded "hi" with a blue foreground and bright black background.
 fmt.Printf("rip")
+
+// Attributes are set at the terminal. Since the highlighting was not reset,
+// anything else printed to the terminal will stay in the set attributes.
 
 // Resets the highlighting and then prints "hello" normally.
 color.Printf("%rhello")

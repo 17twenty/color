@@ -53,16 +53,17 @@ color.Printf("%h[fgGreen+bold]panic:%r rip\n")
 color.Printf("%h[bg8+underline]panic:%r rip\n")
 ```
 
-### How does reset behave?
+### Reset's Behavior
 ```go
 // Bolded "panic:" with a blue foreground then
 // bolded "rip" with a blue foreground and bright black background.
 color.Printf("%h[fgBlue+bold]panic: %h[bg8]rip\n")
 
-// Bolded "hi" with a blue foreground and bright black background.
+// Bolded "hi" with a blue foreground and bright black background because
+// we did not reset the highlighting above.
 fmt.Printf("hi")
 
-// Resets the highlighting.
+// Resets the highlighting and then prints "hello" normally.
 color.Printf("%rhello")
 ```
 
@@ -98,7 +99,8 @@ l.Printf("%h[fgRed]hi%r")
 
 l.EnableColor()
 
-// Prints bold "color:" and then "hi" with red foreground.
+// Prints bold "color:" and then "hi" with red foreground and
+// then exits with status code 1.
 l.Fatalf("%h[fgRed]hi%r")
 ```
 

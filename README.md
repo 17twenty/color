@@ -113,3 +113,4 @@ color.Printf("%rhello")
 - [ ] Windows support
 - [ ] Respect $TERM
 - [ ] Fully wrap \*log.Logger, perhaps a format string that defines the prefix, date, content etc. Perhaps another package?
+- [ ] New interface for sprintf for performance purposes

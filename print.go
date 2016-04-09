@@ -14,20 +14,20 @@ import (
 // to avoid the repetitive terminal checks.
 func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
 	if isTerminal(w) {
-		return fmt.Fprintf(w, Highlight(format), a...)
+		return fmt.Fprintf(w, shighlightf(format), a...)
 	}
-	return fmt.Fprintf(w, stripVerbs(format), a...)
+	return fmt.Fprintf(w, sstripf(format), a...)
 }
 
 // Printf formats according to a format specifier and writes to standard output.
 // It returns the number of bytes written and any write error encountered.
 func Printf(format string, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(os.Stdout, Highlight(format), a...)
+	return fmt.Fprintf(os.Stdout, shighlightf(format), a...)
 }
 
 // Sprintf formats according to a format specifier and returns the resulting string.
 func Sprintf(format string, a ...interface{}) string {
-	return fmt.Sprintf(Highlight(format), a...)
+	return fmt.Sprintf(shighlightf(format), a...)
 }
 
 // Printer prints to a writer. It is exactly like color.Fprintf except use this when
@@ -46,9 +46,9 @@ func (p *Printer) highlight(s string) string {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.color {
-		return Highlight(s)
+		return shighlightf(s)
 	}
-	return stripVerbs(s)
+	return sstripf(s)
 }
 
 // Printf calls fmt.Fprintf to print to the writer.

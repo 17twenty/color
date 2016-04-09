@@ -20,12 +20,9 @@ type highlighter struct {
 	attrs buffer // attributes of current verb
 }
 
-// Highlight replaces the highlight verbs in s with their appropriate
+// shighlightf replaces the highlight verbs in s with their appropriate
 // control sequences and then returns the resulting string.
-// This is a low-level function that only scans highlight verbs. The color.Printf functions
-// are the intended user functions as they wrap around the fmt.Printf functions,
-// which handle the rest. Only use this for performance reasons.
-func Highlight(s string) string {
+func shighlightf(s string) string {
 	hl := getHighlighter(s)
 	defer hl.free()
 	hl.run()
@@ -227,8 +224,8 @@ var bufferPool = sync.Pool{
 	},
 }
 
-// stripVerbs removes all highlight verbs in s.
-func stripVerbs(s string) string {
+// sstrip removes all highlight verbs in s.
+func sstripf(s string) string {
 	buf := bufferPool.Get().(buffer)
 	// pi is the index after the last verb.
 	var pi, i int

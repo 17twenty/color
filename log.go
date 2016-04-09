@@ -20,9 +20,9 @@ func (l *Logger) highlight(s string) string {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	if l.color {
-		return Highlight(s)
+		return shighlightf(s)
 	}
-	return stripVerbs(s)
+	return sstripf(s)
 }
 
 // Printf calls l.Logger.Printf to print to the logger.
@@ -59,7 +59,7 @@ func (l *Logger) EnableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.color = true
-	l.Logger.SetPrefix(Highlight(l.prefix))
+	l.Logger.SetPrefix(shighlightf(l.prefix))
 }
 
 // DisableColor disables color output.
@@ -67,7 +67,7 @@ func (l *Logger) DisableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.color = false
-	l.Logger.SetPrefix(stripVerbs(l.prefix))
+	l.Logger.SetPrefix(sstripf(l.prefix))
 }
 
 // isTerminal turns on color output if w is a terminal.

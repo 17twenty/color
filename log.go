@@ -54,7 +54,6 @@ func (l *Logger) SetPrefix(prefix string) {
 }
 
 // EnableColor enables color output.
-// It also corrects the prefix.
 func (l *Logger) EnableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -63,7 +62,6 @@ func (l *Logger) EnableColor() {
 }
 
 // DisableColor disables color output.
-// It also corrects the prefix.
 func (l *Logger) DisableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -85,6 +83,7 @@ func (l *Logger) isTerminal(w io.Writer) {
 // The prefix appears at the beginning of each generated log line
 // and it can contain highlighting verbs.
 // The flag argument defines the logging properties.
+// It checks if out is a terminal and enables color output accordingly.
 func NewLogger(out io.Writer, prefix string, flag int) (l *Logger) {
 	l = &Logger{Logger: log.New(out, "", flag), prefix: prefix}
 	l.isTerminal(out)

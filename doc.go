@@ -3,7 +3,7 @@ Package color wraps fmt.Printf with verbs for producing colored output.
 
 Printing
 
-This section only describes the additions to fmt.Printf. Everything else is handled by the fmt package. You should read its documentation.
+This section only describes the new highlight verbs. Everything else is handled by the fmt package. You should read its documentation.
 
 Highlight Verbs:
 
@@ -16,11 +16,11 @@ Errors:
 If an error occurs, the generated string will contain a description of the problem, as in these examples.
 
 	No attributes in the highlight verb:
-		Printf("%h[]"):			%!h(MISSING)
+		Printf("%h[]%s", "hi"):			%!h(MISSING)
 	Invalid character in the highlight verb:
-		Printf("%h[%&:*!]"):		%!h(INVALID)
+		Printf("%h[%&:*!]%s", "hi"):		%!h(INVALID)
 	Unknown attribute in the highlight verb:
-		Printf("%h[fgOrange]"):		%!h(BADATTR)
+		Printf("%h[fgOrange]%s", "hi"):	%!h(BADATTR)
 
 Attributes Reference
 

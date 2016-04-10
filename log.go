@@ -31,7 +31,7 @@ func NewLogger(out io.Writer, prefix string, flag int) (l *Logger) {
 func (l *Logger) scolorf(s string) string {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	return Scolorf(s, l.color)
+	return scolorf(s, l.color)
 }
 
 // Printf calls l.Logger.Printf to print to the logger.

@@ -89,6 +89,6 @@ Other:
 
 See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section.
 
-See http://goo.gl/fvtHLs and according to the above document, ISO-8613-3, for more information on 256 colors.
+Also see http://goo.gl/fvtHLs and according to the above document, ISO-8613-3, for more information on 256 colors.
 */
 package color

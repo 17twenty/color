@@ -55,7 +55,7 @@ color.Eprintf(f, "dsda")
 ```
 
 ### Printer
-A `Printer` wraps around a `io.Writer`, but unlike `color.Fprintf`, it gives you full control over whether color output is enabled, avoiding the redundant terminal checks done by `color.Fprintf`.
+A `Printer` wraps around an `io.Writer`, but unlike `color.Fprintf`, it gives you full control over whether color output is enabled.
 
 ```go
 // "hi" with red foreground.

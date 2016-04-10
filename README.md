@@ -26,14 +26,11 @@ color.Printf("%h[bold]panic:%r rip\n")
 // Underlined "panic:" with then normal "rip".
 color.Printf("%h[underline]panic:%r rip\n")
 
-// The following use 256 color attributes.
-// See godoc for more information on 256 colors.
+// "panic:" using color 83 as the foreground then normal "rip".
+color.Printf("%h[fg83]panic:%r rip\n")
 
-// "panic:" with a green foreground then normal "rip".
-color.Printf("%h[fg2]panic:%r rip\n")
-
-// "panic:" with a bright green background then normal "rip".
-color.Printf("%h[bg10]panic:%r rip\n")
+// "panic:" using color 158 as the background then normal "rip".
+color.Printf("%h[bg158]panic:%r rip\n")
 ```
 
 ### Mixing Attributes

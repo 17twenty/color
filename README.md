@@ -70,7 +70,7 @@ p.Printf("%h[fgRed]hi%r\n")
 p = color.NewPrinter(os.Stderr, color.PerformCheck)
 
 // If os.Stderr is a terminal, this will print in color.
-// Otherwise it will be a normal "hi"
+// Otherwise it will be a normal "hi".
 p.Printf("%h[fgRed]hi%r\n")
 ```
 

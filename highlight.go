@@ -12,6 +12,14 @@ const (
 	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the highlight verb
 )
 
+// scolorf returns the highlighted string if color is true, otherwise it returns the string with the highlight verbs stripped.
+func scolorf(format string, color bool) string {
+	if color {
+		return Shighlightf(format)
+	}
+	return Sstripf(format)
+}
+
 // highlighter holds the state of the scanner.
 type highlighter struct {
 	s     string // string being scanned
@@ -274,12 +282,4 @@ LOOP:
 	buf.reset()
 	bufferPool.Put(buf)
 	return s
-}
-
-// scolorf returns the highlighted string if color is true, otherwise it returns the string with the highlight verbs stripped.
-func scolorf(format string, color bool) string {
-	if color {
-		return Shighlightf(format)
-	}
-	return Sstripf(format)
 }

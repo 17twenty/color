@@ -1,12 +1,13 @@
 package color_test
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/nhooyr/color"
 )
 
-func Example() {
+func Example_attributes() {
 	// "panic:" with a red foreground then normal "rip".
 	color.Fprintf(os.Stdout, "%h[fgRed]panic:%r %s\n", "rip")
 
@@ -24,12 +25,28 @@ func Example() {
 
 	// "panic:" using color 158 as the background then normal "rip".
 	color.Printf("%h[bg158]panic:%r %s\n", "rip")
+}
 
+func Example_mixing() {
 	// Bolded "panic:" with a green foreground then normal "rip".
 	color.Printf("%h[fgGreen+bold]panic:%r %s\n", "rip")
 
 	// Underlined "panic:" with a bright black background then normal "rip".
 	color.Printf("%h[bg8+underline]panic:%r %s\n", "rip")
+}
+
+func Example_reset() {
+	// "rip" will be printed with a blue foreground and bright black background
+	// because we never reset the highlighting after "panic:". The blue foreground is
+	// carried on from "panic:".
+	color.Printf("%h[fgBlue+bgBlack]panic: %h[bg8]%s\n", "rip")
+
+	// The attributes carry onto anything written to the terminal until reset.
+	// This prints "rip" in the same attributes as above.
+	fmt.Println("rip")
+
+	// Resets the highlighting and then prints "hello" normally.
+	color.Printf("%r%s", "hello")
 }
 
 func ExamplePrepare() {

@@ -1,15 +1,16 @@
-package color
+package color_test
 
 import (
 	"fmt"
 	"testing"
+	"github.com/nhooyr/color"
 )
 
 func TestAttributes(t *testing.T) {
-	for k, v := range attrs {
+	for k, v := range color.Attrs {
 		s := fmt.Sprintf("%%h[%s]hi%%r", k)
 		exp := fmt.Sprintf("\x1b[%smhi\x1b[0m", v[1:])
-		if r := Shighlightf(s); r != exp {
+		if r := color.Shighlightf(s); r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 	}
@@ -19,12 +20,12 @@ func TestColor256(t *testing.T) {
 	for i := 0; i < 256; i++ {
 		s := fmt.Sprintf("%%h[fg%d]hi%%r", i)
 		exp := fmt.Sprintf("\x1b[38;5;%dmhi\x1b[0m", i)
-		if r := Shighlightf(s); r != exp {
+		if r := color.Shighlightf(s); r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 		s = fmt.Sprintf("%%h[bg%d]hi%%r", i)
 		exp = fmt.Sprintf("\x1b[48;5;%dmhi\x1b[0m", i)
-		if r := Shighlightf(s); r != exp {
+		if r := color.Shighlightf(s); r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 	}
@@ -37,7 +38,7 @@ var combinations = map[string]string{
 
 func TestCombinations(t *testing.T) {
 	for k, v := range combinations {
-		if r := Shighlightf(k); r != v {
+		if r := color.Shighlightf(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)
 		}
 	}
@@ -66,7 +67,7 @@ var highlightEdgeCases = map[string]string{
 
 func TestHighlightEdgeCases(t *testing.T) {
 	for k, v := range highlightEdgeCases {
-		if r := Shighlightf(k); r != v {
+		if r := color.Shighlightf(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)
 		}
 	}
@@ -80,7 +81,7 @@ var stripEdgeCases = map[string]string{
 
 func TestStripEdgeCases(t *testing.T) {
 	for k, v := range stripEdgeCases {
-		if r := Sstripf(k); r != v {
+		if r := color.Sstripf(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)
 		}
 	}
@@ -107,12 +108,12 @@ const s = `%h[fgBlack]hi%r
 
 func BenchmarkShighlightf(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Shighlightf(s)
+		color.Shighlightf(s)
 	}
 }
 
 func BenchmarkSstripf(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Sstripf(s)
+		color.Sstripf(s)
 	}
 }

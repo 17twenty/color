@@ -18,8 +18,8 @@ func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(w, Sstripf(format), a...)
 }
 
-// Cfprintf is the same as Fprintf but takes a prepared Format object.
-func Cfprintf(w io.Writer, f *Format, a ...interface{}) (n int, err error) {
+// Efprintf is the same as Fprintf but takes a prepared Format object.
+func Efprintf(w io.Writer, f *Format, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(w, f.Get(isTerminal(w)), a...)
 }
 
@@ -31,9 +31,9 @@ func Printf(format string, a ...interface{}) (n int, err error) {
 	return stdout.Printf(format, a...)
 }
 
-// Aprintf is the same as Printf but takes a prepared Format object.
-func Aprintf(f *Format, a ...interface{}) (n int, err error) {
-	return stdout.Aprintf(f, a...)
+// Eprintf is the same as Printf but takes a prepared Format object.
+func Eprintf(f *Format, a ...interface{}) (n int, err error) {
+	return stdout.Eprintf(f, a...)
 }
 
 // Sprintf formats according to a format specifier and returns the resulting string.
@@ -55,8 +55,8 @@ func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, Scolorf(format, p.color), a...)
 }
 
-// Aprintf is the same as p.Printf but takes a prepared Format object.
-func (p *Printer) Aprintf(f *Format, a ...interface{}) (n int, err error) {
+// Eprintf is the same as p.Printf but takes a prepared Format object.
+func (p *Printer) Eprintf(f *Format, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, f.Get(p.color), a...)
 }
 

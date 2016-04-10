@@ -81,9 +81,9 @@ p.Printf("%h[fgRed]hi%r\n")
 f := color.Prepare("%h[fgRed+bold]panic:%r %s\n")
 
 // Each prints bolded "panic:" with a red foreground and some normal text after.
-color.Aprintf(f, "rip")
-color.Aprintf(f, "yippie")
-color.Aprintf(f, "dsda")
+color.Eprintf(f, "rip")
+color.Eprintf(f, "yippie")
+color.Eprintf(f, "dsda")
 ```
 
 ### `*log.Logger` wrapper

@@ -10,15 +10,9 @@ go get github.com/nhooyr/color
 ```
 
 ## Usage
-```
-%h[attr...]	replaced with a SGR code that sets all of the attributes in []
-			multiple attributes are + separated
-%r			an abbreviation for %h[reset]
-```
 
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
-## Examples
 ### 16 Colors
 ```go
 // "panic:" with a red foreground then normal "rip".
@@ -55,6 +49,18 @@ color.Printf("%h[fgGreen+bold]panic:%r rip\n")
 color.Printf("%h[bg8+underline]panic:%r rip\n")
 ```
 
+### Preparing Strings
+```go
+// Prepare processes the highlight verbs in the string only once,
+// letting you print it repeatedly with performance.
+f := color.Prepare("%h[fgRed+bold]panic:%r %s\n")
+
+// Each prints bolded "panic:" with a red foreground and some normal text after.
+color.Eprintf(f, "rip")
+color.Eprintf(f, "yippie")
+color.Eprintf(f, "dsda")
+```
+
 ### Printer
 ```go
 // Prints "hi" with red foreground.
@@ -69,18 +75,6 @@ p.Printf("%h[fgRed]hi%r\n")
 // Otherwise it will be a normal "hi".
 p = color.NewPrinter(os.Stderr, color.PerformCheck)
 p.Printf("%h[fgRed]hi%r\n")
-```
-
-### Preparing Strings
-```go
-// Prepare processes the highlight verbs in the string only once,
-// letting you print it repeatedly with performance.
-f := color.Prepare("%h[fgRed+bold]panic:%r %s\n")
-
-// Each prints bolded "panic:" with a red foreground and some normal text after.
-color.Eprintf(f, "rip")
-color.Eprintf(f, "yippie")
-color.Eprintf(f, "dsda")
 ```
 
 ### `*log.Logger` wrapper
@@ -104,7 +98,7 @@ l.Fatalf("%h[fgRed]hi%r")
 // "rip" will be printed with a blue foreground and bright black background
 // because we never reset the highlighting after "panic:". The blue foreground is
 // carried on from "panic:".
-color.Printf("%h[fgBlue+bgBlack+bold]panic: %h[bg8]rip\n")
+color.Printf("%h[fgBlue+bgBlack]panic: %h[bg8]rip\n")
 
 // The attributes carry onto anything written to the terminal until reset.
 // This prints "rip" in the same attributes as above.

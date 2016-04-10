@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	errInvalid = "%%!h(INVALID)" // invalid character in the highlight verb
 	errMissing = "%%!h(MISSING)" // no attributes in the highlight verb
+	errInvalid = "%%!h(INVALID)" // invalid character in the highlight verb
 	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the highlight verb
 )
 

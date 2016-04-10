@@ -1,19 +1,26 @@
 /*
 Package color wraps fmt.Printf with verbs for producing colored output.
 
-Highlight verbs:
+Printing
+
+The highlight verbs:
 
 	%h[attr...]	replaced with a SGR code that sets all of the attributes in []
 			multiple attributes are + separated
 	%r		an abbreviation for %h[reset]
 
-Errors:
+Format errors:
 
-If an error occurs, one of the following strings will replace the position of the highlight verb.
+If an error occurs, the generated string will contain a description of the problem, as in these examples.
 
-	%!h(INVALID)	invalid character in the highlight verb
-	%!h(MISSING)	no attributes in the highlight verb
-	%!h(BADATTR)	unknown attribute in the highlight verb
+	No attributes in the highlight verb:
+		Printf("%h[]"):			%!h(MISSING)
+	Invalid character in the highlight verb:
+		Printf("%h[%&:*!]"):		%!h(INVALID)
+	Unknown attribute in the highlight verb:
+		Printf("%h[fgOrange]"):		%!h(BADATTR)
+
+Everything else is handled by the fmt package. You should read its documentation.
 
 Attributes Reference
 

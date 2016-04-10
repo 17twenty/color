@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sync"
 )
 
 // Fprintf formats according to a format specifier and writes to w.
@@ -13,71 +12,67 @@ import (
 // Use a color.Printer if you want full control over when to print in color or you want
 // to avoid the repetitive terminal checks.
 func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	if isTerminal(w) {
-		return fmt.Fprintf(w, shighlightf(format), a...)
+	if IsTerminal(w) {
+		return fmt.Fprintf(w, Shighlightf(format), a...)
 	}
-	return fmt.Fprintf(w, sstripf(format), a...)
+	return fmt.Fprintf(w, Sstripf(format), a...)
 }
+
+// Efprintf is the same as Fprintf but takes a prepared Format object.
+func Efprintf(w io.Writer, f *Format, a ...interface{}) (n int, err error) {
+	return fmt.Fprintf(w, f.Get(IsTerminal(w)), a...)
+}
+
+var stdout = NewPrinter(os.Stdout, PerformCheck)
 
 // Printf formats according to a format specifier and writes to standard output.
 // It returns the number of bytes written and any write error encountered.
 func Printf(format string, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(os.Stdout, shighlightf(format), a...)
+	return stdout.Printf(format, a...)
+}
+
+// Eprintf is the same as Printf but takes a prepared Format object.
+func Eprintf(f *Format, a ...interface{}) (n int, err error) {
+	return stdout.Eprintf(f, a...)
 }
 
 // Sprintf formats according to a format specifier and returns the resulting string.
 func Sprintf(format string, a ...interface{}) string {
-	return fmt.Sprintf(shighlightf(format), a...)
+	return fmt.Sprintf(Shighlightf(format), a...)
 }
 
 // Printer prints to a writer. It is exactly like color.Fprintf except use this when
 // you want full control over when to color the output or you want to avoid the repetitive
-// terminal checks done by color.Fprinf. Printer only checks if the writer is a terminal
-// when it is created and enables color output accordingly.
+// terminal checks done by color.Fprinf.
 type Printer struct {
 	w     io.Writer
-	color bool // dictates if highlight verbs are applied
-	mu    sync.Mutex
+	color bool
 }
 
-// highlight is a convenience function for highlighting strings according to
-// whether color output is set.
-func (p *Printer) highlight(s string) string {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if p.color {
-		return shighlightf(s)
+// Flags for setting colored output when creating a Printer.
+const (
+	PerformCheck = iota // check if a terminal, and if so enable colored output
+	EnableColor         // enable colored output
+	DisableColor        // disable colored output
+)
+
+// NewPrinter creates a new Printer. It enables colored output
+// based on the flag.
+func NewPrinter(out io.Writer, flag uint8) (p *Printer) {
+	p = &Printer{w: out}
+	if flag == PerformCheck && IsTerminal(out) || flag == EnableColor {
+		p.color = true
 	}
-	return sstripf(s)
+	return
 }
 
 // Printf calls fmt.Fprintf to print to the writer.
-func (p *Printer) Printf(format string, v ...interface{}) {
-	fmt.Fprintf(p.w, p.highlight(format), v...)
+// Arguments are handled in the manner of color.Printf.
+func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
+	return fmt.Fprintf(p.w, Scolorf(format, p.color), a...)
 }
 
-// EnableColor enables color output.
-func (p *Printer) EnableColor() {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.color = true
-}
-
-// DisableColor disables color output.
-func (p *Printer) DisableColor() {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.color = false
-}
-
-// NewPrinter creates a new Printer. It checks if the writer is a terminal,
-// and enables color output accordingly.
-func NewPrinter(out io.Writer) (p *Printer) {
-	p = &Printer{w: out}
-	if isTerminal(out) {
-		p.EnableColor()
-	} else {
-		p.DisableColor()
-	}
-	return
+// Eprintf is the same as p.Printf but takes a prepared Format object.
+func (p *Printer) Eprintf(f *Format, a ...interface{}) (n int, err error) {
+	return fmt.Fprintf(p.w, f.Get(p.color), a...)
 }

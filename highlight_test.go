@@ -9,7 +9,7 @@ func TestAttributes(t *testing.T) {
 	for k, v := range attrs {
 		s := fmt.Sprintf("%%h[%s]hi%%r", k)
 		exp := fmt.Sprintf("\x1b[%smhi\x1b[0m", v[1:])
-		if r := shighlightf(s); r != exp {
+		if r := Shighlightf(s); r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 	}
@@ -19,12 +19,12 @@ func TestColor256(t *testing.T) {
 	for i := 0; i < 256; i++ {
 		s := fmt.Sprintf("%%h[fg%d]hi%%r", i)
 		exp := fmt.Sprintf("\x1b[38;5;%dmhi\x1b[0m", i)
-		if r := shighlightf(s); r != exp {
+		if r := Shighlightf(s); r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 		s = fmt.Sprintf("%%h[bg%d]hi%%r", i)
 		exp = fmt.Sprintf("\x1b[48;5;%dmhi\x1b[0m", i)
-		if r := shighlightf(s); r != exp {
+		if r := Shighlightf(s); r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 	}
@@ -37,13 +37,13 @@ var combinations = map[string]string{
 
 func TestCombinations(t *testing.T) {
 	for k, v := range combinations {
-		if r := shighlightf(k); r != v {
+		if r := Shighlightf(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)
 		}
 	}
 }
 
-var edgeCases = map[string]string{
+var highlightEdgeCases = map[string]string{
 	"%h[fgRed+%h[fgBlue]": "%%!h(INVALID)",
 	"%h[":                 "%%!h(INVALID)",
 	"%h{":                 "%%!h(INVALID)",
@@ -65,54 +65,15 @@ var edgeCases = map[string]string{
 }
 
 func TestEdgeCases(t *testing.T) {
-	for k, v := range edgeCases {
-		if r := shighlightf(k); r != v {
+	for k, v := range highlightEdgeCases {
+		if r := Shighlightf(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)
 		}
 	}
 }
 
-var stripEdgeCases = map[string]string{
-	"%h[fgRed]%smao%r": "%smao",
-	"%":                "%",
-	"%c":               "%c",
-}
-
-func TestStripEdgeCases(t *testing.T) {
-	for k, v := range stripEdgeCases {
-		if r := sstripf(k); r != v {
-			t.Errorf("Expected %q but result was %q", v, r)
-		}
-	}
-}
-
-var s = `%h[fgBlack]hi%r
-%h[fgRed]hi%r
-%h[bgGreen]hi%r
-%h[bgYellow]hi%r
-%h[fgBrightBlue]hi%r
-%h[fgBrightMagenta]hi%r
-%h[bgBrightCyan]hi%r
-%h[bgBrightWhite]hi%r
-%h[bold]hi%r
-%h[underline]hi%r
-%h[italic]hi%r
-%h[blink]hi%r
-%h[fg22]hi%r
-%h[fg233]hi%r
-%h[bg3]hi%r
-%h[bg102]hi%r
-%h[fgWhite+bgBrightCyan+bold+underline+fg32+bg69]hi%r
-%h[fg32+bg123+bold+underline+bgBlue+fgBrighGreen+bgBrightWhite]hi%r`
-
-func BenchmarkHighlight(b *testing.B) {
+func BenchmarkShighlightf(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		shighlightf(s)
-	}
-}
-
-func BenchmarkStripVerbs(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		sstripf(s)
+		Shighlightf(s)
 	}
 }

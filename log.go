@@ -14,31 +14,55 @@ type Logger struct {
 	mu     sync.Mutex
 }
 
-// highlight is a convenience function for highlighting strings according to
+// NewLogger creates a new Logger. The out variable sets the
+// destination to which log data will be written.
+// The prefix appears at the beginning of each generated log line
+// and it can contain highlighting verbs.
+// The flag argument defines the logging properties.
+// It checks if the writer is a terminal and enables color output accordingly.
+func NewLogger(out io.Writer, prefix string, flag int) (l *Logger) {
+	l = &Logger{Logger: log.New(out, "", flag), prefix: prefix}
+	l.isTerminal(out)
+	return
+}
+
+// scolorf is a convenience function for highlighting strings according to
 // whether color output is set.
-func (l *Logger) highlight(s string) string {
+func (l *Logger) scolorf(s string) string {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	if l.color {
-		return shighlightf(s)
-	}
-	return sstripf(s)
+	return Scolorf(s, l.color)
 }
 
 // Printf calls l.Logger.Printf to print to the logger.
-// Arguments are handled in the manner of fmt.Printf.
+// Arguments are handled in the manner of color.Printf.
 func (l *Logger) Printf(format string, v ...interface{}) {
-	l.Logger.Printf(l.highlight(format), v...)
+	l.Logger.Printf(l.scolorf(format), v...)
 }
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
 func (l *Logger) Fatalf(format string, v ...interface{}) {
-	l.Logger.Fatalf(l.highlight(format), v...)
+	l.Logger.Fatalf(l.scolorf(format), v...)
 }
 
 // Panicf is equivalent to l.Printf() followed by a call to panic().
 func (l *Logger) Panicf(format string, v ...interface{}) {
-	l.Logger.Panicf(l.highlight(format), v...)
+	l.Logger.Panicf(l.scolorf(format), v...)
+}
+
+// Eprintf is the same as l.Panicf but takes a prepared Format object.
+func (l *Logger) Eprintf(f *Format, v ...interface{}) {
+	l.Logger.Printf(f.Get(l.color), v...)
+}
+
+// Efatalf is the same as l.Fatalf but takes a prepared Format object.
+func (l *Logger) Efatalf(f *Format, v ...interface{}) {
+	l.Logger.Fatalf(f.Get(l.color), v...)
+}
+
+// Epanicf is the same as l.Panicf but takes a prepared Format object.
+func (l *Logger) Epanicf(f *Format, v ...interface{}) {
+	l.Logger.Panicf(f.Get(l.color), v...)
 }
 
 // SetOutput checks if the writer is a terminal and sets the color output accordingly.
@@ -51,7 +75,7 @@ func (l *Logger) SetOutput(w io.Writer) {
 // SetPrefix sets the output prefix for the logger.
 func (l *Logger) SetPrefix(prefix string) {
 	l.prefix = prefix
-	l.Logger.SetPrefix(l.highlight(prefix))
+	l.Logger.SetPrefix(l.scolorf(prefix))
 }
 
 // EnableColor enables color output.
@@ -59,7 +83,7 @@ func (l *Logger) EnableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.color = true
-	l.Logger.SetPrefix(shighlightf(l.prefix))
+	l.Logger.SetPrefix(Shighlightf(l.prefix))
 }
 
 // DisableColor disables color output.
@@ -67,26 +91,14 @@ func (l *Logger) DisableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.color = false
-	l.Logger.SetPrefix(sstripf(l.prefix))
+	l.Logger.SetPrefix(Sstripf(l.prefix))
 }
 
 // isTerminal turns on color output if w is a terminal.
 func (l *Logger) isTerminal(w io.Writer) {
-	if isTerminal(w) {
+	if IsTerminal(w) {
 		l.EnableColor()
 	} else {
 		l.DisableColor()
 	}
-}
-
-// NewLogger creates a new Logger. The out variable sets the
-// destination to which log data will be written.
-// The prefix appears at the beginning of each generated log line
-// and it can contain highlighting verbs.
-// The flag argument defines the logging properties.
-// It checks if the writer is a terminal and enables color output accordingly.
-func NewLogger(out io.Writer, prefix string, flag int) (l *Logger) {
-	l = &Logger{Logger: log.New(out, "", flag), prefix: prefix}
-	l.isTerminal(out)
-	return
 }

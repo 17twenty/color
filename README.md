@@ -1,6 +1,6 @@
 # color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
-Color wraps the `fmt.Printf` functions with verbs for producing colored output.
+Color wraps `fmt.Printf` with verbs for producing colored output.
 
 __note: this is still a WIP and things may change__
 
@@ -9,41 +9,28 @@ __note: this is still a WIP and things may change__
 go get github.com/nhooyr/color
 ```
 
-## Usage
-```
-%h[attr...]	replaced with a SGR code that sets all of the attributes in []
-			multiple attributes are + separated
-%r			an abbreviation for %h[reset]
-```
-
+## Examples
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
-## Examples
-### 16 Colors
+### Setting Attributes
 ```go
 // "panic:" with a red foreground then normal "rip".
 color.Printf("%h[fgRed]panic:%r rip\n")
 
 // "panic:" with a brightRed background then normal "rip".
 color.Printf("%h[bgBrightRed]panic:%r rip\n")
-```
 
-### 256 Colors
-```go
-// "panic:" with a green foreground then normal "rip".
-color.Printf("%h[fg2]panic:%r rip\n")
-
-// "panic:" with a bright green background then normal "rip".
-color.Printf("%h[bg10]panic:%r rip\n")
-```
-
-### Other Attributes
-```go
 // Bold "panic:" then normal "rip".
 color.Printf("%h[bold]panic:%r rip\n")
 
 // Underlined "panic:" with then normal "rip".
 color.Printf("%h[underline]panic:%r rip\n")
+
+// "panic:" using color 83 as the foreground then normal "rip".
+color.Printf("%h[fg83]panic:%r rip\n")
+
+// "panic:" using color 158 as the background then normal "rip".
+color.Printf("%h[bg158]panic:%r rip\n")
 ```
 
 ### Mixing Attributes
@@ -55,21 +42,33 @@ color.Printf("%h[fgGreen+bold]panic:%r rip\n")
 color.Printf("%h[bg8+underline]panic:%r rip\n")
 ```
 
-### Printer
+### Preparing Strings
 ```go
-p := color.NewPrinter(os.Stderr)
+// Prepare processes the highlight verbs in the string only once,
+// letting you print it repeatedly with performance.
+f := color.Prepare("%h[fgRed+bold]panic:%r %s\n")
 
-// Prints "hi" with red foreground.
+// Each prints bolded "panic:" with a red foreground and some normal text after.
+color.Eprintf(f, "rip")
+color.Eprintf(f, "yippie")
+color.Eprintf(f, "dsda")
+```
+
+### Printer
+A `Printer` wraps around an `io.Writer`, but unlike `color.Fprintf`, it gives you full control over whether color output is enabled.
+
+```go
+// "hi" with red foreground.
+p := color.NewPrinter(os.Stderr, color.EnableColor)
 p.Printf("%h[fgRed]hi%r\n")
 
-p.DisableColor()
-
-// Prints "hi" normally.
+// "hi" normally, the highlight verbs are ignored.
+p = color.NewPrinter(os.Stderr, color.DisableColor)
 p.Printf("%h[fgRed]hi%r\n")
 
-p.EnableColor()
-
-// Prints "hi" with red foreground.
+// If os.Stderr is a terminal, this will print in color.
+// Otherwise it will be a normal "hi".
+p = color.NewPrinter(os.Stderr, color.PerformCheck)
 p.Printf("%h[fgRed]hi%r\n")
 ```
 
@@ -77,33 +76,27 @@ p.Printf("%h[fgRed]hi%r\n")
 ```go
 l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0)
 
-// Prints bold "color:" and then "hi" with red foreground.
+// "hi" with a red foreground.
 l.Printf("%h[fgRed]hi%r")
 
+// "hi" normally, the highlight verbs are ignored.
 l.DisableColor()
-
-// Prints "color: hi" normally.
 l.Printf("%h[fgRed]hi%r")
 
+// "hi" with a red foreground.
 l.EnableColor()
-
-// Prints bold "color:" and then "hi" with red foreground and
-// then exits with status code 1.
 l.Fatalf("%h[fgRed]hi%r")
 ```
 
 ### How does reset behave?
 ```go
-// Bolded "panic:" with a blue foreground and black background, then
-// bolded "rip" with a blue foreground and bright black background.
-color.Printf("%h[fgBlue+bgBlack+bold]panic: %h[bg8]rip\n")
-
-// Notice how the attributes carried on because we never reset the highlighting
-// after "panic:"? "rip" was not just in a bright black background,
-// but also in the attributes carried on from "panic:".
+// "rip" will be printed with a blue foreground and bright black background
+// because we never reset the highlighting after "panic:". The blue foreground is
+// carried on from "panic:".
+color.Printf("%h[fgBlue+bgBlack]panic: %h[bg8]rip\n")
 
 // The attributes carry onto anything written to the terminal until reset.
-// This prints "rip" in the same attributes as above, bold, a blue foreground and bright black background.
+// This prints "rip" in the same attributes as above.
 fmt.Println("rip")
 
 // Resets the highlighting and then prints "hello" normally.
@@ -115,4 +108,3 @@ color.Printf("%rhello")
 - [ ] Windows support
 - [ ] Respect $TERM
 - [ ] Fully wrap \*log.Logger, perhaps a format string that defines the prefix, date, content etc. Perhaps another package?
-- [ ] New interface for sprintf for performance purposes

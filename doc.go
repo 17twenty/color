@@ -19,7 +19,7 @@ If an error occurs, the generated string will contain a description of the probl
 	Invalid character in the highlight verb:
 		Printf("%h[%&:*!]%s", "hi"):		%!h(INVALID)
 	Unknown attribute in the highlight verb:
-		Printf("%h[fgOrange]%s", "hi"):	%!h(BADATTR)
+		Printf("%h[fgOrange]%s", "hi"):		%!h(BADATTR)
 
 Everything else is handled by the fmt package. You should read its documentation.
 

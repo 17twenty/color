@@ -10,7 +10,6 @@ go get github.com/nhooyr/color
 ```
 
 ## Examples
-
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
 ### 16 Colors
@@ -62,6 +61,8 @@ color.Eprintf(f, "dsda")
 ```
 
 ### Printer
+A `Printer` wraps around a `io.Writer`, but unlike `color.Fprintf`, it gives you full control over whether color output is enabled, avoiding the redundant terminal checks done by `color.Fprintf`.
+
 ```go
 // Prints "hi" with red foreground.
 p := color.NewPrinter(os.Stderr, color.EnableColor)

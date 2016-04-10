@@ -9,7 +9,7 @@ __note: this is still a WIP and things may change__
 go get github.com/nhooyr/color
 ```
 
-## Usage
+## Examples
 
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 

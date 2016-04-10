@@ -64,7 +64,7 @@ Bright Colors:
 	%h[bgx]
 Where x is any number from 0-255
 
-Others:
+Other:
 	%h[reset] or the %r verb
 	%h[bold]
 	%h[faint]
@@ -84,5 +84,6 @@ Others:
 	%h[notCrossedOut]
 
 See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section
+See http://goo.gl/fvtHLs and according to the above document, ISO-8613-3 for more information on 256 colors.
 */
 package color

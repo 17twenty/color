@@ -12,31 +12,28 @@ go get github.com/nhooyr/color
 ## Examples
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
-### 16 Colors
+### Setting Attributes
 ```go
 // "panic:" with a red foreground then normal "rip".
 color.Printf("%h[fgRed]panic:%r rip\n")
 
 // "panic:" with a brightRed background then normal "rip".
 color.Printf("%h[bgBrightRed]panic:%r rip\n")
-```
 
-### 256 Colors
-```go
-// "panic:" with a green foreground then normal "rip".
-color.Printf("%h[fg2]panic:%r rip\n")
-
-// "panic:" with a bright green background then normal "rip".
-color.Printf("%h[bg10]panic:%r rip\n")
-```
-
-### Other Attributes
-```go
 // Bold "panic:" then normal "rip".
 color.Printf("%h[bold]panic:%r rip\n")
 
 // Underlined "panic:" with then normal "rip".
 color.Printf("%h[underline]panic:%r rip\n")
+
+// The following use 256 color attributes.
+// See godoc for more information on 256 colors.
+
+// "panic:" with a green foreground then normal "rip".
+color.Printf("%h[fg2]panic:%r rip\n")
+
+// "panic:" with a bright green background then normal "rip".
+color.Printf("%h[bg10]panic:%r rip\n")
 ```
 
 ### Mixing Attributes
@@ -64,11 +61,11 @@ color.Eprintf(f, "dsda")
 A `Printer` wraps around a `io.Writer`, but unlike `color.Fprintf`, it gives you full control over whether color output is enabled, avoiding the redundant terminal checks done by `color.Fprintf`.
 
 ```go
-// Prints "hi" with red foreground.
+// "hi" with red foreground.
 p := color.NewPrinter(os.Stderr, color.EnableColor)
 p.Printf("%h[fgRed]hi%r\n")
 
-// Prints "hi" normally, the highlight verbs are ignored.
+// "hi" normally, the highlight verbs are ignored.
 p = color.NewPrinter(os.Stderr, color.DisableColor)
 p.Printf("%h[fgRed]hi%r\n")
 
@@ -82,14 +79,14 @@ p.Printf("%h[fgRed]hi%r\n")
 ```go
 l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0)
 
-// Prints "hi" with a red foreground.
+// "hi" with a red foreground.
 l.Printf("%h[fgRed]hi%r")
 
-// Prints "hi" normally, the highlight verbs are ignored.
+// "hi" normally, the highlight verbs are ignored.
 l.DisableColor()
 l.Printf("%h[fgRed]hi%r")
 
-// Prints "hi" with a red foreground.
+// "hi" with a red foreground.
 l.EnableColor()
 l.Fatalf("%h[fgRed]hi%r")
 ```

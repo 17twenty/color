@@ -14,6 +14,18 @@ type Logger struct {
 	mu     sync.Mutex
 }
 
+// NewLogger creates a new Logger. The out variable sets the
+// destination to which log data will be written.
+// The prefix appears at the beginning of each generated log line
+// and it can contain highlighting verbs.
+// The flag argument defines the logging properties.
+// It checks if the writer is a terminal and enables color output accordingly.
+func NewLogger(out io.Writer, prefix string, flag int) (l *Logger) {
+	l = &Logger{Logger: log.New(out, "", flag), prefix: prefix}
+	l.isTerminal(out)
+	return
+}
+
 // scolorf is a convenience function for highlighting strings according to
 // whether color output is set.
 func (l *Logger) scolorf(s string) string {
@@ -84,21 +96,9 @@ func (l *Logger) DisableColor() {
 
 // isTerminal turns on color output if w is a terminal.
 func (l *Logger) isTerminal(w io.Writer) {
-	if isTerminal(w) {
+	if IsTerminal(w) {
 		l.EnableColor()
 	} else {
 		l.DisableColor()
 	}
-}
-
-// NewLogger creates a new Logger. The out variable sets the
-// destination to which log data will be written.
-// The prefix appears at the beginning of each generated log line
-// and it can contain highlighting verbs.
-// The flag argument defines the logging properties.
-// It checks if the writer is a terminal and enables color output accordingly.
-func NewLogger(out io.Writer, prefix string, flag int) (l *Logger) {
-	l = &Logger{Logger: log.New(out, "", flag), prefix: prefix}
-	l.isTerminal(out)
-	return
 }

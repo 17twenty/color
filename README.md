@@ -57,27 +57,24 @@ color.Printf("%h[bg8+underline]panic:%r rip\n")
 
 ### Printer
 ```go
-p := color.NewPrinter(os.Stderr, color.EnableColor)
-
 // Prints "hi" with red foreground.
+p := color.NewPrinter(os.Stderr, color.EnableColor)
 p.Printf("%h[fgRed]hi%r\n")
 
+// Prints "hi" normally, the highlight verbs are ignored.
 p = color.NewPrinter(os.Stderr, color.DisableColor)
-
-// Prints "hi" normally.
 p.Printf("%h[fgRed]hi%r\n")
-
-p = color.NewPrinter(os.Stderr, color.PerformCheck)
 
 // If os.Stderr is a terminal, this will print in color.
 // Otherwise it will be a normal "hi".
+p = color.NewPrinter(os.Stderr, color.PerformCheck)
 p.Printf("%h[fgRed]hi%r\n")
 ```
 
 ### Preparing Strings
 ```go
-// Prepare processes the string only once and lets you print it repeatedly
-// without any additional processing overhead.
+// Prepare processes the highlight verbs in the string only once,
+// letting you print it repeatedly with performance.
 f := color.Prepare("%h[fgRed+bold]panic:%r %s\n")
 
 // Each prints bolded "panic:" with a red foreground and some normal text after.
@@ -93,14 +90,12 @@ l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0)
 // Prints "hi" with a red foreground.
 l.Printf("%h[fgRed]hi%r")
 
+// Prints "hi" normally, the highlight verbs are ignored.
 l.DisableColor()
-
-// now a normal "hi", the highlight verbs are ignored.
 l.Printf("%h[fgRed]hi%r")
 
-l.EnableColor()
-
 // Prints "hi" with a red foreground.
+l.EnableColor()
 l.Fatalf("%h[fgRed]hi%r")
 ```
 

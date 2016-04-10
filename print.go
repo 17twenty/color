@@ -12,7 +12,7 @@ import (
 // Use a color.Printer if you want full control over when to print in color or you want
 // to avoid the repetitive terminal checks.
 func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	if isTerminal(w) {
+	if IsTerminal(w) {
 		return fmt.Fprintf(w, Shighlightf(format), a...)
 	}
 	return fmt.Fprintf(w, Sstripf(format), a...)
@@ -20,7 +20,7 @@ func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
 
 // Efprintf is the same as Fprintf but takes a prepared Format object.
 func Efprintf(w io.Writer, f *Format, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(w, f.Get(isTerminal(w)), a...)
+	return fmt.Fprintf(w, f.Get(IsTerminal(w)), a...)
 }
 
 var stdout = NewPrinter(os.Stdout, PerformCheck)
@@ -49,17 +49,6 @@ type Printer struct {
 	color bool
 }
 
-// Printf calls fmt.Fprintf to print to the writer.
-// Arguments are handled in the manner of color.Printf.
-func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(p.w, Scolorf(format, p.color), a...)
-}
-
-// Eprintf is the same as p.Printf but takes a prepared Format object.
-func (p *Printer) Eprintf(f *Format, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(p.w, f.Get(p.color), a...)
-}
-
 // Flags for setting colored output when creating a Printer.
 const (
 	PerformCheck = iota // check if a terminal, and if so enable colored output
@@ -71,8 +60,19 @@ const (
 // based on the flag.
 func NewPrinter(out io.Writer, flag uint8) (p *Printer) {
 	p = &Printer{w: out}
-	if flag == PerformCheck && isTerminal(out) || flag == EnableColor {
+	if flag == PerformCheck && IsTerminal(out) || flag == EnableColor {
 		p.color = true
 	}
 	return
+}
+
+// Printf calls fmt.Fprintf to print to the writer.
+// Arguments are handled in the manner of color.Printf.
+func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
+	return fmt.Fprintf(p.w, Scolorf(format, p.color), a...)
+}
+
+// Eprintf is the same as p.Printf but takes a prepared Format object.
+func (p *Printer) Eprintf(f *Format, a ...interface{}) (n int, err error) {
+	return fmt.Fprintf(p.w, f.Get(p.color), a...)
 }

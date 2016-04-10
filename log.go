@@ -38,18 +38,18 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.Logger.Panicf(l.scolorf(format), v...)
 }
 
-// Cprintf is the same as l.Panicf but takes a prepared Format object.
-func (l *Logger) Cprintf(f *Format, v ...interface{}) {
+// Aprintf is the same as l.Panicf but takes a prepared Format object.
+func (l *Logger) Aprintf(f *Format, v ...interface{}) {
 	l.Logger.Printf(f.Get(l.color), v...)
 }
 
-// Cfatalf is the same as l.Fatalf but takes a prepared Format object.
-func (l *Logger) Cfatalf(f *Format, v ...interface{}) {
+// Afatalf is the same as l.Fatalf but takes a prepared Format object.
+func (l *Logger) Afatalf(f *Format, v ...interface{}) {
 	l.Logger.Fatalf(f.Get(l.color), v...)
 }
 
-// Cpanicf is the same as l.Panicf but takes a prepared Format object.
-func (l *Logger) Cpanicf(f *Format, v ...interface{}) {
+// Apanicf is the same as l.Panicf but takes a prepared Format object.
+func (l *Logger) Apanicf(f *Format, v ...interface{}) {
 	l.Logger.Panicf(f.Get(l.color), v...)
 }
 

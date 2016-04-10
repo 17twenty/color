@@ -57,53 +57,62 @@ color.Printf("%h[bg8+underline]panic:%r rip\n")
 
 ### Printer
 ```go
-p := color.NewPrinter(os.Stderr)
+p := color.NewPrinter(os.Stderr, color.EnableColor)
 
 // Prints "hi" with red foreground.
 p.Printf("%h[fgRed]hi%r\n")
 
-p.DisableColor()
+p = color.NewPrinter(os.Stderr, color.DisableColor)
 
 // Prints "hi" normally.
 p.Printf("%h[fgRed]hi%r\n")
 
-p.EnableColor()
+p = color.NewPrinter(os.Stderr, color.PerformCheck)
 
-// Prints "hi" with red foreground.
+// If os.Stderr is a terminal, this will print in color.
+// Otherwise it will be a normal "hi"
 p.Printf("%h[fgRed]hi%r\n")
+```
+
+### Preparing Strings
+```go
+// Prepare processes the string only once and lets you print it repeatedly
+// without any additional processing overhead.
+f := color.Prepare("%h[fgRed+bold]panic:%r %s\n")
+
+// Each prints bolded "panic:" with a red foreground and some normal text after.
+color.Aprintf(f, "rip")
+color.Aprintf(f, "yippie")
+color.Aprintf(f, "dsda")
 ```
 
 ### `*log.Logger` wrapper
 ```go
 l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0)
 
-// Prints bold "color:" and then "hi" with red foreground.
+// Prints "hi" with a red foreground.
 l.Printf("%h[fgRed]hi%r")
 
 l.DisableColor()
 
-// Prints "color: hi" normally.
+// now a normal "hi", the highlight verbs are ignored.
 l.Printf("%h[fgRed]hi%r")
 
 l.EnableColor()
 
-// Prints bold "color:" and then "hi" with red foreground and
-// then exits with status code 1.
+// Prints "hi" with a red foreground.
 l.Fatalf("%h[fgRed]hi%r")
 ```
 
 ### How does reset behave?
 ```go
-// Bolded "panic:" with a blue foreground and black background, then
-// bolded "rip" with a blue foreground and bright black background.
+// "rip" will be printed with a blue foreground and bright black background
+// because we never reset the highlighting after "panic:". The blue foreground is
+// carried on from "panic:".
 color.Printf("%h[fgBlue+bgBlack+bold]panic: %h[bg8]rip\n")
 
-// Notice how the attributes carried on because we never reset the highlighting
-// after "panic:"? "rip" was not just in a bright black background,
-// but also in the attributes carried on from "panic:".
-
 // The attributes carry onto anything written to the terminal until reset.
-// This prints "rip" in the same attributes as above, bold, a blue foreground and bright black background.
+// This prints "rip" in the same attributes as above.
 fmt.Println("rip")
 
 // Resets the highlighting and then prints "hello" normally.

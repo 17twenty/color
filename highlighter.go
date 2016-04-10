@@ -20,6 +20,7 @@ type highlighter struct {
 	attrs buffer // attributes of current verb
 }
 
+// Scolorf highlights the format string accordingly to color and then returns it.
 func Scolorf(format string, color bool) string {
 	if color {
 		return Shighlightf(format)

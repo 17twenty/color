@@ -31,9 +31,9 @@ func Printf(format string, a ...interface{}) (n int, err error) {
 	return stdout.Printf(format, a...)
 }
 
-// Cprintf is the same as Printf but takes a prepared Format object.
-func Cprintf(f *Format, a ...interface{}) (n int, err error) {
-	return stdout.Cprintf(f, a...)
+// Aprintf is the same as Printf but takes a prepared Format object.
+func Aprintf(f *Format, a ...interface{}) (n int, err error) {
+	return stdout.Aprintf(f, a...)
 }
 
 // Sprintf formats according to a format specifier and returns the resulting string.
@@ -55,8 +55,8 @@ func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, Scolorf(format, p.color), a...)
 }
 
-// Cprintf is the same as p.Printf but takes a prepared Format object.
-func (p *Printer) Cprintf(f *Format, a ...interface{}) (n int, err error) {
+// Aprintf is the same as p.Printf but takes a prepared Format object.
+func (p *Printer) Aprintf(f *Format, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, f.Get(p.color), a...)
 }
 

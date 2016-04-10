@@ -15,22 +15,22 @@ See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 ### Setting Attributes
 ```go
 // "panic:" with a red foreground then normal "rip".
-color.Printf("%h[fgRed]panic:%r rip\n")
+color.Printf("%h[fgRed]panic:%r %s\n", "rip")
 
 // "panic:" with a brightRed background then normal "rip".
-color.Printf("%h[bgBrightRed]panic:%r rip\n")
+color.Printf("%h[bgBrightRed]panic:%r %s\n", "rip")
 
 // Bold "panic:" then normal "rip".
-color.Printf("%h[bold]panic:%r rip\n")
+color.Printf("%h[bold]panic:%r %s\n", "rip")
 
 // Underlined "panic:" with then normal "rip".
-color.Printf("%h[underline]panic:%r rip\n")
+color.Printf("%h[underline]panic:%r %s\n", "rip")
 
 // "panic:" using color 83 as the foreground then normal "rip".
-color.Printf("%h[fg83]panic:%r rip\n")
+color.Printf("%h[fg83]panic:%r %s\n", "rip")
 
 // "panic:" using color 158 as the background then normal "rip".
-color.Printf("%h[bg158]panic:%r rip\n")
+color.Printf("%h[bg158]panic:%r %s\n", "rip")
 ```
 
 ### Mixing Attributes

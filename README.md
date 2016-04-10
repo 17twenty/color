@@ -1,6 +1,6 @@
 # color [![GoDoc](https://godoc.org/github.com/nhooyr/color?status.svg)](https://godoc.org/github.com/nhooyr/color)
 
-Color wraps the `fmt.Printf` functions with verbs for producing colored output.
+Color wraps `fmt.Printf` with verbs for producing colored output.
 
 __note: this is still a WIP and things may change__
 
@@ -115,4 +115,3 @@ color.Printf("%rhello")
 - [ ] Windows support
 - [ ] Respect $TERM
 - [ ] Fully wrap \*log.Logger, perhaps a format string that defines the prefix, date, content etc. Perhaps another package?
-- [ ] New interface for sprintf for performance purposes

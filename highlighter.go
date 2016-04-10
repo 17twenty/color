@@ -20,9 +20,16 @@ type highlighter struct {
 	attrs buffer // attributes of current verb
 }
 
-// shighlightf replaces the highlight verbs in s with their appropriate
+func Scolorf(format string, color bool) string {
+	if color {
+		return Shighlightf(format)
+	}
+	return Sstripf(format)
+}
+
+// Shighlightf replaces the highlight verbs in s with their appropriate
 // control sequences and then returns the resulting string.
-func shighlightf(s string) string {
+func Shighlightf(s string) string {
 	hl := getHighlighter(s)
 	defer hl.free()
 	hl.run()
@@ -224,8 +231,8 @@ var bufferPool = sync.Pool{
 	},
 }
 
-// sstripf removes all highlight verbs in s and then returns the resulting string.
-func sstripf(s string) string {
+// Sstripf removes all highlight verbs in s and then returns the resulting string.
+func Sstripf(s string) string {
 	buf := bufferPool.Get().(buffer)
 	// pi is the index after the last verb.
 	var pi, i int

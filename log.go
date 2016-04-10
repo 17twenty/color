@@ -14,31 +14,43 @@ type Logger struct {
 	mu     sync.Mutex
 }
 
-// highlight is a convenience function for highlighting strings according to
+// scolorf is a convenience function for highlighting strings according to
 // whether color output is set.
-func (l *Logger) highlight(s string) string {
+func (l *Logger) scolorf(s string) string {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	if l.color {
-		return shighlightf(s)
-	}
-	return sstripf(s)
+	return Scolorf(s, l.color)
 }
 
 // Printf calls l.Logger.Printf to print to the logger.
-// Arguments are handled in the manner of fmt.Printf.
+// Arguments are handled in the manner of color.Printf.
 func (l *Logger) Printf(format string, v ...interface{}) {
-	l.Logger.Printf(l.highlight(format), v...)
+	l.Logger.Printf(l.scolorf(format), v...)
 }
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
 func (l *Logger) Fatalf(format string, v ...interface{}) {
-	l.Logger.Fatalf(l.highlight(format), v...)
+	l.Logger.Fatalf(l.scolorf(format), v...)
 }
 
 // Panicf is equivalent to l.Printf() followed by a call to panic().
 func (l *Logger) Panicf(format string, v ...interface{}) {
-	l.Logger.Panicf(l.highlight(format), v...)
+	l.Logger.Panicf(l.scolorf(format), v...)
+}
+
+// Cprintf is the same as l.Panicf but takes a prepared Format object.
+func (l *Logger) Cprintf(f *Format, v ...interface{}) {
+	l.Logger.Printf(f.Get(l.color), v...)
+}
+
+// Cfatalf is the same as l.Fatalf but takes a prepared Format object.
+func (l *Logger) Cfatalf(f *Format, v ...interface{}) {
+	l.Logger.Fatalf(f.Get(l.color), v...)
+}
+
+// Cpanicf is the same as l.Panicf but takes a prepared Format object.
+func (l *Logger) Cpanicf(f *Format, v ...interface{}) {
+	l.Logger.Panicf(f.Get(l.color), v...)
 }
 
 // SetOutput checks if the writer is a terminal and sets the color output accordingly.
@@ -51,7 +63,7 @@ func (l *Logger) SetOutput(w io.Writer) {
 // SetPrefix sets the output prefix for the logger.
 func (l *Logger) SetPrefix(prefix string) {
 	l.prefix = prefix
-	l.Logger.SetPrefix(l.highlight(prefix))
+	l.Logger.SetPrefix(l.scolorf(prefix))
 }
 
 // EnableColor enables color output.
@@ -59,7 +71,7 @@ func (l *Logger) EnableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.color = true
-	l.Logger.SetPrefix(shighlightf(l.prefix))
+	l.Logger.SetPrefix(Shighlightf(l.prefix))
 }
 
 // DisableColor disables color output.
@@ -67,7 +79,7 @@ func (l *Logger) DisableColor() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.color = false
-	l.Logger.SetPrefix(sstripf(l.prefix))
+	l.Logger.SetPrefix(Sstripf(l.prefix))
 }
 
 // isTerminal turns on color output if w is a terminal.

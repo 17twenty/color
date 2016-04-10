@@ -7,10 +7,6 @@ Highlight verbs:
 			multiple attributes are + separated
 	%r		an abbreviation for %h[reset]
 
-Multiple highlight verbs do not reset preceding verbs, they add onto them.
-For example, if you set the foreground to green and background to yellow in the first verb, then set the background to red in the second, any text following the second will have a green foreground and a red background.
-This also applies across calls, the attributes are never reset unless explicitly requested.
-
 Errors:
 
 If an error occurs, one of the following strings will replace the position of the highlight verb.
@@ -83,7 +79,8 @@ Other:
 	%h[visible]
 	%h[notCrossedOut]
 
-See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section
-See http://goo.gl/fvtHLs and according to the above document, ISO-8613-3 for more information on 256 colors.
+See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section.
+
+See http://goo.gl/fvtHLs and according to the above document, ISO-8613-3, for more information on 256 colors.
 */
 package color

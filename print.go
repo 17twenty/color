@@ -72,6 +72,14 @@ func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, scolorf(format, p.color), a...)
 }
 
+// scolorf returns the highlighted string if color is true, otherwise it returns the string with the highlight verbs stripped.
+func scolorf(format string, color bool) string {
+	if color {
+		return Shighlightf(format)
+	}
+	return Sstripf(format)
+}
+
 // Eprintf is the same as p.Printf but takes a prepared Format object.
 func (p *Printer) Eprintf(f *Format, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, f.Get(p.color), a...)

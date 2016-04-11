@@ -12,14 +12,6 @@ const (
 	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the highlight verb
 )
 
-// scolorf returns the highlighted string if color is true, otherwise it returns the string with the highlight verbs stripped.
-func scolorf(format string, color bool) string {
-	if color {
-		return Shighlightf(format)
-	}
-	return Sstripf(format)
-}
-
 // highlighter holds the state of the scanner.
 type highlighter struct {
 	s     string // string being scanned
@@ -36,7 +28,15 @@ type highlighter struct {
 func Shighlightf(s string) string {
 	hl := getHighlighter(s)
 	defer hl.free()
-	hl.run()
+	hl.run(initHighlight)
+	s = string(hl.buf)
+	return s
+}
+
+func Sstripf(s string) string {
+	hl := getHighlighter(s)
+	defer hl.free()
+	hl.run(initStrip)
 	s = string(hl.buf)
 	return s
 }
@@ -70,8 +70,8 @@ func (hl *highlighter) free() {
 type stateFn func(*highlighter) stateFn
 
 // run runs the state machine for the highlighter.
-func (hl *highlighter) run() {
-	for state := scanText; state != nil; {
+func (hl *highlighter) run(init stateFn) {
+	for state := init; state != nil; {
 		state = state(hl)
 	}
 }
@@ -93,36 +93,72 @@ func (hl *highlighter) writeAttrs() {
 	hl.buf.writeByte('m')
 }
 
-// writePrev writes n previous characters to the buffer.
+// writePrev writes n previous characters to the buffer
 func (hl *highlighter) writePrev(n int) {
-	hl.buf.writeString(hl.s[n:hl.pos])
+	hl.pos++
+	hl.buf.writeString(hl.s[hl.pos-n : hl.pos])
 }
 
-// scanText scans until the next highlight or reset verb.
-func scanText(hl *highlighter) stateFn {
+func initHighlight(hl *highlighter) stateFn {
+	return scanText(hl, scanVerb)
+}
+
+func initStrip(hl *highlighter) stateFn {
+	return scanText(hl, stripVerb)
+}
+
+// scanText scans until the next verb.
+func scanText(hl *highlighter, fn stateFn) stateFn {
 	ppos := hl.pos
-LOOP:
 	// Find next verb.
 	for {
 		switch hl.get() {
 		case eof:
 			if hl.pos > ppos {
 				// Append remaining characters.
-				hl.writePrev(ppos)
+				hl.buf.writeString(hl.s[ppos:hl.pos])
 			}
 			return nil
 		case '%':
 			if hl.pos > ppos {
 				// Append the characters after the last verb.
-				hl.writePrev(ppos)
+				hl.buf.writeString(hl.s[ppos:hl.pos])
 			}
-			break LOOP
+			hl.pos++
+			return fn
 
 		}
 		hl.pos++
 	}
-	hl.pos++
-	// At the verb.
+}
+
+func stripVerb(hl *highlighter) stateFn {
+	switch hl.get() {
+	case 'r':
+		// Strip the reset verb.
+		hl.pos++
+	case 'h':
+		// Strip inside the highlight verb.
+		hl.pos++
+		j := strings.IndexByte(hl.s[hl.pos:], ']')
+		if j == -1 {
+			hl.buf.writeString(errInvalid)
+			return nil
+		}
+		hl.pos += j + 1
+	case eof:
+		// Let fmt handle "%!h(NOVERB)".
+		hl.buf.writeByte('%')
+		return nil
+	default:
+		// Include the verb.
+		hl.writePrev(2)
+	}
+	return initStrip
+}
+
+// scanVerb scans the current verb.
+func scanVerb(hl *highlighter) stateFn {
 	switch hl.get() {
 	case 'r':
 		hl.pos++
@@ -135,9 +171,8 @@ LOOP:
 		hl.buf.writeByte('%')
 		return nil
 	}
-	hl.pos++
-	hl.writePrev(hl.pos - 2)
-	return scanText
+	hl.writePrev(2)
+	return initHighlight
 }
 
 // verbReset writes the reset verb with the reset control sequence.
@@ -145,7 +180,7 @@ func verbReset(hl *highlighter) stateFn {
 	hl.attrs.writeString(attrs["reset"])
 	hl.writeAttrs()
 	hl.attrs.reset()
-	return scanText
+	return initHighlight
 }
 
 // scanHighlight scans the highlight verb for attributes,
@@ -170,7 +205,7 @@ func scanHighlight(hl *highlighter) stateFn {
 		}
 		hl.attrs.reset()
 		hl.pos++
-		return scanText
+		return initHighlight
 	default:
 		return abortHighlight(hl, errInvalid)
 	}
@@ -199,7 +234,7 @@ func abortHighlight(hl *highlighter, msg string) stateFn {
 		switch hl.get() {
 		case ']':
 			hl.pos++
-			return scanText
+			return initHighlight
 		case eof:
 			return nil
 		}
@@ -225,61 +260,4 @@ func scanColor256(hl *highlighter, pre string) stateFn {
 	hl.attrs.writeString(pre)
 	hl.attrs.writeString(hl.s[start:hl.pos])
 	return scanHighlight
-}
-
-// bufferPool allows the reuse of buffers to avoid allocations.
-var bufferPool = sync.Pool{
-	New: func() interface{} {
-		// The initial capacity avoids constant reallocation during growth.
-		return buffer(make([]byte, 0, 30))
-	},
-}
-
-// Sstripf removes all highlight verbs in s and then returns the resulting string.
-// This is a low level function, you shouldn't need to use this most of the time.
-func Sstripf(s string) string {
-	buf := bufferPool.Get().(buffer)
-	// pi is the index after the last verb.
-	var pi, i int
-LOOP:
-	for ; ; i++ {
-		if i >= len(s) {
-			if i > pi {
-				buf.writeString(s[pi:i])
-			}
-			break
-		} else if s[i] != '%' {
-			continue
-		}
-		if i > pi {
-			buf.writeString(s[pi:i])
-		}
-		i++
-		if i >= len(s) {
-			// Let fmt handle "%!h(NOVERB)".
-			buf.writeByte('%')
-			break
-		}
-		switch s[i] {
-		case 'r':
-			// Strip the reset verb.
-			pi = i + 1
-		case 'h':
-			// Strip inside the highlight verb.
-			j := strings.IndexByte(s[i+1:], ']')
-			if j == -1 {
-				buf.writeString(errInvalid)
-				break LOOP
-			}
-			i += j + 1
-			pi = i + 1
-		default:
-			// Include the verb.
-			pi = i - 1
-		}
-	}
-	s = string(buf)
-	buf.reset()
-	bufferPool.Put(buf)
-	return s
 }

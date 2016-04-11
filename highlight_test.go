@@ -3,6 +3,7 @@ package color_test
 import (
 	"fmt"
 	"testing"
+
 	"github.com/nhooyr/color"
 )
 

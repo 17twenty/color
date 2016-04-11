@@ -62,7 +62,7 @@ A `Printer` wraps around an `io.Writer`, but unlike `color.Fprintf`, it gives yo
 p := color.NewPrinter(os.Stderr, color.EnableColor)
 p.Printf("%h[fgRed]%s%r\n", "hi")
 
-// "hi" normally, the highlight verbs are ignored.
+// normal "hi", the highlight verbs are ignored.
 p = color.NewPrinter(os.Stderr, color.DisableColor)
 p.Printf("%h[fgRed]%s%r\n", "hi")
 
@@ -79,7 +79,7 @@ l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0)
 // "hi" with a red foreground.
 l.Printf("%h[fgRed]%s%r", "hi")
 
-// "hi" normally, the highlight verbs are ignored.
+// normal "hi", the highlight verbs are ignored.
 l.DisableColor()
 l.Printf("%h[fgRed]%s%r", "hi")
 

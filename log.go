@@ -1,6 +1,7 @@
 package color
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"sync"
@@ -11,7 +12,7 @@ type Logger struct {
 	*log.Logger
 	prefix string
 	color  bool // dictates if highlight verbs are applied
-	mu     sync.Mutex
+	mu     sync.RWMutex
 }
 
 // NewLogger creates a new Logger. The out variable sets the
@@ -29,15 +30,19 @@ func NewLogger(out io.Writer, prefix string, flag int) (l *Logger) {
 // scolorf is a convenience function for highlighting strings according to
 // whether color output is set.
 func (l *Logger) scolorf(s string) string {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	return scolorf(s, l.color)
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	return Run(s, l.color)
 }
 
 // Printf calls l.Logger.Printf to print to the logger.
 // Arguments are handled in the manner of color.Printf.
 func (l *Logger) Printf(format string, v ...interface{}) {
 	l.Logger.Printf(l.scolorf(format), v...)
+}
+
+func (l *Logger) Sprintf(format string, v ...interface{}) string {
+	return fmt.Sprintf(l.scolorf(format), v...)
 }
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
@@ -50,9 +55,14 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.Logger.Panicf(l.scolorf(format), v...)
 }
 
-// Eprintf is the same as l.Panicf but takes a prepared Format object.
+// Eprintf is the same as l.Printf but takes a prepared Format object.
 func (l *Logger) Eprintf(f *Format, v ...interface{}) {
 	l.Logger.Printf(f.Get(l.color), v...)
+}
+
+// Esprintf is the same as l.Sprintf but takes a prepared Format object.
+func (l *Logger) Esprintf(f *Format, v ...interface{}) string {
+	return fmt.Sprintf(f.Get(l.color), v...)
 }
 
 // Efatalf is the same as l.Fatalf but takes a prepared Format object.

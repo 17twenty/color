@@ -69,15 +69,7 @@ func NewPrinter(out io.Writer, flag uint8) (p *Printer) {
 // Printf calls fmt.Fprintf to print to the writer.
 // Arguments are handled in the manner of color.Printf.
 func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(p.w, scolorf(format, p.color), a...)
-}
-
-// scolorf returns the highlighted string if color is true, otherwise it returns the string with the highlight verbs stripped.
-func scolorf(format string, color bool) string {
-	if color {
-		return Shighlightf(format)
-	}
-	return Sstripf(format)
+	return fmt.Fprintf(p.w, Run(format, p.color), a...)
 }
 
 // Eprintf is the same as p.Printf but takes a prepared Format object.

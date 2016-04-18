@@ -2,6 +2,7 @@ package color_test
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/nhooyr/color"
@@ -64,17 +65,17 @@ func ExamplePrinter() {
 
 func ExampleLogger() {
 	// "hi" with a red foreground.
-	l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, true)
+	l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, true)
 	redFormat := l.Prepare("%h[fgRed]%s%r\n")
 	l.Printf(redFormat, "hi")
 
 	// normal "hi", the highlight verbs are ignored.
-	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, false)
+	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, false)
 	l.Printfh("%h[fgRed]%s%r", "hi")
 
 	// If os.Stderr is a terminal, this will print in color.
 	// Otherwise it will be a normal "hi".
-	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, color.IsTerminal(os.Stderr))
+	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, color.IsTerminal(os.Stderr))
 	l.Fatalf("%h[fgRed]%s%r", "hi")
 }
 

@@ -37,11 +37,13 @@ func Example_mixing() {
 }
 
 func ExamplePrepare() {
-	// Prepare processes the highlight verbs in the string only once,
+	// Prepare only processes the highlight verbs in the string,
 	// letting you print it repeatedly with performance.
 	panicFormat := color.Prepare("%h[fgRed+bold]panic:%r %s\n")
 
 	// Each prints a bolded "panic:" in red foreground and some normal text after.
+	// Notice that fmt.Printf is used, this works because only the highlight verbs
+	// were processed above, the %s verb was not.
 	fmt.Printf(panicFormat, "rip")
 	fmt.Printf(panicFormat, "yippie")
 	fmt.Printf(panicFormat, "dsda")
@@ -50,6 +52,7 @@ func ExamplePrepare() {
 func ExamplePrinter() {
 	// "hi" with red foreground.
 	p := color.NewPrinter(os.Stderr, true)
+	// See the Prepare example for an explanation of this.
 	redFormat := p.Prepare("%h[fgRed]%s%r\n")
 	p.Printf(redFormat, "hi")
 
@@ -66,6 +69,7 @@ func ExamplePrinter() {
 func ExampleLogger() {
 	// "hi" with a red foreground.
 	l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, true)
+	// See the Prepare example for an explanation of this.
 	redFormat := l.Prepare("%h[fgRed]%s%r\n")
 	l.Printf(redFormat, "hi")
 

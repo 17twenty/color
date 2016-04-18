@@ -21,18 +21,18 @@ type highlighter struct {
 	color bool   // whether to color the highlight verbs or strip them
 }
 
-// Shighlightf replaces the highlight verbs in s with their appropriate
+// Highlight replaces the highlight verbs in s with their appropriate
 // control sequences and then returns the resulting string.
 // This is a low level function, you shouldn't need to use this most of the time.
 // This is just a wrapper around color.Run().
-func Shighlightf(s string) string {
+func Highlight(s string) string {
 	return Run(s, true)
 }
 
-// Sstripf removes all highlight verbs in s and then returns the resulting string.
+// Strip removes all highlight verbs in s and then returns the resulting string.
 // This is a low level function, you shouldn't need to use this most of the time.
 // This is just a wrapper around color.Run().
-func Sstripf(s string) string {
+func Strip(s string) string {
 	return Run(s, false)
 }
 

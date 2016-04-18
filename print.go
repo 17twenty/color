@@ -20,15 +20,20 @@ func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
 
 var stdout = NewPrinter(os.Stdout, PerformCheck)
 
-// Printf formats according to a format specifier and writes to standard output.
+// Hprintf formats according to a format specifier and writes to standard output.
 // It returns the number of bytes written and any write error encountered.
-func Printf(format string, a ...interface{}) (n int, err error) {
-	return stdout.Printf(format, a...)
+func Hprintf(format string, a ...interface{}) (n int, err error) {
+	return stdout.Hprintf(format, a...)
 }
 
 // Sprintf formats according to a format specifier and returns the resulting string.
 func Sprintf(format string, a ...interface{}) string {
-	return fmt.Sprintf(Shighlightf(format), a...)
+	return stdout.Sprintf(format, a...)
+}
+
+// Prepare returns the format string with only the highlight verbs handled.
+func Prepare(format string) string {
+	return stdout.Prepare(format)
 }
 
 // Printer prints to a writer. It is exactly like color.Fprintf except use this when
@@ -41,13 +46,12 @@ type Printer struct {
 
 // Flags for setting colored output when creating a Printer.
 const (
-	PerformCheck = iota // check if a terminal, and if so enable colored output
-	EnableColor         // enable colored output
-	DisableColor        // disable colored output
+	PerformCheck = 1 << iota // check if a terminal, and if so enable colored output
+	EnableColor              // enable colored output
+	DisableColor             // disable colored output
 )
 
-// NewPrinter creates a new Printer. It enables colored output
-// based on the flag.
+// NewPrinter creates a new Printer. Color output is enabled or disabled based on the flag.
 func NewPrinter(out io.Writer, flag int) (p *Printer) {
 	p = &Printer{w: out}
 	if flag == PerformCheck && IsTerminal(out) || flag == EnableColor {
@@ -57,11 +61,23 @@ func NewPrinter(out io.Writer, flag int) (p *Printer) {
 }
 
 // Printf calls fmt.Fprintf to print to the writer.
-// Arguments are handled in the manner of color.Printf.
+// Arguments are handled in the manner of fmt.Printf.
 func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
+	return fmt.Fprintf(p.w, format, a...)
+}
+
+// Hprintf calls fmt.Fprintf to print to the writer.
+// Arguments are handled in the manner of color.Printf.
+func (p *Printer) Hprintf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, Run(format, p.color), a...)
 }
 
+// Sprintf formats according to a format specifier and returns the resulting string.
+func (p *Printer) Sprintf(format string, a ...interface{}) string {
+	return fmt.Sprintf(p.Prepare(format), a...)
+}
+
+// Prepare returns the format string with only the highlight verbs handled.
 func (p *Printer) Prepare(format string) string {
 	return Run(format, p.color)
 }

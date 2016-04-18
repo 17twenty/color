@@ -18,7 +18,7 @@ type Logger struct {
 // The flag argument defines the logging properties.
 // It checks if the writer is a terminal and enables color output accordingly.
 func NewLogger(out io.Writer, prefix string, flag int, cflag int) (l *Logger) {
-	if flag == PerformCheck && IsTerminal(out) || flag == EnableColor {
+	if cflag == PerformCheck && IsTerminal(out) || cflag == EnableColor {
 		l = &Logger{Logger: log.New(out, Shighlightf(prefix), flag)}
 		l.color = true
 	} else {
@@ -29,10 +29,11 @@ func NewLogger(out io.Writer, prefix string, flag int, cflag int) (l *Logger) {
 
 // Printf calls l.Logger.Printf to print to the logger.
 // Arguments are handled in the manner of color.Printf.
-func (l *Logger) Printf(format string, v ...interface{}) {
+func (l *Logger) Hprintf(format string, v ...interface{}) {
 	l.Logger.Printf(Run(format, l.color), v...)
 }
 
+// Prepare returns the format string with only the highlight verbs handled.
 func (l *Logger) Prepare(format string) string {
 	return Run(format, l.color)
 }

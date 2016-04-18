@@ -91,7 +91,7 @@ l.Fatalf("%h[fgRed]%s%r", "hi")
 ```
 
 ### How does reset behave?
-```
+```go
 // "rip" will be printed with a blue foreground and bright black background
 // because we never reset the highlighting after "panic:". The blue foreground is
 // carried on from "panic:".

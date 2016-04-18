@@ -7,18 +7,21 @@ import (
 
 // Logger is a very lightweight wrapper around log.Logger to support the highlighting verbs.
 type Logger struct {
-	*log.Logger
-	color bool // dictates whether highlight verbs are processed or stripped
+	*log.Logger      // TODO unexport this somehow
+	color       bool // dictates whether highlight verbs are processed or stripped
 }
 
 // NewLogger creates a new Logger. The out argument sets the
 // destination to which log data will be written.
 // The prefix appears at the beginning of each generated log line.
+// It can contain highlight verbs, however l.SetPrefix does not allow highlight verbs.
 // The flag argument defines the logging properties.
 // The cflag argument dictates whether the color output is enabled.
-func NewLogger(out io.Writer, prefix string, flag int, cflag int) *Logger {
-	return &Logger{Logger: log.New(out, prefix, flag),
+func NewLogger(out io.Writer, prefix string, flag int, cflag int) (l *Logger) {
+	l = &Logger{Logger: log.New(out, "", flag),
 		color: cflag == PerformCheck && IsTerminal(out) || cflag == EnableColor}
+	l.SetPrefix(l.Prepare(prefix))
+	return
 }
 
 // Printfh calls l.Logger.Printf to print to the logger.

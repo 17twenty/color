@@ -12,10 +12,7 @@ import (
 // Use a color.Printer if you want full control over when to print in color or you want
 // to avoid the repetitive terminal checks.
 func Fprintfh(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	if IsTerminal(w) {
-		return fmt.Fprintf(w, Highlight(format), a...)
-	}
-	return fmt.Fprintf(w, Strip(format), a...)
+	return fmt.Fprintf(w, Run(format, IsTerminal(w)))
 }
 
 var stdout = NewPrinter(os.Stdout, PerformCheck)
@@ -36,23 +33,20 @@ func Prepare(format string) string {
 // terminal checks done by color.Fprinf.
 type Printer struct {
 	w     io.Writer
-	color bool
+	color bool // dictates whether highlight verbs are processed or stripped
 }
 
-// Flags for setting colored output when creating a Printer.
+// Flags for setting colored output when creating a Printer/Logger.
 const (
 	PerformCheck = 1 << iota // check if a terminal, and if so enable colored output
 	EnableColor              // enable colored output
 	DisableColor             // disable colored output
 )
 
-// NewPrinter creates a new Printer. Color output is enabled or disabled based on the flag.
-func NewPrinter(out io.Writer, flag int) (p *Printer) {
-	p = &Printer{w: out}
-	if flag == PerformCheck && IsTerminal(out) || flag == EnableColor {
-		p.color = true
-	}
-	return
+// NewPrinter creates a new Printer.
+// The flag argument dictates whether color output is enabled.
+func NewPrinter(out io.Writer, flag int) *Printer {
+	return &Printer{w: out, color: flag == PerformCheck && IsTerminal(out) || flag == EnableColor}
 }
 
 // Printf calls fmt.Fprintf to print to the writer.
@@ -64,7 +58,7 @@ func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 // Printfh calls fmt.Fprintf to print to the writer.
 // Arguments are handled in the manner of color.Printf.
 func (p *Printer) Printfh(format string, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(p.w, Run(format, p.color), a...)
+	return fmt.Fprintf(p.w, p.Prepare(format), a...)
 }
 
 // Prepare returns the format string with only the highlight verbs processed.

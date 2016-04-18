@@ -106,6 +106,8 @@ func (hl *highlighter) writePrev(n int) {
 	hl.pos++
 	hl.buf.writeString(hl.s[hl.pos-n : hl.pos])
 }
+
+// writeFrom writes the characters from ppos to pos to the buffer.
 func (hl *highlighter) writeFrom(ppos int) {
 	if hl.pos > ppos {
 		// Append remaining characters.

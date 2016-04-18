@@ -18,20 +18,20 @@ type highlighter struct {
 	pos   int    // position in s
 	buf   buffer // where result is built
 	attrs buffer // attributes of current verb
-	color bool   // whether to color the highlight verbs or strip them
+	color bool   // color or strip the highlight verbs
 }
 
 // Highlight replaces the highlight verbs in s with their appropriate
 // control sequences and then returns the resulting string.
 // This is a low level function, you shouldn't need to use this most of the time.
-// This is just a wrapper around color.Run().
+// This is just a thin wrapper around color.Run().
 func Highlight(s string) string {
 	return Run(s, true)
 }
 
 // Strip removes all highlight verbs in s and then returns the resulting string.
 // This is a low level function, you shouldn't need to use this most of the time.
-// This is just a wrapper around color.Run().
+// This is just a thin wrapper around color.Run().
 func Strip(s string) string {
 	return Run(s, false)
 }

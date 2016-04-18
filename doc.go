@@ -1,8 +1,7 @@
 /*
-Package color wraps fmt.Printf with verbs for producing colored output.
+Package color adds verbs to fmt.Printf for producing colored output.
 
 Printing
-
 
 Highlight Verbs:
 

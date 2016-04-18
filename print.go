@@ -45,7 +45,7 @@ func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, format, a...)
 }
 
-// Printfh first calls p.Prepare(format) to process the highlight verbs and then
+// Printfh first calls p.Prepare to process the highlight verbs and then
 // calls fmt.Fprintf to print to the writer.
 func (p *Printer) Printfh(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, p.Prepare(format), a...)

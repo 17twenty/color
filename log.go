@@ -21,7 +21,7 @@ func NewLogger(out io.Writer, prefix string, flag int, color bool) *Logger {
 	return &Logger{log.New(out, Run(prefix, color), flag), color}
 }
 
-// Printfh first calls l.Prepare(format) to process the highlight verbs and then
+// Printfh first calls l.Prepare to process the highlight verbs and then
 // calls l.Logger.Printf to print to the logger.
 func (l *Logger) Printfh(format string, v ...interface{}) {
 	l.Logger.Printf(l.Prepare(format), v...)

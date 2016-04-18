@@ -48,33 +48,33 @@ func ExamplePrepare() {
 
 func ExamplePrinter() {
 	// "hi" with red foreground.
-	p := color.NewPrinter(os.Stderr, color.EnableColor)
+	p := color.NewPrinter(os.Stderr, true)
 	redFormat := p.Prepare("%h[fgRed]%s%r\n")
 	p.Printf(redFormat, "hi")
 
 	// normal "hi", the highlight verbs are ignored.
-	p = color.NewPrinter(os.Stderr, color.DisableColor)
+	p = color.NewPrinter(os.Stderr, false)
 	p.Printfh("%h[fgRed]%s%r\n", "hi")
 
 	// If os.Stderr is a terminal, this will print in color.
 	// Otherwise it will be a normal "hi".
-	p = color.NewPrinter(os.Stderr, color.PerformCheck)
+	p = color.NewPrinter(os.Stderr, color.IsTerminal(os.Stderr))
 	p.Printfh("%h[fgRed]%s%r\n", "hi")
 }
 
 func ExampleLogger() {
 	// "hi" with a red foreground.
-	l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, color.EnableColor)
+	l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, true)
 	redFormat := l.Prepare("%h[fgRed]%s%r\n")
 	l.Printf(redFormat, "hi")
 
 	// normal "hi", the highlight verbs are ignored.
-	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, color.DisableColor)
+	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, false)
 	l.Printfh("%h[fgRed]%s%r", "hi")
 
 	// If os.Stderr is a terminal, this will print in color.
 	// Otherwise it will be a normal "hi".
-	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, color.PerformCheck)
+	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", 0, color.IsTerminal(os.Stderr))
 	l.Fatalf("%h[fgRed]%s%r", "hi")
 }
 

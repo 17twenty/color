@@ -21,17 +21,15 @@ type highlighter struct {
 	color bool   // color or strip the highlight verbs
 }
 
-// Highlight replaces the highlight verbs in s with their appropriate
-// control sequences and then returns the resulting string.
-// This is a low level function, you shouldn't need to use this most of the time.
-// This is just a thin wrapper around color.Run().
+// Highlight replaces the highlight verbs in s with the appropriate control sequences and
+// then returns the resulting string.
+// It is a thin wrapper around color.Run().
 func Highlight(s string) string {
 	return Run(s, true)
 }
 
 // Strip removes all highlight verbs in s and then returns the resulting string.
-// This is a low level function, you shouldn't need to use this most of the time.
-// This is just a thin wrapper around color.Run().
+// It is a thin wrapper around color.Run().
 func Strip(s string) string {
 	return Run(s, false)
 }
@@ -39,8 +37,7 @@ func Strip(s string) string {
 // Run runs a highlighter with s as the input and then returns the output. The strip argument
 // determines whether the highlight verbs will be stripped or instead replaced with
 // their appropriate control sequences.
-// This is a low level function that only handles highlight verbs, you should use
-// color.Sprintf most of the time as it wraps around fmt.Sprintf which handles other verbs.
+// Do not use this directly unless you know what you are doing.
 func Run(s string, color bool) string {
 	hl := getHighlighter(s, color)
 	defer hl.free()

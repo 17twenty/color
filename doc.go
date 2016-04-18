@@ -3,7 +3,7 @@ Package color adds verbs to fmt.Printf for producing colored output.
 
 Printing
 
-Highlight Verbs:
+Verbs:
 
 	%h[attr...]	replaced with a SGR code that sets all of the attributes in []
 			multiple attributes are + separated

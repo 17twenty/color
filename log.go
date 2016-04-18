@@ -38,7 +38,7 @@ func (l *Logger) Panicfh(format string, v ...interface{}) {
 }
 
 // Prepare returns the format string with the highlight verbs processed.
-// It is a thin wrapper around color.Run.
+// It is a thin wrapper around Run.
 func (l *Logger) Prepare(format string) string {
 	return Run(format, l.color)
 }
@@ -46,5 +46,5 @@ func (l *Logger) Prepare(format string) string {
 // SetOutput panics if called. You cannot change the output writer once the Logger is created.
 // TODO fix this.
 func (l *Logger) SetOutput(w io.Writer) {
-	panic("color.Logger.SetOutput is not supported")
+	panic("SetOutput is not supported on *color.Logger")
 }

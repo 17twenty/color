@@ -27,8 +27,8 @@ func Prepare(format string) string {
 	return stdout.Prepare(format)
 }
 
-// Printer prints to a writer. Use this over color.Fprintf when you want full control over when
-// to color the output or you want to avoid the repetitive terminal checks done by color.Fprinf.
+// Printer prints to a writer. Use this over Fprintf when you want full control over when
+// to color the output or you want to avoid the repetitive terminal checks done by Fprinf.
 type Printer struct {
 	w     io.Writer
 	color bool // dictates whether highlight verbs are processed or stripped
@@ -52,7 +52,7 @@ func (p *Printer) Printfh(format string, a ...interface{}) (n int, err error) {
 }
 
 // Prepare returns the format string with the highlight verbs processed.
-// It is a thin wrapper around color.Run.
+// It is a thin wrapper around Run.
 func (p *Printer) Prepare(format string) string {
 	return Run(format, p.color)
 }

@@ -23,13 +23,13 @@ type highlighter struct {
 
 // Highlight replaces the highlight verbs in s with the appropriate control sequences and
 // then returns the resulting string.
-// It is a thin wrapper around color.Run().
+// It is a thin wrapper around Run.
 func Highlight(s string) string {
 	return Run(s, true)
 }
 
 // Strip removes all highlight verbs in s and then returns the resulting string.
-// It is a thin wrapper around color.Run().
+// It is a thin wrapper around Run.
 func Strip(s string) string {
 	return Run(s, false)
 }

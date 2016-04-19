@@ -110,8 +110,8 @@ color.Printfh("%r%s", "hello")
 ```
 
 ## TODO
-- [ ] True color support
+- [x] True color support
 - [ ] Windows support
-- [ ] Respect $TERM
+- [x] Respect $TERM
 - [ ] Wrap the print/println functions as well.
 - [ ] Fully wrap \*log.Logger, perhaps a format string that defines the prefix, date, content etc. Perhaps another package?

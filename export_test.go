@@ -3,4 +3,4 @@
 
 package color
 
-var Attrs = attrs
+var Colors = colors

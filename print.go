@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/gdamore/tcell"
 )
 
 // Fprintfh formats according to a format specifier or highlight verb and writes to w.
@@ -11,7 +13,9 @@ import (
 // color if the writer is a terminal, otherwise it prints normally. Use a Printer if you want
 // full control over when to print in color or you want to avoid the repetitive terminal checks.
 func Fprintfh(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	return fmt.Fprintf(w, Run(format, IsTerminal(w)))
+	// TODO FIX
+	// return fmt.Fprintf(w, Run(format, IsTerminal(w)))
+	return 0, nil
 }
 
 var stdout = NewPrinter(os.Stdout, IsTerminal(os.Stdout))
@@ -32,12 +36,14 @@ func Prepare(format string) string {
 type Printer struct {
 	w     io.Writer
 	color bool // dictates whether highlight verbs are processed or stripped
+	ti    *tcell.Terminfo
 }
 
 // NewPrinter creates a new Printer.
 // The color argument dictates whether color output is enabled.
 func NewPrinter(out io.Writer, color bool) *Printer {
-	return &Printer{out, color}
+	ti, _ := tcell.LookupTerminfo(os.Getenv("TERM"))
+	return &Printer{out, color, ti}
 }
 
 // Printf calls fmt.Fprintf to print to the writer.
@@ -54,5 +60,5 @@ func (p *Printer) Printfh(format string, a ...interface{}) (n int, err error) {
 // Prepare returns the format string with the highlight verbs processed.
 // It is a thin wrapper around Run.
 func (p *Printer) Prepare(format string) string {
-	return Run(format, p.color)
+	return Run(format, p.color, p.ti)
 }

@@ -1,9 +1,12 @@
 package color
 
 import (
+	"strconv"
 	"strings"
 	"sync"
 	"unicode"
+
+	"github.com/gdamore/tcell"
 )
 
 const (
@@ -12,34 +15,54 @@ const (
 	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the highlight verb
 )
 
+var colors = map[string]tcell.Color{
+	"Black":   tcell.ColorBlack,
+	"Maroon":  tcell.ColorMaroon,
+	"Green":   tcell.ColorGreen,
+	"Olive":   tcell.ColorOlive,
+	"Navy":    tcell.ColorNavy,
+	"Purple":  tcell.ColorPurple,
+	"Teal":    tcell.ColorTeal,
+	"Silver":  tcell.ColorSilver,
+	"Gray":    tcell.ColorGray,
+	"Red":     tcell.ColorRed,
+	"Lime":    tcell.ColorLime,
+	"Yellow":  tcell.ColorYellow,
+	"Blue":    tcell.ColorBlue,
+	"Fuchsia": tcell.ColorFuchsia,
+	"Aqua":    tcell.ColorAqua,
+	"White":   tcell.ColorWhite,
+}
+
 // highlighter holds the state of the scanner.
 type highlighter struct {
 	s     string // string being scanned
 	pos   int    // position in s
 	buf   buffer // where result is built
-	attrs buffer // attributes of current verb
 	color bool   // color or strip the highlight verbs
+	fg    bool   // foreground or background color attribute
+	ti    *tcell.Terminfo
 }
 
 // Highlight replaces the highlight verbs in s with the appropriate control sequences and
 // then returns the resulting string.
 // It is a thin wrapper around Run.
-func Highlight(s string) string {
-	return Run(s, true)
+func Highlight(s string, ti *tcell.Terminfo) string {
+	return Run(s, true, ti)
 }
 
 // Strip removes all highlight verbs in s and then returns the resulting string.
 // It is a thin wrapper around Run.
-func Strip(s string) string {
-	return Run(s, false)
+func Strip(s string, ti *tcell.Terminfo) string {
+	return Run(s, false, ti)
 }
 
 // Run runs a highlighter with s as the input and then returns the output. The strip argument
 // determines whether the highlight verbs will be stripped or instead replaced with
 // their appropriate control sequences.
 // Do not use this directly unless you know what you are doing.
-func Run(s string, color bool) string {
-	hl := getHighlighter(s, color)
+func Run(s string, color bool, ti *tcell.Terminfo) string {
+	hl := getHighlighter(s, color, ti)
 	defer hl.free()
 	hl.run()
 	s = string(hl.buf)
@@ -52,15 +75,17 @@ var highlighterPool = sync.Pool{
 		hl := new(highlighter)
 		// The initial capacities avoid constant reallocation during growth.
 		hl.buf = make([]byte, 0, 45)
-		hl.attrs = make([]byte, 0, 15)
 		return hl
 	},
 }
 
 // getHighlighter returns a new initialized highlighter from the pool.
-func getHighlighter(s string, color bool) (hl *highlighter) {
+func getHighlighter(s string, color bool, ti *tcell.Terminfo) (hl *highlighter) {
 	hl = highlighterPool.Get().(*highlighter)
 	hl.s, hl.color = s, color
+	if hl.color {
+		hl.ti = ti
+	}
 	return
 }
 
@@ -89,13 +114,6 @@ func (hl *highlighter) get() rune {
 		return eof
 	}
 	return rune(hl.s[hl.pos])
-}
-
-// writeAttrs writes a control sequence derived from h.attrs[1:] to h.buf.
-func (hl *highlighter) writeAttrs() {
-	hl.buf.writeString(csi)
-	hl.buf.write(hl.attrs[1:])
-	hl.buf.writeByte('m')
 }
 
 // writePrev writes n previous characters to the buffer
@@ -179,59 +197,40 @@ func scanVerb(hl *highlighter) stateFn {
 
 // verbReset writes the reset verb with the reset control sequence.
 func verbReset(hl *highlighter) stateFn {
-	hl.attrs.writeString(attrs["reset"])
-	hl.writeAttrs()
-	hl.attrs.reset()
+	hl.buf.writeString(hl.ti.AttrOff)
 	return scanText
 }
 
 // scanHighlight scans the highlight verb for attributes,
 // then writes a control sequence derived from said attributes to the buffer.
 func scanHighlight(hl *highlighter) stateFn {
-	r := hl.get()
-	switch {
-	case r == 'f':
-		return scanColor256(hl, preFg256)
-	case r == 'b':
-		return scanColor256(hl, preBg256)
-	case unicode.IsLetter(r):
-		return scanAttribute(hl, 0)
-	case r == '+':
-		hl.pos++
-		return scanHighlight
-	case r == ']':
-		if len(hl.attrs) != 0 {
-			hl.writeAttrs()
-		} else {
-			hl.buf.writeString(errMissing)
+	for {
+		r := hl.get()
+		switch {
+		case r == 'f':
+			hl.fg = true
+			return scanColor
+		case r == 'b':
+			hl.fg = false
+			return scanColor
+		case unicode.IsLetter(r):
+			return scanAttribute
+		case r == '+':
+			hl.pos++
+			continue
+		case r == ']':
+			hl.pos++
+			return scanText
+		default:
+			return abortHighlight(hl, errInvalid)
 		}
-		hl.attrs.reset()
-		hl.pos++
-		return scanText
-	default:
-		return abortHighlight(hl, errInvalid)
 	}
-}
-
-// scanAttribute scans a named attribute.
-func scanAttribute(hl *highlighter, off int) stateFn {
-	start := hl.pos - off
-	for unicode.IsLetter(hl.get()) {
-		hl.pos++
-	}
-	if a, ok := attrs[hl.s[start:hl.pos]]; ok {
-		hl.attrs.writeString(a)
-	} else {
-		return abortHighlight(hl, errBadAttr)
-	}
-	return scanHighlight
 }
 
 // abortHighlight writes a error to the buffer and
 // then skips to the end of the highlight verb.
 func abortHighlight(hl *highlighter, msg string) stateFn {
 	hl.buf.writeString(msg)
-	hl.attrs.reset()
 	for {
 		switch hl.get() {
 		case ']':
@@ -244,22 +243,75 @@ func abortHighlight(hl *highlighter, msg string) stateFn {
 	}
 }
 
-// scanColor256 scans a 256 color attribute.
-func scanColor256(hl *highlighter, pre string) stateFn {
+// scanAttribute scans a named attribute.
+func scanAttribute(hl *highlighter) stateFn {
+	start := hl.pos
+	for unicode.IsLetter(hl.get()) {
+		hl.pos++
+	}
+	a := hl.s[start:hl.pos]
+	switch a {
+	case "bold":
+		a = hl.ti.Bold
+	case "underline":
+		a = hl.ti.Underline
+	case "reverse":
+		a = hl.ti.Reverse
+	case "blink":
+		a = hl.ti.Blink
+	case "dim":
+		a = hl.ti.Dim
+	case "attrOff":
+		a = hl.ti.AttrOff
+	default:
+		return abortHighlight(hl, errBadAttr)
+	}
+	hl.buf.writeString(a)
+	return scanHighlight
+}
+
+// scanColor scans a color attribute.
+func scanColor(hl *highlighter) stateFn {
 	hl.pos++
 	if hl.get() != 'g' {
-		return scanAttribute(hl, 1)
+		hl.pos--
+		return scanAttribute
 	}
 	hl.pos++
-	if !unicode.IsNumber(hl.get()) {
-		return scanAttribute(hl, 2)
+	r := hl.get()
+	switch {
+	case unicode.IsNumber(r):
+		return scanColor256
+	case unicode.IsLetter(r):
+		// continue
+	default:
+		return abortHighlight(hl, errBadAttr)
 	}
+	start := hl.pos
+	hl.pos++
+	for unicode.IsLetter(hl.get()) {
+		hl.pos++
+	}
+	if hl.fg {
+		hl.buf.writeString(hl.ti.TColor(colors[hl.s[start:hl.pos]], -1))
+	} else {
+		hl.buf.writeString(hl.ti.TColor(-1, colors[hl.s[start:hl.pos]]))
+	}
+	return scanHighlight
+}
+
+// scanColor256 scans a 256 color attribute.
+func scanColor256(hl *highlighter) stateFn {
 	start := hl.pos
 	hl.pos++
 	for unicode.IsNumber(hl.get()) {
 		hl.pos++
 	}
-	hl.attrs.writeString(pre)
-	hl.attrs.writeString(hl.s[start:hl.pos])
+	n, _ := strconv.ParseInt(hl.s[start:hl.pos], 10, 32)
+	if hl.fg {
+		hl.buf.writeString(hl.ti.TColor(tcell.Color(n), -1))
+	} else {
+		hl.buf.writeString(hl.ti.TColor(-1, tcell.Color(n)))
+	}
 	return scanHighlight
 }

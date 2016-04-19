@@ -39,8 +39,9 @@ type highlighter struct {
 	s     string // string being scanned
 	pos   int    // position in s
 	buf   buffer // where result is built
-	color bool   // color or strip the highlight verbs
-	fg    bool   // foreground or background color attribute
+	attrs buffer
+	color bool // color or strip the highlight verbs
+	fg    bool // foreground or background color attribute
 	ti    *tcell.Terminfo
 }
 
@@ -75,6 +76,7 @@ var highlighterPool = sync.Pool{
 		hl := new(highlighter)
 		// The initial capacities avoid constant reallocation during growth.
 		hl.buf = make([]byte, 0, 45)
+		hl.attrs = make([]byte, 0, 15)
 		return hl
 	},
 }
@@ -219,6 +221,12 @@ func scanHighlight(hl *highlighter) stateFn {
 			hl.pos++
 			continue
 		case r == ']':
+			if len(hl.attrs) != 0 {
+				hl.buf.write(hl.attrs)
+			} else {
+				hl.buf.writeString(errMissing)
+			}
+			hl.attrs.reset()
 			hl.pos++
 			return scanText
 		default:
@@ -231,6 +239,7 @@ func scanHighlight(hl *highlighter) stateFn {
 // then skips to the end of the highlight verb.
 func abortHighlight(hl *highlighter, msg string) stateFn {
 	hl.buf.writeString(msg)
+	hl.attrs.reset()
 	for {
 		switch hl.get() {
 		case ']':
@@ -266,7 +275,7 @@ func scanAttribute(hl *highlighter) stateFn {
 	default:
 		return abortHighlight(hl, errBadAttr)
 	}
-	hl.buf.writeString(a)
+	hl.attrs.writeString(a)
 	return scanHighlight
 }
 
@@ -292,12 +301,15 @@ func scanColor(hl *highlighter) stateFn {
 	for unicode.IsLetter(hl.get()) {
 		hl.pos++
 	}
-	if hl.fg {
-		hl.buf.writeString(hl.ti.TColor(colors[hl.s[start:hl.pos]], -1))
-	} else {
-		hl.buf.writeString(hl.ti.TColor(-1, colors[hl.s[start:hl.pos]]))
+	if c, ok := colors[hl.s[start:hl.pos]]; ok {
+		if hl.fg {
+			hl.attrs.writeString(hl.ti.TColor(c, -1))
+		} else {
+			hl.attrs.writeString(hl.ti.TColor(-1, c))
+		}
+		return scanHighlight
 	}
-	return scanHighlight
+	return abortHighlight(hl, errBadAttr)
 }
 
 // scanColor256 scans a 256 color attribute.
@@ -309,9 +321,9 @@ func scanColor256(hl *highlighter) stateFn {
 	}
 	n, _ := strconv.ParseInt(hl.s[start:hl.pos], 10, 32)
 	if hl.fg {
-		hl.buf.writeString(hl.ti.TColor(tcell.Color(n), -1))
+		hl.attrs.writeString(hl.ti.TColor(tcell.Color(n), -1))
 	} else {
-		hl.buf.writeString(hl.ti.TColor(-1, tcell.Color(n)))
+		hl.attrs.writeString(hl.ti.TColor(-1, tcell.Color(n)))
 	}
 	return scanHighlight
 }

@@ -36,13 +36,13 @@ var colors = map[string]tcell.Color{
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
-	s     string // string being scanned
-	pos   int    // position in s
-	buf   buffer // where result is built
-	color bool   // color or strip the highlight verbs
-	fg    bool   // foreground or background color attribute
+	s       string // string being scanned
+	pos     int    // position in s
+	buf     buffer // where result is built
+	color   bool   // color or strip the highlight verbs
+	fg      bool   // foreground or background color attribute
 	noAttrs bool   // not written attrs to buf
-	ti    *tcell.Terminfo
+	ti      *tcell.Terminfo
 }
 
 // Highlight replaces the highlight verbs in s with the appropriate control sequences and
@@ -144,7 +144,6 @@ func scanText(hl *highlighter) stateFn {
 			hl.writeFrom(ppos)
 			hl.pos++
 			if hl.color {
-				hl.noAttrs = true
 				return scanVerb
 			}
 			return stripVerb
@@ -187,6 +186,7 @@ func scanVerb(hl *highlighter) stateFn {
 		return verbReset
 	case 'h':
 		hl.pos += 2
+		hl.noAttrs = true
 		return scanHighlight
 	case eof:
 		// Let fmt handle "%!h(NOVERB)".
@@ -223,28 +223,14 @@ func scanHighlight(hl *highlighter) stateFn {
 		case r == ']':
 			if hl.noAttrs {
 				hl.buf.writeString(errMissing)
+				return nil
 			}
 			hl.pos++
 			return scanText
 		default:
-			return abortHighlight(hl, errInvalid)
-		}
-	}
-}
-
-// abortHighlight writes a error to the buffer and
-// then skips to the end of the highlight verb.
-func abortHighlight(hl *highlighter, msg string) stateFn {
-	hl.buf.writeString(msg)
-	for {
-		switch hl.get() {
-		case ']':
-			hl.pos++
-			return scanText
-		case eof:
+			hl.buf.writeString(errInvalid)
 			return nil
 		}
-		hl.pos++
 	}
 }
 
@@ -269,7 +255,8 @@ func scanAttribute(hl *highlighter) stateFn {
 	case "attrOff":
 		a = hl.ti.AttrOff
 	default:
-		return abortHighlight(hl, errBadAttr)
+		hl.buf.writeString(errBadAttr)
+		return nil
 	}
 	hl.buf.writeString(a)
 	hl.noAttrs = false
@@ -291,7 +278,8 @@ func scanColor(hl *highlighter) stateFn {
 	case unicode.IsLetter(r):
 		// continue
 	default:
-		return abortHighlight(hl, errBadAttr)
+		hl.buf.writeString(errBadAttr)
+		return nil
 	}
 	start := hl.pos
 	hl.pos++
@@ -307,7 +295,8 @@ func scanColor(hl *highlighter) stateFn {
 		hl.noAttrs = false
 		return scanHighlight
 	}
-	return abortHighlight(hl, errBadAttr)
+	hl.buf.writeString(errBadAttr)
+	return nil
 }
 
 // scanColor256 scans a 256 color attribute.

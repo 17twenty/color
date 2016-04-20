@@ -4,3 +4,9 @@
 package color
 
 var Colors = colors
+
+const (
+	ErrMissing = errMissing
+	ErrInvalid = errInvalid
+	ErrBadAttr = errBadAttr
+)

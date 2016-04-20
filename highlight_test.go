@@ -42,8 +42,8 @@ func TestColor256(t *testing.T) {
 }
 
 var combinations = map[string]string{
-	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]": ti.TColor(tcell.ColorMaroon, tcell.ColorNavy) + ti.Bold + ti.Underline + ti.TColor(23, 235),
-	"%h[bgBlue+fgOlive+fgGreen+fg34]":               ti.TColor(-1, tcell.ColorBlue) + ti.TColor(tcell.ColorOlive, -1) + ti.TColor(tcell.ColorGreen, -1) + ti.TColor(34, -1),
+	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]":     ti.TColor(tcell.ColorMaroon, tcell.ColorNavy) + ti.Bold + ti.Underline + ti.TColor(23, 235),
+	"%h[bgBlue+fgOlive+fgGreen+fg34+blink+dim+reverse]": ti.TColor(-1, tcell.ColorBlue) + ti.TColor(tcell.ColorOlive, -1) + ti.TColor(tcell.ColorGreen, -1) + ti.TColor(34, -1) + ti.Blink + ti.Dim + ti.Reverse,
 }
 
 func TestCombinations(t *testing.T) {
@@ -55,24 +55,26 @@ func TestCombinations(t *testing.T) {
 }
 
 var highlightEdgeCases = map[string]string{
-	"%h[fgGray+%h[fgBlue]": ti.TColor(tcell.ColorGray, -1) + "%%!h(INVALID)",
-	"%h[":                  "%%!h(INVALID)",
-	"%h{":                  "%%!h(INVALID)",
-	"%h[]":                 "%%!h(MISSING)",
+	"%h[fgGray+%h[fgBlue]": ti.TColor(tcell.ColorGray, -1) + color.ErrInvalid,
+	"%h[":                  color.ErrInvalid,
+	"%h{":                  color.ErrInvalid,
+	"%h[]":                 color.ErrMissing,
 	"%%h[fgRed]":           "%%h[fgRed]",
 	"%[bg232]":             "%[bg232]",
-	"%h[fg132":             ti.TColor(132, -1) + "%%!h(INVALID)",
-	"%h[fgFuchsia[]":       ti.TColor(tcell.ColorFuchsia, -1) + "%%!h(INVALID)",
-	"%h[fgGreen+lold[]":    ti.TColor(tcell.ColorGreen, -1) + "%%!h(BADATTR)",
-	"%h[fgOlive+%#bgBlue]": ti.TColor(tcell.ColorOlive, -1) + "%%!h(INVALID)",
-	"%h][fgRed+%#bgBlue]":  "%%!h(INVALID)",
-	"%h[fgRed+":            ti.TColor(tcell.ColorRed, -1) + "%%!h(INVALID)",
+	"%h[fg132":             ti.TColor(132, -1) + color.ErrInvalid,
+	"%h[fgFuchsia[]":       ti.TColor(tcell.ColorFuchsia, -1) + color.ErrInvalid,
+	"%h[fgGreen+lold[]":    ti.TColor(tcell.ColorGreen, -1) + color.ErrBadAttr,
+	"%h[fgOlive+%#bgBlue]": ti.TColor(tcell.ColorOlive, -1) + color.ErrInvalid,
+	"%h][fgRed+%#bgBlue]":  color.ErrInvalid,
+	"%h[fgRed+":            ti.TColor(tcell.ColorRed, -1) + color.ErrInvalid,
 	"%%h%h[fgRed]%%":       "%%h\x1b[91m%%",
-	"%h[dsadadssadas]":     "%%!h(BADATTR)",
+	"%h[dsadadssadas]":     color.ErrBadAttr,
 	"%":                    "%",
-	"%h[fgsadas]":          "%%!h(BADATTR)",
-	"%h[fgAqua+%h[bgBlue]": ti.TColor(tcell.ColorAqua, -1) + "%%!h(INVALID)",
+	"%h[fgsadas]":          color.ErrBadAttr,
+	"%h[fgAqua+%h[bgBlue]": ti.TColor(tcell.ColorAqua, -1) + color.ErrInvalid,
 	"lmaokai":              "lmaokai",
+	"%h[fgMaroon]%h[]":     ti.TColor(tcell.ColorMaroon, -1) + color.ErrMissing,
+	"%h[bgGjo]%h[bgGreen]": color.ErrBadAttr,
 }
 
 func TestHighlightEdgeCases(t *testing.T) {

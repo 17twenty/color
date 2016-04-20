@@ -55,30 +55,30 @@ func TestCombinations(t *testing.T) {
 }
 
 var highlightEdgeCases = map[string]string{
-	"%h[fgRed+%h[fgBlue]": "%%!h(INVALID)",
-	"%h[":                 "%%!h(INVALID)",
-	"%h{":                 "%%!h(INVALID)",
-	"%h[]":                "%%!h(MISSING)",
-	"%%h[fgRed]":          "%%h[fgRed]",
-	"%[bg232]":            "%[bg232]",
-	"%h[fg132":            "%%!h(INVALID)",
-	"%h[fgRed[]":          "%%!h(INVALID)",
-	"%h[fgRed+lold[]":     "%%!h(BADATTR)",
-	"%h[fgRed+%#bgBlue]":  "%%!h(INVALID)",
-	"%h][fgRed+%#bgBlue]": "%%!h(INVALID)",
-	"%h[fgRed+":           "%%!h(INVALID)",
-	"%%h%h[fgRed]%%":      "%%h\x1b[91m%%",
-	"%h[dsadadssadas]":    "%%!h(BADATTR)",
-	"%":                   "%",
-	"%h[fgsadas]":         "%%!h(BADATTR)",
-	"%h[fgRed+%h[bgBlue]": "%%!h(INVALID)",
-	"lmaokai":             "lmaokai",
+	"%h[fgGray+%h[fgBlue]": ti.TColor(tcell.ColorGray, -1) + "%%!h(INVALID)",
+	"%h[":                  "%%!h(INVALID)",
+	"%h{":                  "%%!h(INVALID)",
+	"%h[]":                 "%%!h(MISSING)",
+	"%%h[fgRed]":           "%%h[fgRed]",
+	"%[bg232]":             "%[bg232]",
+	"%h[fg132":             ti.TColor(132, -1) + "%%!h(INVALID)",
+	"%h[fgFuchsia[]":       ti.TColor(tcell.ColorFuchsia, -1) + "%%!h(INVALID)",
+	"%h[fgGreen+lold[]":    ti.TColor(tcell.ColorGreen, -1) + "%%!h(BADATTR)",
+	"%h[fgOlive+%#bgBlue]": ti.TColor(tcell.ColorOlive, -1) + "%%!h(INVALID)",
+	"%h][fgRed+%#bgBlue]":  "%%!h(INVALID)",
+	"%h[fgRed+":            ti.TColor(tcell.ColorRed, -1) + "%%!h(INVALID)",
+	"%%h%h[fgRed]%%":       "%%h\x1b[91m%%",
+	"%h[dsadadssadas]":     "%%!h(BADATTR)",
+	"%":                    "%",
+	"%h[fgsadas]":          "%%!h(BADATTR)",
+	"%h[fgAqua+%h[bgBlue]": ti.TColor(tcell.ColorAqua, -1) + "%%!h(INVALID)",
+	"lmaokai":              "lmaokai",
 }
 
 func TestHighlightEdgeCases(t *testing.T) {
 	for k, v := range highlightEdgeCases {
 		if r := color.Highlight(k, ti); r != v {
-			t.Errorf("Expected %q but result was %q", v, r)
+			t.Errorf("Expected %q from %q but result was %q", v, k, r)
 		}
 	}
 }

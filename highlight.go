@@ -84,7 +84,7 @@ var highlighterPool = sync.Pool{
 func getHighlighter(s string, color bool, ti *tcell.Terminfo) (hl *highlighter) {
 	hl = highlighterPool.Get().(*highlighter)
 	hl.s, hl.color = s, color
-	if hl.color {
+	if color {
 		hl.ti = ti
 	}
 	return

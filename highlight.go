@@ -36,13 +36,13 @@ var colors = map[string]tcell.Color{
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
-	s       string // string being scanned
-	pos     int    // position in s
-	buf     buffer // where result is built
-	color   bool   // color or strip the highlight verbs
-	fg      bool   // foreground or background color attribute
-	noAttrs bool   // not written attrs to buf
-	ti      *tcell.Terminfo
+	s       string          // string being scanned
+	pos     int             // position in s
+	buf     buffer          // where result is built
+	color   bool            // color or strip the highlight verbs
+	fg      bool            // foreground or background color attribute
+	noAttrs bool            // not written attrs to buf
+	ti      *tcell.Terminfo // TODO WHY THE FUCK
 }
 
 // Highlight replaces the highlight verbs in s with the appropriate control sequences and
@@ -306,11 +306,12 @@ func scanColor256(hl *highlighter) stateFn {
 	for unicode.IsNumber(hl.get()) {
 		hl.pos++
 	}
-	n, _ := strconv.ParseInt(hl.s[start:hl.pos], 10, 32)
+	t, _ := strconv.Atoi(hl.s[start:hl.pos])
+	n := tcell.Color(t)
 	if hl.fg {
-		hl.buf.writeString(hl.ti.TColor(tcell.Color(n), -1))
+		hl.buf.writeString(hl.ti.TColor(n, -1))
 	} else {
-		hl.buf.writeString(hl.ti.TColor(-1, tcell.Color(n)))
+		hl.buf.writeString(hl.ti.TColor(-1, n))
 	}
 	hl.noAttrs = false
 	return scanHighlight

@@ -3,7 +3,10 @@
 
 package color
 
-var Colors = colors
+var (
+	Colors = colors
+	Ti = ti
+)
 
 const (
 	ErrMissing = errMissing

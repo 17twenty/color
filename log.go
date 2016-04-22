@@ -3,16 +3,12 @@ package color
 import (
 	"io"
 	"log"
-	"os"
-
-	"github.com/gdamore/tcell"
 )
 
 // Logger is a very thin wrapper around log.Logger to support the highlighting verbs.
 type Logger struct {
 	*log.Logger      // TODO unexport this somehow
 	color       bool // dictates whether highlight verbs are processed or stripped
-	ti          *tcell.Terminfo
 }
 
 // NewLogger creates a new Logger. The out argument sets the
@@ -22,8 +18,7 @@ type Logger struct {
 // The flag argument defines the logging properties.
 // The color argument dictates whether color output is enabled.
 func NewLogger(out io.Writer, prefix string, flag int, color bool) *Logger {
-	ti, _ := tcell.LookupTerminfo(os.Getenv("TERM"))
-	return &Logger{log.New(out, Run(prefix, color, ti), flag), color, ti}
+	return &Logger{log.New(out, Run(prefix, color), flag), color}
 }
 
 // Printfh first calls l.Prepare to process the highlight verbs and then
@@ -45,7 +40,7 @@ func (l *Logger) Panicfh(format string, v ...interface{}) {
 // Prepare returns the format string with the highlight verbs processed.
 // It is a thin wrapper around Run.
 func (l *Logger) Prepare(format string) string {
-	return Run(format, l.color, l.ti)
+	return Run(format, l.color)
 }
 
 // SetOutput panics if called. You cannot change the output writer once the Logger is created.

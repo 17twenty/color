@@ -1,6 +1,7 @@
 package color
 
 import (
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -36,34 +37,35 @@ var colors = map[string]tcell.Color{
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
-	s       string          // string being scanned
-	pos     int             // position in s
-	buf     buffer          // where result is built
-	color   bool            // color or strip the highlight verbs
-	fg      bool            // foreground or background color attribute
-	noAttrs bool            // not written attrs to buf
-	ti      *tcell.Terminfo // TODO WHY THE FUCK
+	s       string // string being scanned
+	pos     int    // position in s
+	buf     buffer // where result is built
+	color   bool   // color or strip the highlight verbs
+	fg      bool   // foreground or background color attribute
+	noAttrs bool   // not written attrs to buf
 }
+
+var ti, tiErr = tcell.LookupTerminfo(os.Getenv("TERM"))
 
 // Highlight replaces the highlight verbs in s with the appropriate control sequences and
 // then returns the resulting string.
 // It is a thin wrapper around Run.
-func Highlight(s string, ti *tcell.Terminfo) string {
-	return Run(s, true, ti)
+func Highlight(s string) string {
+	return Run(s, true)
 }
 
 // Strip removes all highlight verbs in s and then returns the resulting string.
 // It is a thin wrapper around Run.
-func Strip(s string, ti *tcell.Terminfo) string {
-	return Run(s, false, ti)
+func Strip(s string) string {
+	return Run(s, false)
 }
 
 // Run runs a highlighter with s as the input and then returns the output. The strip argument
 // determines whether the highlight verbs will be stripped or instead replaced with
 // their appropriate control sequences.
 // Do not use this directly unless you know what you are doing.
-func Run(s string, color bool, ti *tcell.Terminfo) string {
-	hl := getHighlighter(s, color, ti)
+func Run(s string, color bool) string {
+	hl := getHighlighter(s, color)
 	defer hl.free()
 	hl.run()
 	s = string(hl.buf)
@@ -81,11 +83,13 @@ var highlighterPool = sync.Pool{
 }
 
 // getHighlighter returns a new initialized highlighter from the pool.
-func getHighlighter(s string, color bool, ti *tcell.Terminfo) (hl *highlighter) {
+func getHighlighter(s string, color bool) (hl *highlighter) {
 	hl = highlighterPool.Get().(*highlighter)
-	hl.s, hl.color = s, color
-	if color {
-		hl.ti = ti
+	hl.s = s
+	if tiErr == nil {
+		hl.color = color
+	} else {
+		hl.color = false
 	}
 	return
 }
@@ -199,7 +203,7 @@ func scanVerb(hl *highlighter) stateFn {
 
 // verbReset writes the reset verb with the reset control sequence.
 func verbReset(hl *highlighter) stateFn {
-	hl.buf.writeString(hl.ti.AttrOff)
+	hl.buf.writeString(ti.AttrOff)
 	return scanText
 }
 
@@ -243,17 +247,17 @@ func scanAttribute(hl *highlighter) stateFn {
 	a := hl.s[start:hl.pos]
 	switch a {
 	case "bold":
-		a = hl.ti.Bold
+		a = ti.Bold
 	case "underline":
-		a = hl.ti.Underline
+		a = ti.Underline
 	case "reverse":
-		a = hl.ti.Reverse
+		a = ti.Reverse
 	case "blink":
-		a = hl.ti.Blink
+		a = ti.Blink
 	case "dim":
-		a = hl.ti.Dim
+		a = ti.Dim
 	case "attrOff":
-		a = hl.ti.AttrOff
+		a = ti.AttrOff
 	default:
 		hl.buf.writeString(errBadAttr)
 		return nil
@@ -288,9 +292,9 @@ func scanColor(hl *highlighter) stateFn {
 	}
 	if c, ok := colors[hl.s[start:hl.pos]]; ok {
 		if hl.fg {
-			hl.buf.writeString(hl.ti.TColor(c, -1))
+			hl.buf.writeString(ti.TColor(c, -1))
 		} else {
-			hl.buf.writeString(hl.ti.TColor(-1, c))
+			hl.buf.writeString(ti.TColor(-1, c))
 		}
 		hl.noAttrs = false
 		return scanHighlight
@@ -309,9 +313,9 @@ func scanColor256(hl *highlighter) stateFn {
 	t, _ := strconv.Atoi(hl.s[start:hl.pos])
 	n := tcell.Color(t)
 	if hl.fg {
-		hl.buf.writeString(hl.ti.TColor(n, -1))
+		hl.buf.writeString(ti.TColor(n, -1))
 	} else {
-		hl.buf.writeString(hl.ti.TColor(-1, n))
+		hl.buf.writeString(ti.TColor(-1, n))
 	}
 	hl.noAttrs = false
 	return scanHighlight

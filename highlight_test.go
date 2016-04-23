@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gdamore/tcell"
 	"github.com/nhooyr/color"
+	"github.com/nhooyr/terminfo"
 )
 
 func TestAttributes(t *testing.T) {
 	for k, v := range color.Colors {
-		exp := color.Ti.TColor(v, -1) + "hi" + color.Ti.AttrOff
+		exp := color.Ti.Color(v, -1) + "hi" + color.Ti.Reset
 		r := color.Highlight(fmt.Sprintf("%%h[fg%s]hi%%r", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
-		exp = color.Ti.TColor(-1, v) + "hi" + color.Ti.AttrOff
+		exp = color.Ti.Color(-1, v) + "hi" + color.Ti.Reset
 		r = color.Highlight(fmt.Sprintf("%%h[bg%s]hi%%r", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
@@ -24,13 +24,13 @@ func TestAttributes(t *testing.T) {
 }
 
 func TestColor256(t *testing.T) {
-	for i := tcell.Color(0); i < 256; i++ {
-		exp := color.Ti.TColor(i, -1) + "hi" + color.Ti.AttrOff
+	for i := 0; i < 256; i++ {
+		exp := color.Ti.Color(i, -1) + "hi" + color.Ti.Reset
 		r := color.Highlight(fmt.Sprintf("%%h[fg%d]hi%%r", i))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
-		exp = color.Ti.TColor(-1, i) + "hi" + color.Ti.AttrOff
+		exp = color.Ti.Color(-1, i) + "hi" + color.Ti.Reset
 		r = color.Highlight(fmt.Sprintf("%%h[bg%d]hi%%r", i))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
@@ -39,8 +39,8 @@ func TestColor256(t *testing.T) {
 }
 
 var combinations = map[string]string{
-	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]":     color.Ti.TColor(tcell.ColorMaroon, tcell.ColorNavy) + color.Ti.Bold + color.Ti.Underline + color.Ti.TColor(23, 235),
-	"%h[bgBlue+fgOlive+fgGreen+fg34+blink+dim+reverse]": color.Ti.TColor(-1, tcell.ColorBlue) + color.Ti.TColor(tcell.ColorOlive, -1) + color.Ti.TColor(tcell.ColorGreen, -1) + color.Ti.TColor(34, -1) + color.Ti.Blink + color.Ti.Dim + color.Ti.Reverse,
+	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]":     color.Ti.Color(terminfo.ColorMaroon, terminfo.ColorNavy) + color.Ti.Bold + color.Ti.Underline + color.Ti.Color(23, 235),
+	"%h[bgBlue+fgOlive+fgGreen+fg34+blink+dim+reverse]": color.Ti.Color(-1, terminfo.ColorBlue) + color.Ti.Color(terminfo.ColorOlive, -1) + color.Ti.Color(terminfo.ColorGreen, -1) + color.Ti.Color(34, -1) + color.Ti.Blink + color.Ti.Dim + color.Ti.Reverse,
 }
 
 func TestCombinations(t *testing.T) {
@@ -52,25 +52,25 @@ func TestCombinations(t *testing.T) {
 }
 
 var highlightEdgeCases = map[string]string{
-	"%h[fgGray+%h[fgBlue]": color.Ti.TColor(tcell.ColorGray, -1) + color.ErrInvalid,
+	"%h[fgGray+%h[fgBlue]": color.Ti.Color(terminfo.ColorGray, -1) + color.ErrInvalid,
 	"%h[":                  color.ErrInvalid,
 	"%h{":                  color.ErrInvalid,
 	"%h[]":                 color.ErrMissing,
 	"%%h[fgRed]":           "%%h[fgRed]",
 	"%[bg232]":             "%[bg232]",
-	"%h[fg132":             color.Ti.TColor(132, -1) + color.ErrInvalid,
-	"%h[fgFuchsia[]":       color.Ti.TColor(tcell.ColorFuchsia, -1) + color.ErrInvalid,
-	"%h[fgGreen+lold[]":    color.Ti.TColor(tcell.ColorGreen, -1) + color.ErrBadAttr,
-	"%h[fgOlive+%#bgBlue]": color.Ti.TColor(tcell.ColorOlive, -1) + color.ErrInvalid,
+	"%h[fg132":             color.Ti.Color(132, -1) + color.ErrInvalid,
+	"%h[fgFuchsia[]":       color.Ti.Color(terminfo.ColorFuchsia, -1) + color.ErrInvalid,
+	"%h[fgGreen+lold[]":    color.Ti.Color(terminfo.ColorGreen, -1) + color.ErrBadAttr,
+	"%h[fgOlive+%#bgBlue]": color.Ti.Color(terminfo.ColorOlive, -1) + color.ErrInvalid,
 	"%h][fgRed+%#bgBlue]":  color.ErrInvalid,
-	"%h[fgRed+":            color.Ti.TColor(tcell.ColorRed, -1) + color.ErrInvalid,
+	"%h[fgRed+":            color.Ti.Color(terminfo.ColorRed, -1) + color.ErrInvalid,
 	"%%h%h[fgRed]%%":       "%%h\x1b[91m%%",
 	"%h[dsadadssadas]":     color.ErrBadAttr,
 	"%":                    "%",
 	"%h[fgsadas]":          color.ErrBadAttr,
-	"%h[fgAqua+%h[bgBlue]": color.Ti.TColor(tcell.ColorAqua, -1) + color.ErrInvalid,
+	"%h[fgAqua+%h[bgBlue]": color.Ti.Color(terminfo.ColorAqua, -1) + color.ErrInvalid,
 	"lmaokai":              "lmaokai",
-	"%h[fgMaroon]%h[]":     color.Ti.TColor(tcell.ColorMaroon, -1) + color.ErrMissing,
+	"%h[fgMaroon]%h[]":     color.Ti.Color(terminfo.ColorMaroon, -1) + color.ErrMissing,
 	"%h[bgGjo]%h[bgGreen]": color.ErrBadAttr,
 }
 

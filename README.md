@@ -110,7 +110,7 @@ color.Printfh("%r%s", "hello")
 ```
 
 ## TODO
-- [ ] True color support (in tcell, just need to figure out the syntax)
+- [ ] True color support
 - [ ] Windows support
 - [x] Respect $TERM
 - [ ] Wrap the print/println functions as well.

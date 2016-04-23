@@ -2,13 +2,12 @@ package color
 
 import (
 	"bytes"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"unicode"
 
-	"github.com/gdamore/tcell"
+	"github.com/nhooyr/terminfo"
 )
 
 const (
@@ -17,23 +16,23 @@ const (
 	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the highlight verb
 )
 
-var colors = map[string]tcell.Color{
-	"Black":   tcell.ColorBlack,
-	"Maroon":  tcell.ColorMaroon,
-	"Green":   tcell.ColorGreen,
-	"Olive":   tcell.ColorOlive,
-	"Navy":    tcell.ColorNavy,
-	"Purple":  tcell.ColorPurple,
-	"Teal":    tcell.ColorTeal,
-	"Silver":  tcell.ColorSilver,
-	"Gray":    tcell.ColorGray,
-	"Red":     tcell.ColorRed,
-	"Lime":    tcell.ColorLime,
-	"Yellow":  tcell.ColorYellow,
-	"Blue":    tcell.ColorBlue,
-	"Fuchsia": tcell.ColorFuchsia,
-	"Aqua":    tcell.ColorAqua,
-	"White":   tcell.ColorWhite,
+var colors = map[string]int{
+	"Black":   terminfo.ColorBlack,
+	"Maroon":  terminfo.ColorMaroon,
+	"Green":   terminfo.ColorGreen,
+	"Olive":   terminfo.ColorOlive,
+	"Navy":    terminfo.ColorNavy,
+	"Purple":  terminfo.ColorPurple,
+	"Teal":    terminfo.ColorTeal,
+	"Silver":  terminfo.ColorSilver,
+	"Gray":    terminfo.ColorGray,
+	"Red":     terminfo.ColorRed,
+	"Lime":    terminfo.ColorLime,
+	"Yellow":  terminfo.ColorYellow,
+	"Blue":    terminfo.ColorBlue,
+	"Fuchsia": terminfo.ColorFuchsia,
+	"Aqua":    terminfo.ColorAqua,
+	"White":   terminfo.ColorWhite,
 }
 
 // highlighter holds the state of the scanner.
@@ -46,7 +45,7 @@ type highlighter struct {
 	noAttrs bool          // not written attrs to buf
 }
 
-var ti, tiErr = tcell.LookupTerminfo(os.Getenv("TERM"))
+var ti, tiErr = terminfo.OpenEnv()
 
 // Highlight replaces the highlight verbs in s with the appropriate control sequences and
 // then returns the resulting string.
@@ -203,7 +202,7 @@ func scanVerb(hl *highlighter) stateFn {
 
 // verbReset writes the reset verb with the reset control sequence.
 func verbReset(hl *highlighter) stateFn {
-	hl.buf.WriteString(ti.AttrOff)
+	hl.buf.WriteString(ti.Reset)
 	return scanText
 }
 
@@ -256,8 +255,8 @@ func scanAttribute(hl *highlighter) stateFn {
 		a = ti.Blink
 	case "dim":
 		a = ti.Dim
-	case "attrOff":
-		a = ti.AttrOff
+	case "reset":
+		a = ti.Reset
 	default:
 		hl.buf.WriteString(errBadAttr)
 		return nil
@@ -292,9 +291,9 @@ func scanColor(hl *highlighter) stateFn {
 	}
 	if c, ok := colors[hl.s[start:hl.pos]]; ok {
 		if hl.fg {
-			hl.buf.WriteString(ti.TColor(c, -1))
+			hl.buf.WriteString(ti.Color(c, -1))
 		} else {
-			hl.buf.WriteString(ti.TColor(-1, c))
+			hl.buf.WriteString(ti.Color(-1, c))
 		}
 		hl.noAttrs = false
 		return scanHighlight
@@ -311,11 +310,10 @@ func scanColor256(hl *highlighter) stateFn {
 		hl.pos++
 	}
 	t, _ := strconv.Atoi(hl.s[start:hl.pos])
-	n := tcell.Color(t)
 	if hl.fg {
-		hl.buf.WriteString(ti.TColor(n, -1))
+		hl.buf.WriteString(ti.Color(t, -1))
 	} else {
-		hl.buf.WriteString(ti.TColor(-1, n))
+		hl.buf.WriteString(ti.Color(-1, t))
 	}
 	hl.noAttrs = false
 	return scanHighlight

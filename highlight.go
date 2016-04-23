@@ -68,8 +68,7 @@ func Strip(s string) string {
 func Run(s string, color bool) string {
 	hl := getHighlighter(s, color)
 	defer hl.free()
-	hl.run()
-	return hl.buf.String()
+	return hl.run()
 }
 
 // highlighterPool allows the reuse of highlighters to avoid allocations.
@@ -105,10 +104,11 @@ func (hl *highlighter) free() {
 type stateFn func(*highlighter) stateFn
 
 // run runs the state machine for the highlighter.
-func (hl *highlighter) run() {
+func (hl *highlighter) run() string {
 	for state := scanText; state != nil; {
 		state = state(hl)
 	}
+	return hl.buf.String()
 }
 
 const eof = -1

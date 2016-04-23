@@ -141,9 +141,6 @@ func scanText(hl *highlighter) stateFn {
 	// Find next verb.
 	for {
 		switch hl.get() {
-		case eof:
-			hl.writeFrom(ppos)
-			return nil
 		case '%':
 			hl.writeFrom(ppos)
 			hl.pos++
@@ -151,6 +148,9 @@ func scanText(hl *highlighter) stateFn {
 				return scanVerb
 			}
 			return stripVerb
+		case eof:
+			hl.writeFrom(ppos)
+			return nil
 		}
 		hl.pos++
 	}

@@ -1,6 +1,7 @@
 package color
 
 import (
+	"bytes"
 	"os"
 	"strconv"
 	"strings"
@@ -37,12 +38,12 @@ var colors = map[string]tcell.Color{
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
-	s       string // string being scanned
-	pos     int    // position in s
-	buf     buffer // where result is built
-	color   bool   // color or strip the highlight verbs
-	fg      bool   // foreground or background color attribute
-	noAttrs bool   // not written attrs to buf
+	s       string        // string being scanned
+	pos     int           // position in s
+	buf     *bytes.Buffer // where result is built
+	color   bool          // color or strip the highlight verbs
+	fg      bool          // foreground or background color attribute
+	noAttrs bool          // not written attrs to buf
 }
 
 var ti, tiErr = tcell.LookupTerminfo(os.Getenv("TERM"))
@@ -68,16 +69,15 @@ func Run(s string, color bool) string {
 	hl := getHighlighter(s, color)
 	defer hl.free()
 	hl.run()
-	s = string(hl.buf)
-	return s
+	return hl.buf.String()
 }
 
 // highlighterPool allows the reuse of highlighters to avoid allocations.
 var highlighterPool = sync.Pool{
 	New: func() interface{} {
 		hl := new(highlighter)
-		// The initial capacities avoid constant reallocation during growth.
-		hl.buf = make([]byte, 0, 45)
+		// The initial capacity avoids constant reallocation during growth.
+		hl.buf = bytes.NewBuffer(make([]byte, 0, 45))
 		return hl
 	},
 }
@@ -96,7 +96,7 @@ func getHighlighter(s string, color bool) (hl *highlighter) {
 
 // free resets the highlighter.
 func (hl *highlighter) free() {
-	hl.buf.reset()
+	hl.buf.Reset()
 	hl.pos = 0
 	highlighterPool.Put(hl)
 }
@@ -124,14 +124,14 @@ func (hl *highlighter) get() rune {
 // writePrev writes n previous characters to the buffer
 func (hl *highlighter) writePrev(n int) {
 	hl.pos++
-	hl.buf.writeString(hl.s[hl.pos-n : hl.pos])
+	hl.buf.WriteString(hl.s[hl.pos-n : hl.pos])
 }
 
 // writeFrom writes the characters from ppos to pos to the buffer.
 func (hl *highlighter) writeFrom(ppos int) {
 	if hl.pos > ppos {
 		// Append remaining characters.
-		hl.buf.writeString(hl.s[ppos:hl.pos])
+		hl.buf.WriteString(hl.s[ppos:hl.pos])
 	}
 }
 
@@ -167,13 +167,13 @@ func stripVerb(hl *highlighter) stateFn {
 		hl.pos++
 		j := strings.IndexByte(hl.s[hl.pos:], ']')
 		if j == -1 {
-			hl.buf.writeString(errInvalid)
+			hl.buf.WriteString(errInvalid)
 			return nil
 		}
 		hl.pos += j + 1
 	case eof:
 		// Let fmt handle "%!h(NOVERB)".
-		hl.buf.writeByte('%')
+		hl.buf.WriteByte('%')
 		return nil
 	default:
 		// Include the verb.
@@ -194,7 +194,7 @@ func scanVerb(hl *highlighter) stateFn {
 		return scanHighlight
 	case eof:
 		// Let fmt handle "%!h(NOVERB)".
-		hl.buf.writeByte('%')
+		hl.buf.WriteByte('%')
 		return nil
 	}
 	hl.writePrev(2)
@@ -203,7 +203,7 @@ func scanVerb(hl *highlighter) stateFn {
 
 // verbReset writes the reset verb with the reset control sequence.
 func verbReset(hl *highlighter) stateFn {
-	hl.buf.writeString(ti.AttrOff)
+	hl.buf.WriteString(ti.AttrOff)
 	return scanText
 }
 
@@ -226,13 +226,13 @@ func scanHighlight(hl *highlighter) stateFn {
 			continue
 		case r == ']':
 			if hl.noAttrs {
-				hl.buf.writeString(errMissing)
+				hl.buf.WriteString(errMissing)
 				return nil
 			}
 			hl.pos++
 			return scanText
 		default:
-			hl.buf.writeString(errInvalid)
+			hl.buf.WriteString(errInvalid)
 			return nil
 		}
 	}
@@ -259,10 +259,10 @@ func scanAttribute(hl *highlighter) stateFn {
 	case "attrOff":
 		a = ti.AttrOff
 	default:
-		hl.buf.writeString(errBadAttr)
+		hl.buf.WriteString(errBadAttr)
 		return nil
 	}
-	hl.buf.writeString(a)
+	hl.buf.WriteString(a)
 	hl.noAttrs = false
 	return scanHighlight
 }
@@ -282,7 +282,7 @@ func scanColor(hl *highlighter) stateFn {
 	case unicode.IsLetter(r):
 		// continue
 	default:
-		hl.buf.writeString(errBadAttr)
+		hl.buf.WriteString(errBadAttr)
 		return nil
 	}
 	start := hl.pos
@@ -292,14 +292,14 @@ func scanColor(hl *highlighter) stateFn {
 	}
 	if c, ok := colors[hl.s[start:hl.pos]]; ok {
 		if hl.fg {
-			hl.buf.writeString(ti.TColor(c, -1))
+			hl.buf.WriteString(ti.TColor(c, -1))
 		} else {
-			hl.buf.writeString(ti.TColor(-1, c))
+			hl.buf.WriteString(ti.TColor(-1, c))
 		}
 		hl.noAttrs = false
 		return scanHighlight
 	}
-	hl.buf.writeString(errBadAttr)
+	hl.buf.WriteString(errBadAttr)
 	return nil
 }
 
@@ -313,9 +313,9 @@ func scanColor256(hl *highlighter) stateFn {
 	t, _ := strconv.Atoi(hl.s[start:hl.pos])
 	n := tcell.Color(t)
 	if hl.fg {
-		hl.buf.writeString(ti.TColor(n, -1))
+		hl.buf.WriteString(ti.TColor(n, -1))
 	} else {
-		hl.buf.writeString(ti.TColor(-1, n))
+		hl.buf.WriteString(ti.TColor(-1, n))
 	}
 	hl.noAttrs = false
 	return scanHighlight

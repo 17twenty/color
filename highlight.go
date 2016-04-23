@@ -8,6 +8,7 @@ import (
 	"unicode"
 
 	"github.com/nhooyr/terminfo"
+	"github.com/nhooyr/terminfo/caps"
 )
 
 const (
@@ -202,7 +203,7 @@ func scanVerb(hl *highlighter) stateFn {
 
 // verbReset writes the reset verb with the reset control sequence.
 func verbReset(hl *highlighter) stateFn {
-	hl.buf.WriteString(ti.Reset)
+	hl.buf.WriteString(ti.StringCaps[caps.ExitAttributeMode])
 	return scanText
 }
 
@@ -246,17 +247,17 @@ func scanAttribute(hl *highlighter) stateFn {
 	a := hl.s[start:hl.pos]
 	switch a {
 	case "bold":
-		a = ti.Bold
+		a = ti.StringCaps[caps.EnterBoldMode]
 	case "underline":
-		a = ti.Underline
+		a = ti.StringCaps[caps.EnterUnderlineMode]
 	case "reverse":
-		a = ti.Reverse
+		a = ti.StringCaps[caps.EnterReverseMode]
 	case "blink":
-		a = ti.Blink
+		a = ti.StringCaps[caps.EnterBlinkMode]
 	case "dim":
-		a = ti.Dim
+		a = ti.StringCaps[caps.EnterDimMode]
 	case "reset":
-		a = ti.Reset
+		a = ti.StringCaps[caps.ExitAttributeMode]
 	default:
 		hl.buf.WriteString(errBadAttr)
 		return nil

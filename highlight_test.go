@@ -11,22 +11,32 @@ import (
 
 var ti = color.Ti
 
-func TestAttributes(t *testing.T) {
-	for k, v := range color.Colors {
-		exp := ti.Color(v, -1) + "hi" + ti.StringCaps[caps.ExitAttributeMode]
-		r := color.Highlight(fmt.Sprintf("%%h[fg%s]hi%%r", k))
-		if r != exp {
-			t.Errorf("Expected %q but result was %q", exp, r)
-		}
-		exp = ti.Color(-1, v) + "hi" + ti.StringCaps[caps.ExitAttributeMode]
-		r = color.Highlight(fmt.Sprintf("%%h[bg%s]hi%%r", k))
+func TestModes(t *testing.T) {
+	for k, v := range color.Modes {
+		exp := ti.StringCaps[v] + "hi" + ti.StringCaps[caps.ExitAttributeMode]
+		r := color.Highlight(fmt.Sprintf("%%h[%s]hi%%r", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 	}
 }
 
-func TestColor256(t *testing.T) {
+func TestColors(t *testing.T) {
+	for k, v := range color.Colors {
+		exp := ti.Color(v, -1) + "hi"
+		r := color.Highlight(fmt.Sprintf("%%h[fg%s]hi", k))
+		if r != exp {
+			t.Errorf("Expected %q but result was %q", exp, r)
+		}
+		exp = ti.Color(-1, v) + "hi"
+		r = color.Highlight(fmt.Sprintf("%%h[bg%s]hi", k))
+		if r != exp {
+			t.Errorf("Expected %q but result was %q", exp, r)
+		}
+	}
+}
+
+func TestColors256(t *testing.T) {
 	for i := 0; i < 256; i++ {
 		exp := ti.Color(i, -1) + "hi" + ti.StringCaps[caps.ExitAttributeMode]
 		r := color.Highlight(fmt.Sprintf("%%h[fg%d]hi%%r", i))
@@ -118,7 +128,7 @@ const s = `%h[fgBlack]hi%r
 %h[fgGray+bgAqua+bold+underline+fg32+bg69]hi%r
 %h[fg32+bg123+bold+underline+bgNavy+fgLime+bgWhite]hi%r`
 
-var result string
+var result interface{}
 
 func BenchmarkHighlight(b *testing.B) {
 	var r string

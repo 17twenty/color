@@ -6,6 +6,7 @@ package color
 var (
 	Colors = colors
 	Ti     = ti
+	Modes = modes
 )
 
 const (

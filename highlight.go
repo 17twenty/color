@@ -53,9 +53,6 @@ var ti, tiErr = terminfo.OpenEnv()
 // then returns the resulting string.
 // It is a thin wrapper around Run.
 func Highlight(s string) string {
-	if tiErr != nil {
-		return Run(s, false)
-	}
 	return Run(s, true)
 }
 
@@ -70,6 +67,9 @@ func Strip(s string) string {
 // their appropriate control sequences.
 // Do not use this directly unless you know what you are doing.
 func Run(s string, color bool) string {
+	if tiErr != nil {
+		color = false
+	}
 	hl := getHighlighter(s, color)
 	defer hl.free()
 	return hl.run()
@@ -253,6 +253,15 @@ func scanHighlight(hl *highlighter) stateFn {
 	}
 }
 
+var modes = map[string]int{
+	"bold":      caps.EnterBoldMode,
+	"underline": caps.EnterUnderlineMode,
+	"reverse":   caps.EnterReverseMode,
+	"blink":     caps.EnterBlinkMode,
+	"dim":       caps.EnterDimMode,
+	"reset":     caps.ExitAttributeMode,
+}
+
 // scanAttribute scans a mode.
 func scanMode(hl *highlighter) stateFn {
 	a, err := hl.scanAttribute()
@@ -260,25 +269,12 @@ func scanMode(hl *highlighter) stateFn {
 		hl.buf.WriteString(errShort)
 		return nil
 	}
-	switch a {
-	case "bold":
-		a = ti.StringCaps[caps.EnterBoldMode]
-	case "underline":
-		a = ti.StringCaps[caps.EnterUnderlineMode]
-	case "reverse":
-		a = ti.StringCaps[caps.EnterReverseMode]
-	case "blink":
-		a = ti.StringCaps[caps.EnterBlinkMode]
-	case "dim":
-		a = ti.StringCaps[caps.EnterDimMode]
-	case "reset":
-		a = ti.StringCaps[caps.ExitAttributeMode]
-	default:
-		hl.buf.WriteString(errBadAttr)
-		return nil
+	if n, ok := modes[a]; ok {
+		hl.buf.WriteString(ti.StringCaps[n])
+		return successAttribute
 	}
-	hl.buf.WriteString(a)
-	return successAttribute
+	hl.buf.WriteString(errBadAttr)
+	return nil
 }
 
 // scanColor scans a color attribute.

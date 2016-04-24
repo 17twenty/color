@@ -131,7 +131,7 @@ var result interface{}
 
 func BenchmarkHighlight(b *testing.B) {
 	var r string
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < b.N; i++ {
 		r = color.Highlight(s)
 	}
 	result = r
@@ -139,7 +139,7 @@ func BenchmarkHighlight(b *testing.B) {
 
 func BenchmarkStrip(b *testing.B) {
 	var r string
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < b.N; i++ {
 		r = color.Strip(s)
 	}
 	result = r

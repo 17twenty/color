@@ -10,5 +10,7 @@ var (
 
 const (
 	ErrInvalid = errInvalid
+	ErrMissing = errMissing
 	ErrBadAttr = errBadAttr
+	ErrShort = errShort
 )

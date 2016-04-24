@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	errInvalid = "%%!h(INVALID)" // invalid character in the highlight verb
-	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the highlight verb
+	errInvalid = "%%!h(INVALID)" // invalid character in the verb
+	errMissing = "%%!h(MISSING)" // no attributes in the verb
+	errShort   = "%%!h(SHORT)"   // string ended before the verb
+	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the verb
 )
 
 var colors = map[string]int{
@@ -38,12 +40,11 @@ var colors = map[string]int{
 
 // highlighter holds the state of the scanner.
 type highlighter struct {
-	s       string        // string being scanned
-	pos     int           // position in s
-	buf     *bytes.Buffer // where result is built
-	color   bool          // color or strip the highlight verbs
-	fg      bool          // foreground or background color attribute
-	noAttrs bool          // not written attrs to buf
+	s     string        // string being scanned
+	pos   int           // position in s
+	buf   *bytes.Buffer // where result is built
+	color bool          // color or strip the highlight verbs
+	fg    bool          // foreground or background color attribute
 }
 
 var ti, tiErr = terminfo.OpenEnv()
@@ -52,6 +53,9 @@ var ti, tiErr = terminfo.OpenEnv()
 // then returns the resulting string.
 // It is a thin wrapper around Run.
 func Highlight(s string) string {
+	if tiErr != nil {
+		return Run(s, false)
+	}
 	return Run(s, true)
 }
 
@@ -85,11 +89,7 @@ var highlighterPool = sync.Pool{
 func getHighlighter(s string, color bool) (hl *highlighter) {
 	hl = highlighterPool.Get().(*highlighter)
 	hl.s = s
-	if tiErr == nil {
-		hl.color = color
-	} else {
-		hl.color = false
-	}
+	hl.color = color
 	return
 }
 
@@ -137,12 +137,9 @@ func (hl *highlighter) scanAttribute() (string, error) {
 	start := hl.pos
 	hl.pos++
 	for {
-		ch, err := hl.get()
-		if err != nil {
-			hl.buf.WriteString(errInvalid)
+		if ch, err := hl.get(); err != nil {
 			return "", err
-		}
-		if ch == '+' || ch == ']' {
+		} else if ch == '+' || ch == ']' {
 			break
 		}
 		hl.pos++
@@ -188,7 +185,7 @@ func stripVerb(hl *highlighter) stateFn {
 		hl.pos++
 		j := strings.IndexByte(hl.s[hl.pos:], ']')
 		if j == -1 {
-			hl.buf.WriteString(errInvalid)
+			hl.buf.WriteString(errShort)
 			return nil
 		}
 		hl.pos += j + 1
@@ -214,37 +211,41 @@ func scanVerb(hl *highlighter) stateFn {
 	case 'h':
 		hl.pos++
 		ch, err = hl.get()
-		if err != nil || ch != '[' {
+		if err != nil {
+			hl.buf.WriteString(errShort)
+			return nil
+		} else if ch != '[' {
 			hl.buf.WriteString(errInvalid)
 			return nil
 		}
-		hl.noAttrs = true
 		hl.pos++
+		ch, err = hl.get()
+		if err != nil {
+			hl.buf.WriteString(errShort)
+			return nil
+		} else if ch == ']' {
+			hl.buf.WriteString(errMissing)
+			return nil
+		}
 		return scanHighlight
 	}
 	hl.writePrev(2)
 	return scanText
 }
 
-// verbReset writes the reset verb with the reset control sequence.
+// verbReset writes the reset control sequences.
 func verbReset(hl *highlighter) stateFn {
 	hl.buf.WriteString(ti.StringCaps[caps.ExitAttributeMode])
 	return scanText
 }
 
-// scanHighlight scans the highlight verb for attributes,
-// then writes a control sequence derived from said attributes to the buffer.
 func scanHighlight(hl *highlighter) stateFn {
-	ch, err := hl.get()
-	if err != nil {
-		hl.buf.WriteString(errInvalid)
-		return nil
-	}
-	switch {
-	case ch == 'f':
+	// No need to check error because the character was already read.
+	switch ch, _ := hl.get(); ch {
+	case 'f':
 		hl.fg = true
 		return scanColor
-	case ch == 'b':
+	case 'b':
 		hl.fg = false
 		return scanColor
 	default:
@@ -256,6 +257,7 @@ func scanHighlight(hl *highlighter) stateFn {
 func scanMode(hl *highlighter) stateFn {
 	a, err := hl.scanAttribute()
 	if err != nil {
+		hl.buf.WriteString(errShort)
 		return nil
 	}
 	switch a {
@@ -281,28 +283,29 @@ func scanMode(hl *highlighter) stateFn {
 
 // scanColor scans a color attribute.
 func scanColor(hl *highlighter) stateFn {
+	// scanHighlight had us at the 'f'or 'b', so skip it.
 	hl.pos++
 	ch, err := hl.get()
 	if err != nil {
+		hl.buf.WriteString(errShort)
 		return nil
-	}
-	if ch != 'g' {
+	} else if ch != 'g' {
 		hl.pos--
 		return scanMode
 	}
 	hl.pos++
 	ch, err = hl.get()
 	if err != nil {
+		hl.buf.WriteString(errShort)
 		return nil
-	}
-	if unicode.IsNumber(rune(ch)) {
+	} else if unicode.IsNumber(rune(ch)) {
 		return scanColor256
 	}
 	a, err := hl.scanAttribute()
 	if err != nil {
+		hl.buf.WriteString(errShort)
 		return nil
-	}
-	if c, ok := colors[a]; ok {
+	} else if c, ok := colors[a]; ok {
 		if hl.fg {
 			hl.buf.WriteString(ti.Color(c, -1))
 		} else {
@@ -318,9 +321,14 @@ func scanColor(hl *highlighter) stateFn {
 func scanColor256(hl *highlighter) stateFn {
 	a, err := hl.scanAttribute()
 	if err != nil {
+		hl.buf.WriteString(errShort)
 		return nil
 	}
-	t, _ := strconv.Atoi(a)
+	t, err := strconv.Atoi(a)
+	if err != nil {
+		hl.buf.WriteString(errBadAttr)
+		return nil
+	}
 	if hl.fg {
 		hl.buf.WriteString(ti.Color(t, -1))
 	} else {
@@ -330,11 +338,14 @@ func scanColor256(hl *highlighter) stateFn {
 }
 
 func successAttribute(hl *highlighter) stateFn {
-	hl.noAttrs = false
 	ch, _ := hl.get()
 	hl.pos++
 	if ch == ']' {
 		return scanText
+	}
+	if _, err := hl.get(); err != nil {
+		hl.buf.WriteString(errShort)
+		return nil
 	}
 	return scanHighlight
 }

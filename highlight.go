@@ -232,15 +232,14 @@ func startAttribute(hl *highlighter) stateFn {
 	// No need to check error because the character was already read.
 	switch ch, _ := hl.get(); ch {
 	case 'f':
-		// Maybe a color attribute because they begin with "f"
 		hl.fg = true
 	case 'b':
-		// Maybe a color attribute because they begin with "b"
 		hl.fg = false
 	default:
 		return scanMode
 	}
-	// Rest of the code checks if it really is a color attribute, and if so,
+	// Attribute starts with 'f' or 'b' so it could be a color attribute.
+	// Rest of the code confirms if it is a color attribute, and if so,
 	// whether it is a named or a 256 color attribute.
 	hl.pos++
 	ch, err := hl.get()
@@ -253,6 +252,7 @@ func startAttribute(hl *highlighter) stateFn {
 		hl.pos--
 		return scanMode
 	}
+	// Now check if it is a named or 256 color attribute.
 	hl.pos++
 	ch, err = hl.get()
 	if err != nil {
@@ -265,6 +265,21 @@ func startAttribute(hl *highlighter) stateFn {
 	return scanColor
 }
 
+// scanAttribute scans a mode attribute.
+func scanMode(hl *highlighter) stateFn {
+	a, err := hl.scanAttribute()
+	if err != nil {
+		hl.buf.WriteString(errShort)
+		return nil
+	}
+	if n, ok := modes[a]; ok {
+		hl.buf.WriteString(ti.StringCaps[n])
+		return endAttribute
+	}
+	hl.buf.WriteString(errBadAttr)
+	return nil
+}
+
 // modes maps mode names to their string capacity positions.
 var modes = map[string]int{
 	"bold":      caps.EnterBoldMode,
@@ -275,15 +290,19 @@ var modes = map[string]int{
 	"reset":     caps.ExitAttributeMode,
 }
 
-// scanAttribute scans a mode attribute.
-func scanMode(hl *highlighter) stateFn {
+// scanColor scans a named color attribute.
+func scanColor(hl *highlighter) stateFn {
 	a, err := hl.scanAttribute()
 	if err != nil {
 		hl.buf.WriteString(errShort)
 		return nil
 	}
-	if n, ok := modes[a]; ok {
-		hl.buf.WriteString(ti.StringCaps[n])
+	if c, ok := colors[a]; ok {
+		if hl.fg {
+			hl.buf.WriteString(ti.Color(c, -1))
+		} else {
+			hl.buf.WriteString(ti.Color(-1, c))
+		}
 		return endAttribute
 	}
 	hl.buf.WriteString(errBadAttr)
@@ -308,25 +327,6 @@ var colors = map[string]int{
 	"Fuchsia": caps.Fuchsia,
 	"Aqua":    caps.Aqua,
 	"White":   caps.White,
-}
-
-// scanColor scans a named color attribute.
-func scanColor(hl *highlighter) stateFn {
-	a, err := hl.scanAttribute()
-	if err != nil {
-		hl.buf.WriteString(errShort)
-		return nil
-	}
-	if c, ok := colors[a]; ok {
-		if hl.fg {
-			hl.buf.WriteString(ti.Color(c, -1))
-		} else {
-			hl.buf.WriteString(ti.Color(-1, c))
-		}
-		return endAttribute
-	}
-	hl.buf.WriteString(errBadAttr)
-	return nil
 }
 
 // scanColor256 scans a 256 color attribute.

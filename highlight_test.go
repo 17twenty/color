@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/nhooyr/color"
-	"github.com/nhooyr/terminfo"
 	"github.com/nhooyr/terminfo/caps"
 )
 
@@ -52,8 +51,8 @@ func TestColors256(t *testing.T) {
 }
 
 var combinations = map[string]string{
-	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]":     ti.Color(terminfo.ColorMaroon, terminfo.ColorNavy) + ti.StringCaps[caps.EnterBoldMode] + ti.StringCaps[caps.EnterUnderlineMode] + ti.Color(23, 235),
-	"%h[bgBlue+fgOlive+fgGreen+fg34+blink+dim+reverse]": ti.Color(-1, terminfo.ColorBlue) + ti.Color(terminfo.ColorOlive, -1) + ti.Color(terminfo.ColorGreen, -1) + ti.Color(34, -1) + ti.StringCaps[caps.EnterBlinkMode] + ti.StringCaps[caps.EnterDimMode] + ti.StringCaps[caps.EnterReverseMode],
+	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]":     ti.Color(caps.Maroon, caps.Navy) + ti.StringCaps[caps.EnterBoldMode] + ti.StringCaps[caps.EnterUnderlineMode] + ti.Color(23, 235),
+	"%h[bgBlue+fgOlive+fgGreen+fg34+blink+dim+reverse]": ti.Color(-1, caps.Blue) + ti.Color(caps.Olive, -1) + ti.Color(caps.Green, -1) + ti.Color(34, -1) + ti.StringCaps[caps.EnterBlinkMode] + ti.StringCaps[caps.EnterDimMode] + ti.StringCaps[caps.EnterReverseMode],
 }
 
 func TestCombinations(t *testing.T) {
@@ -65,7 +64,7 @@ func TestCombinations(t *testing.T) {
 }
 
 var highlightEdgeCases = map[string]string{
-	"%h[fgGray+%h[fgBlue]": ti.Color(terminfo.ColorGray, -1) + color.ErrBadAttr,
+	"%h[fgGray+%h[fgBlue]": ti.Color(caps.Gray, -1) + color.ErrBadAttr,
 	"%h[":                  color.ErrShort,
 	"%h{":                  color.ErrInvalid,
 	"%h[]":                 color.ErrMissing,
@@ -73,17 +72,17 @@ var highlightEdgeCases = map[string]string{
 	"%[bg232]":             "%[bg232]",
 	"%h[fg132":             color.ErrShort,
 	"%h[fgFuchsia[]":       color.ErrBadAttr,
-	"%h[fgGreen+lold[]":    ti.Color(terminfo.ColorGreen, -1) + color.ErrBadAttr,
-	"%h[fgOlive+%#bgBlue]": ti.Color(terminfo.ColorOlive, -1) + color.ErrBadAttr,
+	"%h[fgGreen+lold[]":    ti.Color(caps.Green, -1) + color.ErrBadAttr,
+	"%h[fgOlive+%#bgBlue]": ti.Color(caps.Olive, -1) + color.ErrBadAttr,
 	"%h][fgRed+%#bgBlue]":  color.ErrInvalid,
-	"%h[fgRed+":            ti.Color(terminfo.ColorRed, -1) + color.ErrShort,
+	"%h[fgRed+":            ti.Color(caps.Red, -1) + color.ErrShort,
 	"%%h%h[fgRed]%%":       "%%h\x1b[91m%%",
 	"%h[dsadadssadas]":     color.ErrBadAttr,
 	"%":                    "%",
 	"%h[fgsadas]":          color.ErrBadAttr,
-	"%h[fgAqua+%h[bgBlue]": ti.Color(terminfo.ColorAqua, -1) + color.ErrBadAttr,
+	"%h[fgAqua+%h[bgBlue]": ti.Color(caps.Aqua, -1) + color.ErrBadAttr,
 	"lmaokai":              "lmaokai",
-	"%h[fgMaroon]%h[]":     ti.Color(terminfo.ColorMaroon, -1) + color.ErrMissing,
+	"%h[fgMaroon]%h[]":     ti.Color(caps.Maroon, -1) + color.ErrMissing,
 	"%h[bgGjo]%h[bgGreen]": color.ErrBadAttr,
 	"%h[fg23a]":            color.ErrBadAttr,
 }
@@ -132,7 +131,7 @@ var result interface{}
 
 func BenchmarkHighlight(b *testing.B) {
 	var r string
-	for i := 0; i < b.N; i++ {
+	for i := 0; i < 100000; i++ {
 		r = color.Highlight(s)
 	}
 	result = r
@@ -140,7 +139,7 @@ func BenchmarkHighlight(b *testing.B) {
 
 func BenchmarkStrip(b *testing.B) {
 	var r string
-	for i := 0; i < b.N; i++ {
+	for i := 0; i < 100000; i++ {
 		r = color.Strip(s)
 	}
 	result = r

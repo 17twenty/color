@@ -262,22 +262,22 @@ func scanMode(hl *highlighter) stateFn {
 
 // colors maps color names to their integer values.
 var colors = map[string]int{
-	"Black":   caps.Black,
-	"Maroon":  caps.Maroon,
-	"Green":   caps.Green,
-	"Olive":   caps.Olive,
-	"Navy":    caps.Navy,
-	"Purple":  caps.Purple,
-	"Teal":    caps.Teal,
-	"Silver":  caps.Silver,
-	"Gray":    caps.Gray,
-	"Red":     caps.Red,
-	"Lime":    caps.Lime,
-	"Yellow":  caps.Yellow,
-	"Blue":    caps.Blue,
-	"Fuchsia": caps.Fuchsia,
-	"Aqua":    caps.Aqua,
-	"White":   caps.White,
+	"Black":         caps.Black,
+	"Red":           caps.Red,
+	"Green":         caps.Green,
+	"Yellow":        caps.Yellow,
+	"Blue":          caps.Blue,
+	"Magenta":       caps.Magenta,
+	"Cyan":          caps.Cyan,
+	"White":         caps.White,
+	"BrightBlack":   caps.BrightBlack,
+	"BrightRed":     caps.BrightRed,
+	"BrightGreen":   caps.BrightGreen,
+	"BrightYellow":  caps.BrightYellow,
+	"BrightBlue":    caps.BrightBlue,
+	"BrightMagenta": caps.BrightMagenta,
+	"BrightCyan":    caps.BrightCyan,
+	"BrightWhite":   caps.BrightWhite,
 }
 
 // scanColor scans a named color attribute.

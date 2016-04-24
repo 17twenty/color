@@ -28,21 +28,21 @@ Attributes Reference
 
 Named Colors:
 	%h[xgBlack]
-	%h[xgMaroon]
-	%h[xgGreen]
-	%h[xgOlive]
-	%h[xgNavy]
-	%h[xgPurple]
-	%h[xgTeal]
-	%h[xgSilver]
-	%h[xgGray]
 	%h[xgRed]
-	%h[xgLime]
+	%h[xgGreen]
 	%h[xgYellow]
 	%h[xgBlue]
-	%h[xgFuchsia]
-	%h[xgAqua]
+	%h[xgMagenta]
+	%h[xgCyan]
 	%h[xgWhite]
+	%h[xgBrightBlack]
+	%h[xgBrightRed]
+	%h[xgBrightGreen]
+	%h[xgBrightYellow]
+	%h[xgBrightBlue]
+	%h[xgBrightMagenta]
+	%h[xgBrightCyan]
+	%h[xgBrightWhite]
 
 	Where 'x' is either 'f' or 'b'.
 
@@ -63,7 +63,5 @@ Modes:
 See http://goo.gl/LRLA7o for information on the attributes. Scroll down to the SGR section.
 
 See http://goo.gl/fvtHLs and ISO-8613-3 (according to above document) for more information on 256 colors.
-
-See http://jonasjacek.github.io/colors/ for a reference of the colors.
 */
 package color

@@ -65,8 +65,8 @@ func TestColors256(t *testing.T) {
 }
 
 var combinations = map[string]string{
-	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]hi":     expF(ti.Color(caps.Maroon, caps.Navy)+ti.StringCaps[caps.EnterBoldMode]+ti.StringCaps[caps.EnterUnderlineMode]+ti.Color(23, 235)+"%s", "hi"),
-	"%h[bgBlue+fgOlive+fgGreen+fg34+blink+dim+reverse]hi": expF(ti.Color(-1, caps.Blue)+ti.Color(caps.Olive, -1)+ti.Color(caps.Green, -1)+ti.Color(34, -1)+ti.StringCaps[caps.EnterBlinkMode]+ti.StringCaps[caps.EnterDimMode]+ti.StringCaps[caps.EnterReverseMode]+"%s", "hi"),
+	"%h[fgRed+bgBlue+bold+underline+fg23+bg235]hi":     expF(ti.Color(caps.Red, caps.Blue)+ti.StringCaps[caps.EnterBoldMode]+ti.StringCaps[caps.EnterUnderlineMode]+ti.Color(23, 235)+"%s", "hi"),
+	"%h[bgBlue+fgYellow+fgGreen+fg34+blink+dim+reverse]hi": expF(ti.Color(-1, caps.Blue)+ti.Color(caps.Yellow, -1)+ti.Color(caps.Green, -1)+ti.Color(34, -1)+ti.StringCaps[caps.EnterBlinkMode]+ti.StringCaps[caps.EnterDimMode]+ti.StringCaps[caps.EnterReverseMode]+"%s", "hi"),
 }
 
 func TestCombinations(t *testing.T) {
@@ -78,25 +78,25 @@ func TestCombinations(t *testing.T) {
 }
 
 var highlightEdgeCases = map[string]string{
-	"%h[fgGray+%h[fgBlue]": exp(ti.Color(caps.Gray, -1)) + color.ErrBadAttr,
+	"%h[fgBrightBlack+%h[fgBlue]": exp(ti.Color(caps.BrightBlack, -1)) + color.ErrBadAttr,
 	"%h[":                  color.ErrShort,
 	"%h{":                  color.ErrInvalid,
 	"%h[]":                 color.ErrMissing,
 	"%%h[fgRed]":           "%%h[fgRed]",
 	"%[bg232]":             "%[bg232]",
 	"%h[fg132":             color.ErrShort,
-	"%h[fgFuchsia[]":       color.ErrBadAttr,
+	"%h[fgMagenta[]":       color.ErrBadAttr,
 	"%h[fgGreen+lold[]":    exp(ti.Color(caps.Green, -1)) + color.ErrBadAttr,
-	"%h[fgOlive+%#bgBlue]": exp(ti.Color(caps.Olive, -1)) + color.ErrBadAttr,
+	"%h[fgYellow+%#bgBlue]": exp(ti.Color(caps.Yellow, -1)) + color.ErrBadAttr,
 	"%h][fgRed+%#bgBlue]":  color.ErrInvalid,
 	"%h[fgRed+":            exp(ti.Color(caps.Red, -1)) + color.ErrShort,
 	"%%h%h[fgRed]%%":       "%%h" + exp(ti.Color(caps.Red, -1)) + "%%",
 	"%h[dsadadssadas]":     color.ErrBadAttr,
 	"%":                    "%",
 	"%h[fgsadas]":          color.ErrBadAttr,
-	"%h[fgAqua+%h[bgBlue]": exp(ti.Color(caps.Aqua, -1)) + color.ErrBadAttr,
+	"%h[fgCyan+%h[bgBlue]": exp(ti.Color(caps.Cyan, -1)) + color.ErrBadAttr,
 	"lmaokai":              "lmaokai",
-	"%h[fgMaroon]%h[]":     exp(ti.Color(caps.Maroon, -1)) + color.ErrMissing,
+	"%h[fgRed]%h[]":     exp(ti.Color(caps.Red, -1)) + color.ErrMissing,
 	"%h[bgGjo]%h[bgGreen]": color.ErrBadAttr,
 	"%h[fg23a]":            color.ErrBadAttr,
 }
@@ -124,12 +124,12 @@ func TestStripEdgeCases(t *testing.T) {
 }
 
 const s = `%h[fgBlack]hi%r
-%h[fgMaroon]hi%r
+%h[fgRed]hi%r
 %h[bgGreen]hi%r
-%h[bgOlive]hi%r
+%h[bgYellow]hi%r
 %h[fgBlue]hi%r
-%h[fgFuchsia]hi%r
-%h[bgAqua]hi%r
+%h[fgMagenta]hi%r
+%h[bgCyan]hi%r
 %h[bgWhite]hi%r
 %h[bold]hi%r
 %h[underline]hi%r
@@ -138,8 +138,8 @@ const s = `%h[fgBlack]hi%r
 %h[fg233]hi%r
 %h[bg3]hi%r
 %h[bg102]hi%r
-%h[fgGray+bgAqua+bold+underline+fg32+bg69]hi%r
-%h[fg32+bg123+bold+underline+bgNavy+fgLime+bgWhite]hi%r`
+%h[fgBrightBlack+bgCyan+bold+underline+fg32+bg69]hi%r
+%h[fg32+bg123+bold+underline+bgBlue+fgBrightGreen+bgWhite]hi%r`
 
 var result interface{}
 

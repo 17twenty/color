@@ -8,11 +8,25 @@ import (
 	"github.com/nhooyr/terminfo/caps"
 )
 
-var ti = color.Ti
+var ti, tiErr = color.Ti, color.TiErr
+
+func exp(s string) string {
+	if tiErr != nil {
+		return ""
+	}
+	return s
+}
+
+func expF(f string, s string) string {
+	if tiErr != nil {
+		return s
+	}
+	return fmt.Sprintf(f, s)
+}
 
 func TestModes(t *testing.T) {
 	for k, v := range color.Modes {
-		exp := ti.StringCaps[v] + "hi" + ti.StringCaps[caps.ExitAttributeMode]
+		exp := expF(ti.StringCaps[v]+"%s"+ti.StringCaps[caps.ExitAttributeMode], "hi")
 		r := color.Highlight(fmt.Sprintf("%%h[%s]hi%%r", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
@@ -22,12 +36,12 @@ func TestModes(t *testing.T) {
 
 func TestColors(t *testing.T) {
 	for k, v := range color.Colors {
-		exp := ti.Color(v, -1) + "hi"
+		exp := expF(ti.Color(v, -1)+"%s", "hi")
 		r := color.Highlight(fmt.Sprintf("%%h[fg%s]hi", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
-		exp = ti.Color(-1, v) + "hi"
+		exp = expF(ti.Color(-1, v)+"%s", "hi")
 		r = color.Highlight(fmt.Sprintf("%%h[bg%s]hi", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
@@ -37,12 +51,12 @@ func TestColors(t *testing.T) {
 
 func TestColors256(t *testing.T) {
 	for i := 0; i < 256; i++ {
-		exp := ti.Color(i, -1) + "hi" + ti.StringCaps[caps.ExitAttributeMode]
+		exp := expF(ti.Color(i, -1)+"%s"+ti.StringCaps[caps.ExitAttributeMode], "hi")
 		r := color.Highlight(fmt.Sprintf("%%h[fg%d]hi%%r", i))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
-		exp = ti.Color(-1, i) + "hi" + ti.StringCaps[caps.ExitAttributeMode]
+		exp = expF(ti.Color(-1, i)+"%s"+ti.StringCaps[caps.ExitAttributeMode], "hi")
 		r = color.Highlight(fmt.Sprintf("%%h[bg%d]hi%%r", i))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
@@ -51,8 +65,8 @@ func TestColors256(t *testing.T) {
 }
 
 var combinations = map[string]string{
-	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]":     ti.Color(caps.Maroon, caps.Navy) + ti.StringCaps[caps.EnterBoldMode] + ti.StringCaps[caps.EnterUnderlineMode] + ti.Color(23, 235),
-	"%h[bgBlue+fgOlive+fgGreen+fg34+blink+dim+reverse]": ti.Color(-1, caps.Blue) + ti.Color(caps.Olive, -1) + ti.Color(caps.Green, -1) + ti.Color(34, -1) + ti.StringCaps[caps.EnterBlinkMode] + ti.StringCaps[caps.EnterDimMode] + ti.StringCaps[caps.EnterReverseMode],
+	"%h[fgMaroon+bgNavy+bold+underline+fg23+bg235]hi":     expF(ti.Color(caps.Maroon, caps.Navy)+ti.StringCaps[caps.EnterBoldMode]+ti.StringCaps[caps.EnterUnderlineMode]+ti.Color(23, 235)+"%s", "hi"),
+	"%h[bgBlue+fgOlive+fgGreen+fg34+blink+dim+reverse]hi": expF(ti.Color(-1, caps.Blue)+ti.Color(caps.Olive, -1)+ti.Color(caps.Green, -1)+ti.Color(34, -1)+ti.StringCaps[caps.EnterBlinkMode]+ti.StringCaps[caps.EnterDimMode]+ti.StringCaps[caps.EnterReverseMode]+"%s", "hi"),
 }
 
 func TestCombinations(t *testing.T) {
@@ -64,7 +78,7 @@ func TestCombinations(t *testing.T) {
 }
 
 var highlightEdgeCases = map[string]string{
-	"%h[fgGray+%h[fgBlue]": ti.Color(caps.Gray, -1) + color.ErrBadAttr,
+	"%h[fgGray+%h[fgBlue]": exp(ti.Color(caps.Gray, -1)) + color.ErrBadAttr,
 	"%h[":                  color.ErrShort,
 	"%h{":                  color.ErrInvalid,
 	"%h[]":                 color.ErrMissing,
@@ -72,17 +86,17 @@ var highlightEdgeCases = map[string]string{
 	"%[bg232]":             "%[bg232]",
 	"%h[fg132":             color.ErrShort,
 	"%h[fgFuchsia[]":       color.ErrBadAttr,
-	"%h[fgGreen+lold[]":    ti.Color(caps.Green, -1) + color.ErrBadAttr,
-	"%h[fgOlive+%#bgBlue]": ti.Color(caps.Olive, -1) + color.ErrBadAttr,
+	"%h[fgGreen+lold[]":    exp(ti.Color(caps.Green, -1)) + color.ErrBadAttr,
+	"%h[fgOlive+%#bgBlue]": exp(ti.Color(caps.Olive, -1)) + color.ErrBadAttr,
 	"%h][fgRed+%#bgBlue]":  color.ErrInvalid,
-	"%h[fgRed+":            ti.Color(caps.Red, -1) + color.ErrShort,
-	"%%h%h[fgRed]%%":       "%%h\x1b[91m%%",
+	"%h[fgRed+":            exp(ti.Color(caps.Red, -1)) + color.ErrShort,
+	"%%h%h[fgRed]%%":       "%%h" + exp(ti.Color(caps.Red, -1)) + "%%",
 	"%h[dsadadssadas]":     color.ErrBadAttr,
 	"%":                    "%",
 	"%h[fgsadas]":          color.ErrBadAttr,
-	"%h[fgAqua+%h[bgBlue]": ti.Color(caps.Aqua, -1) + color.ErrBadAttr,
+	"%h[fgAqua+%h[bgBlue]": exp(ti.Color(caps.Aqua, -1)) + color.ErrBadAttr,
 	"lmaokai":              "lmaokai",
-	"%h[fgMaroon]%h[]":     ti.Color(caps.Maroon, -1) + color.ErrMissing,
+	"%h[fgMaroon]%h[]":     exp(ti.Color(caps.Maroon, -1)) + color.ErrMissing,
 	"%h[bgGjo]%h[bgGreen]": color.ErrBadAttr,
 	"%h[fg23a]":            color.ErrBadAttr,
 }

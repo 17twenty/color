@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"strconv"
-	"strings"
 	"sync"
 	"unicode"
 
@@ -69,7 +68,7 @@ func getHighlighter(s string, color bool) (hl *highlighter) {
 	hl = highlighterPool.Get().(*highlighter)
 	hl.s = s
 	if tiErr != nil {
-		hl.color = false
+		color = false
 	}
 	hl.color = color
 	return
@@ -113,6 +112,12 @@ func (hl *highlighter) writeFrom(ppos int) {
 	}
 }
 
+func (hl *highlighter) writeAttr(a string) {
+	if hl.color {
+		hl.buf.WriteString(a)
+	}
+}
+
 // scanAttribute returns the string from the current character to
 // the start of the next attribute or end of the verb.
 func (hl *highlighter) scanAttribute() (string, error) {
@@ -144,40 +149,10 @@ func scanText(hl *highlighter) stateFn {
 		if ch == '%' {
 			hl.writeFrom(ppos)
 			hl.pos++
-			if hl.color {
-				return scanVerb
-			}
-			return stripVerb
+			return scanVerb
 		}
 		hl.pos++
 	}
-}
-
-// stripVerb skips the current verb.
-func stripVerb(hl *highlighter) stateFn {
-	ch, err := hl.get()
-	if err != nil {
-		// Let fmt insert "%!h(NOVERB)".
-		hl.buf.WriteByte('%')
-		return nil
-	}
-	hl.pos++
-	switch ch {
-	case 'r':
-		// Strip the reset verb.
-	case 'h':
-		// Strip inside the highlight verb.
-		j := strings.IndexByte(hl.s[hl.pos:], ']')
-		if j == -1 {
-			hl.buf.WriteString(errShort)
-			return nil
-		}
-		hl.pos += j + 1
-	default:
-		// Include the verb.
-		hl.writePrev(2)
-	}
-	return scanText
 }
 
 // scanVerb scans the current verb.
@@ -191,7 +166,8 @@ func scanVerb(hl *highlighter) stateFn {
 	hl.pos++
 	switch ch {
 	case 'r':
-		return verbReset
+		hl.writeAttr(ti.StringCaps[caps.ExitAttributeMode])
+		return scanText
 	case 'h':
 		// Ensure next character is '['.
 		ch, err = hl.get()
@@ -218,12 +194,6 @@ func scanVerb(hl *highlighter) stateFn {
 	}
 	// Include the verb.
 	hl.writePrev(2)
-	return scanText
-}
-
-// verbReset writes the reset control sequence to the buffer.
-func verbReset(hl *highlighter) stateFn {
-	hl.buf.WriteString(ti.StringCaps[caps.ExitAttributeMode])
 	return scanText
 }
 
@@ -265,21 +235,6 @@ func startAttribute(hl *highlighter) stateFn {
 	return scanColor
 }
 
-// scanAttribute scans a mode attribute.
-func scanMode(hl *highlighter) stateFn {
-	a, err := hl.scanAttribute()
-	if err != nil {
-		hl.buf.WriteString(errShort)
-		return nil
-	}
-	if n, ok := modes[a]; ok {
-		hl.buf.WriteString(ti.StringCaps[n])
-		return endAttribute
-	}
-	hl.buf.WriteString(errBadAttr)
-	return nil
-}
-
 // modes maps mode names to their string capacity positions.
 var modes = map[string]int{
 	"reset":     caps.ExitAttributeMode,
@@ -290,19 +245,15 @@ var modes = map[string]int{
 	"dim":       caps.EnterDimMode,
 }
 
-// scanColor scans a named color attribute.
-func scanColor(hl *highlighter) stateFn {
+// scanAttribute scans a mode attribute.
+func scanMode(hl *highlighter) stateFn {
 	a, err := hl.scanAttribute()
 	if err != nil {
 		hl.buf.WriteString(errShort)
 		return nil
 	}
-	if c, ok := colors[a]; ok {
-		if hl.fg {
-			hl.buf.WriteString(ti.Color(c, -1))
-		} else {
-			hl.buf.WriteString(ti.Color(-1, c))
-		}
+	if n, ok := modes[a]; ok {
+		hl.writeAttr(ti.StringCaps[n])
 		return endAttribute
 	}
 	hl.buf.WriteString(errBadAttr)
@@ -329,6 +280,25 @@ var colors = map[string]int{
 	"White":   caps.White,
 }
 
+// scanColor scans a named color attribute.
+func scanColor(hl *highlighter) stateFn {
+	a, err := hl.scanAttribute()
+	if err != nil {
+		hl.buf.WriteString(errShort)
+		return nil
+	}
+	if c, ok := colors[a]; ok {
+		if hl.fg {
+			hl.writeAttr(ti.Color(c, -1))
+		} else {
+			hl.writeAttr(ti.Color(-1, c))
+		}
+		return endAttribute
+	}
+	hl.buf.WriteString(errBadAttr)
+	return nil
+}
+
 // scanColor256 scans a 256 color attribute.
 func scanColor256(hl *highlighter) stateFn {
 	a, err := hl.scanAttribute()
@@ -342,9 +312,9 @@ func scanColor256(hl *highlighter) stateFn {
 		return nil
 	}
 	if hl.fg {
-		hl.buf.WriteString(ti.Color(t, -1))
+		hl.writeAttr(ti.Color(t, -1))
 	} else {
-		hl.buf.WriteString(ti.Color(-1, t))
+		hl.writeAttr(ti.Color(-1, t))
 	}
 	return endAttribute
 }

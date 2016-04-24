@@ -5,7 +5,7 @@ package color
 
 var (
 	Colors = colors
-	Ti     = ti
+	Ti, TiErr     = ti, tiErr
 	Modes = modes
 )
 

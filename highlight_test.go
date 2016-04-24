@@ -55,25 +55,25 @@ func TestCombinations(t *testing.T) {
 }
 
 var highlightEdgeCases = map[string]string{
-	"%h[fgGray+%h[fgBlue]": ti.Color(terminfo.ColorGray, -1) + color.ErrInvalid,
+	"%h[fgGray+%h[fgBlue]": ti.Color(terminfo.ColorGray, -1) + color.ErrBadAttr,
 	"%h[":                  color.ErrInvalid,
 	"%h{":                  color.ErrInvalid,
-	"%h[]":                 color.ErrMissing,
+	"%h[]":                 color.ErrInvalid,
 	"%%h[fgRed]":           "%%h[fgRed]",
 	"%[bg232]":             "%[bg232]",
-	"%h[fg132":             ti.Color(132, -1) + color.ErrInvalid,
-	"%h[fgFuchsia[]":       ti.Color(terminfo.ColorFuchsia, -1) + color.ErrInvalid,
+	"%h[fg132":             color.ErrInvalid,
+	"%h[fgFuchsia[]":       color.ErrBadAttr,
 	"%h[fgGreen+lold[]":    ti.Color(terminfo.ColorGreen, -1) + color.ErrBadAttr,
-	"%h[fgOlive+%#bgBlue]": ti.Color(terminfo.ColorOlive, -1) + color.ErrInvalid,
+	"%h[fgOlive+%#bgBlue]": ti.Color(terminfo.ColorOlive, -1) + color.ErrBadAttr,
 	"%h][fgRed+%#bgBlue]":  color.ErrInvalid,
 	"%h[fgRed+":            ti.Color(terminfo.ColorRed, -1) + color.ErrInvalid,
 	"%%h%h[fgRed]%%":       "%%h\x1b[91m%%",
 	"%h[dsadadssadas]":     color.ErrBadAttr,
 	"%":                    "%",
 	"%h[fgsadas]":          color.ErrBadAttr,
-	"%h[fgAqua+%h[bgBlue]": ti.Color(terminfo.ColorAqua, -1) + color.ErrInvalid,
+	"%h[fgAqua+%h[bgBlue]": ti.Color(terminfo.ColorAqua, -1) + color.ErrBadAttr,
 	"lmaokai":              "lmaokai",
-	"%h[fgMaroon]%h[]":     ti.Color(terminfo.ColorMaroon, -1) + color.ErrMissing,
+	"%h[fgMaroon]%h[]":     ti.Color(terminfo.ColorMaroon, -1) + color.ErrInvalid,
 	"%h[bgGjo]%h[bgGreen]": color.ErrBadAttr,
 }
 

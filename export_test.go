@@ -9,7 +9,6 @@ var (
 )
 
 const (
-	ErrMissing = errMissing
 	ErrInvalid = errInvalid
 	ErrBadAttr = errBadAttr
 )

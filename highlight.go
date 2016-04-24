@@ -282,12 +282,12 @@ func scanMode(hl *highlighter) stateFn {
 
 // modes maps mode names to their string capacity positions.
 var modes = map[string]int{
+	"reset":     caps.ExitAttributeMode,
 	"bold":      caps.EnterBoldMode,
 	"underline": caps.EnterUnderlineMode,
 	"reverse":   caps.EnterReverseMode,
 	"blink":     caps.EnterBlinkMode,
 	"dim":       caps.EnterDimMode,
-	"reset":     caps.ExitAttributeMode,
 }
 
 // scanColor scans a named color attribute.

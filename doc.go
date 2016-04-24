@@ -13,81 +13,57 @@ Errors:
 
 If an error occurs, the generated string will contain a description of the problem, as in these examples.
 
+	Invalid character in the highlight verb:
+		Printf("%h(fgMaroon)%s", "hi"):		%!h(INVALID)
 	No attributes in the highlight verb:
 		Printf("%h[]%s", "hi"):			%!h(MISSING)
-	Invalid character in the highlight verb:
-		Printf("%h[%&:*!]%s", "hi"):		%!h(INVALID)
 	Unknown attribute in the highlight verb:
-		Printf("%h[fgOrange]%s", "hi"):		%!h(BADATTR)
+		Printf("%h[fgGdsds]%s", "hi"):		%!h(BADATTR)
+	String ended before the verb:
+		Printf("%h[fg", "hi"):			%!h(SHORT)
 
 Everything else is handled by the fmt package. You should read its documentation.
 
 Attributes Reference
 
-Standard Colors:
-	%h[fgBlack]
-	%h[fgRed]
-	%h[fgGreen]
-	%h[fgYellow]
-	%h[fgBlue]
-	%h[fgMagenta]
-	%h[fgCyan]
-	%h[fgWhite]
-	%h[fgDefault]
-	%h[bgBlack]
-	%h[bgRed]
-	%h[bgGreen]
-	%h[bgYellow]
-	%h[bgBlue]
-	%h[bgMagenta]
-	%h[bgCyan]
-	%h[bgWhite]
-	%h[bgDefault]
+Named Colors:
+	%h[xgBlack]
+	%h[xgMaroon]
+	%h[xgGreen]
+	%h[xgOlive]
+	%h[xgNavy]
+	%h[xgPurple]
+	%h[xgTeal]
+	%h[xgSilver]
+	%h[xgGray]
+	%h[xgRed]
+	%h[xgLime]
+	%h[xgYellow]
+	%h[xgBlue]
+	%h[xgFuchsia]
+	%h[xgAqua]
+	%h[xgWhite]
 
-Bright Colors:
-	%h[fgBrightBlack]
-	%h[fgBrightRed]
-	%h[fgBrightGreen]
-	%h[fgBrightYellow]
-	%h[fgBrightBlue]
-	%h[fgBrightMagenta]
-	%h[fgBrightCyan]
-	%h[fgBrightWhite]
-	%h[bgBrightBlack]
-	%h[bgBrightRed]
-	%h[bgBrightGreen]
-	%h[bgBrightYellow]
-	%h[bgBrightBlue]
-	%h[bgBrightMagenta]
-	%h[bgBrightCyan]
-	%h[bgBrightWhite]
+	Where 'x' is either 'f' or 'b'.
 
 256 Colors:
 	%h[fgx]
 	%h[bgx]
-Where x is any number from 0-255
 
-Other:
+	Where x is any number from 0-255.
+
+Modes:
 	%h[reset] or the %r verb
 	%h[bold]
-	%h[faint]
-	%h[italic]
 	%h[underline]
+	%h[reverse]
 	%h[blink]
-	%h[inverse]
-	%h[invisible]
-	%h[crossedOut]
-	%h[doubleUnderline]
-	%h[normal]
-	%h[notItalic]
-	%h[notUnderlined]
-	%h[steady]
-	%h[positive]
-	%h[visible]
-	%h[notCrossedOut]
+	%h[dim]
 
-See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section.
+See http://goo.gl/LRLA7o for information on the attributes. Scroll down to the SGR section.
 
-Also see http://goo.gl/fvtHLs and according to the above document, ISO-8613-3, for more information on 256 colors.
+See http://goo.gl/fvtHLs and ISO-8613-3 (according to above document) for more information on 256 colors.
+
+See http://jonasjacek.github.io/colors/ for a reference of the colors.
 */
 package color

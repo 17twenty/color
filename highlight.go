@@ -42,15 +42,15 @@ var highlighterPool = sync.Pool{
 var ti, tiErr = terminfo.OpenEnv()
 
 // getHighlighter returns a new initialized highlighter from the pool.
-func getHighlighter(s string, color bool) (hl *highlighter) {
-	hl = highlighterPool.Get().(*highlighter)
+func getHighlighter(s string, color bool) *highlighter {
+	hl := highlighterPool.Get().(*highlighter)
 	hl.s = s
 	if tiErr != nil {
 		hl.color = false
 	} else {
 		hl.color = color
 	}
-	return
+	return hl
 }
 
 // free resets the highlighter.

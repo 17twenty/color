@@ -8,7 +8,7 @@ import (
 	"unicode"
 
 	"github.com/nhooyr/terminfo"
-	"github.com/nhooyr/terminfo/cap"
+	"github.com/nhooyr/terminfo/caps"
 )
 
 const (
@@ -31,7 +31,7 @@ type highlighter struct {
 var highlighterPool = sync.Pool{
 	New: func() interface{} {
 		hl := new(highlighter)
-		// The initial capacity avoids constant reallocation during growth.
+		// The initial capsacity avoids constant reallocation during growth.
 		hl.buf = bytes.NewBuffer(make([]byte, 0, 45))
 		return hl
 	},
@@ -166,7 +166,7 @@ func scanVerb(hl *highlighter) stateFn {
 	hl.pos++
 	switch ch {
 	case 'r':
-		hl.writeAttr(ti.StringCaps[cap.ExitAttributeMode])
+		hl.writeAttr(ti.Strings[caps.ExitAttributeMode])
 		return scanText
 	case 'h':
 		// Ensure next character is '['.
@@ -235,14 +235,14 @@ func startAttribute(hl *highlighter) stateFn {
 	return scanColor
 }
 
-// modes maps mode names to their string capacity positions.
+// modes maps mode names to their string capsacity positions.
 var modes = map[string]int{
-	"reset":     cap.ExitAttributeMode,
-	"bold":      cap.EnterBoldMode,
-	"underline": cap.EnterUnderlineMode,
-	"reverse":   cap.EnterReverseMode,
-	"blink":     cap.EnterBlinkMode,
-	"dim":       cap.EnterDimMode,
+	"reset":     caps.ExitAttributeMode,
+	"bold":      caps.EnterBoldMode,
+	"underline": caps.EnterUnderlineMode,
+	"reverse":   caps.EnterReverseMode,
+	"blink":     caps.EnterBlinkMode,
+	"dim":       caps.EnterDimMode,
 }
 
 // scanAttribute scans a mode attribute.
@@ -253,7 +253,7 @@ func scanMode(hl *highlighter) stateFn {
 		return nil
 	}
 	if n, ok := modes[a]; ok {
-		hl.writeAttr(ti.StringCaps[n])
+		hl.writeAttr(ti.Strings[n])
 		return endAttribute
 	}
 	hl.buf.WriteString(errBadAttr)
@@ -262,22 +262,22 @@ func scanMode(hl *highlighter) stateFn {
 
 // colors maps color names to their integer values.
 var colors = map[string]int{
-	"Black":         cap.Black,
-	"Red":           cap.Red,
-	"Green":         cap.Green,
-	"Yellow":        cap.Yellow,
-	"Blue":          cap.Blue,
-	"Magenta":       cap.Magenta,
-	"Cyan":          cap.Cyan,
-	"White":         cap.White,
-	"BrightBlack":   cap.BrightBlack,
-	"BrightRed":     cap.BrightRed,
-	"BrightGreen":   cap.BrightGreen,
-	"BrightYellow":  cap.BrightYellow,
-	"BrightBlue":    cap.BrightBlue,
-	"BrightMagenta": cap.BrightMagenta,
-	"BrightCyan":    cap.BrightCyan,
-	"BrightWhite":   cap.BrightWhite,
+	"Black":         caps.Black,
+	"Red":           caps.Red,
+	"Green":         caps.Green,
+	"Yellow":        caps.Yellow,
+	"Blue":          caps.Blue,
+	"Magenta":       caps.Magenta,
+	"Cyan":          caps.Cyan,
+	"White":         caps.White,
+	"BrightBlack":   caps.BrightBlack,
+	"BrightRed":     caps.BrightRed,
+	"BrightGreen":   caps.BrightGreen,
+	"BrightYellow":  caps.BrightYellow,
+	"BrightBlue":    caps.BrightBlue,
+	"BrightMagenta": caps.BrightMagenta,
+	"BrightCyan":    caps.BrightCyan,
+	"BrightWhite":   caps.BrightWhite,
 }
 
 // scanColor scans a named color attribute.

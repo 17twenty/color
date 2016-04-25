@@ -65,7 +65,7 @@ func TestColors256(t *testing.T) {
 }
 
 var combinations = map[string]string{
-	"%h[fgRed+bgBlue+bold+underline+fg23+bg235]hi":     expF(ti.Color(cap.Red, cap.Blue)+ti.StringCaps[cap.EnterBoldMode]+ti.StringCaps[cap.EnterUnderlineMode]+ti.Color(23, 235)+"%s", "hi"),
+	"%h[fgRed+bgBlue+bold+underline+fg23+bg235]hi":         expF(ti.Color(cap.Red, cap.Blue)+ti.StringCaps[cap.EnterBoldMode]+ti.StringCaps[cap.EnterUnderlineMode]+ti.Color(23, 235)+"%s", "hi"),
 	"%h[bgBlue+fgYellow+fgGreen+fg34+blink+dim+reverse]hi": expF(ti.Color(-1, cap.Blue)+ti.Color(cap.Yellow, -1)+ti.Color(cap.Green, -1)+ti.Color(34, -1)+ti.StringCaps[cap.EnterBlinkMode]+ti.StringCaps[cap.EnterDimMode]+ti.StringCaps[cap.EnterReverseMode]+"%s", "hi"),
 }
 
@@ -79,26 +79,26 @@ func TestCombinations(t *testing.T) {
 
 var highlightEdgeCases = map[string]string{
 	"%h[fgBrightBlack+%h[fgBlue]": exp(ti.Color(cap.BrightBlack, -1)) + color.ErrBadAttr,
-	"%h[":                  color.ErrShort,
-	"%h{":                  color.ErrInvalid,
-	"%h[]":                 color.ErrMissing,
-	"%%h[fgRed]":           "%%h[fgRed]",
-	"%[bg232]":             "%[bg232]",
-	"%h[fg132":             color.ErrShort,
-	"%h[fgMagenta[]":       color.ErrBadAttr,
-	"%h[fgGreen+lold[]":    exp(ti.Color(cap.Green, -1)) + color.ErrBadAttr,
+	"%h[":                   color.ErrShort,
+	"%h{":                   color.ErrInvalid,
+	"%h[]":                  color.ErrMissing,
+	"%%h[fgRed]":            "%%h[fgRed]",
+	"%[bg232]":              "%[bg232]",
+	"%h[fg132":              color.ErrShort,
+	"%h[fgMagenta[]":        color.ErrBadAttr,
+	"%h[fgGreen+lold[]":     exp(ti.Color(cap.Green, -1)) + color.ErrBadAttr,
 	"%h[fgYellow+%#bgBlue]": exp(ti.Color(cap.Yellow, -1)) + color.ErrBadAttr,
-	"%h][fgRed+%#bgBlue]":  color.ErrInvalid,
-	"%h[fgRed+":            exp(ti.Color(cap.Red, -1)) + color.ErrShort,
-	"%%h%h[fgRed]%%":       "%%h" + exp(ti.Color(cap.Red, -1)) + "%%",
-	"%h[dsadadssadas]":     color.ErrBadAttr,
-	"%":                    "%",
-	"%h[fgsadas]":          color.ErrBadAttr,
-	"%h[fgCyan+%h[bgBlue]": exp(ti.Color(cap.Cyan, -1)) + color.ErrBadAttr,
-	"lmaokai":              "lmaokai",
-	"%h[fgRed]%h[]":     exp(ti.Color(cap.Red, -1)) + color.ErrMissing,
-	"%h[bgGjo]%h[bgGreen]": color.ErrBadAttr,
-	"%h[fg23a]":            color.ErrBadAttr,
+	"%h][fgRed+%#bgBlue]":   color.ErrInvalid,
+	"%h[fgRed+":             exp(ti.Color(cap.Red, -1)) + color.ErrShort,
+	"%%h%h[fgRed]%%":        "%%h" + exp(ti.Color(cap.Red, -1)) + "%%",
+	"%h[dsadadssadas]":      color.ErrBadAttr,
+	"%":                     "%",
+	"%h[fgsadas]":           color.ErrBadAttr,
+	"%h[fgCyan+%h[bgBlue]":  exp(ti.Color(cap.Cyan, -1)) + color.ErrBadAttr,
+	"lmaokai":               "lmaokai",
+	"%h[fgRed]%h[]":         exp(ti.Color(cap.Red, -1)) + color.ErrMissing,
+	"%h[bgGjo]%h[bgGreen]":  color.ErrBadAttr,
+	"%h[fg23a]":             color.ErrBadAttr,
 }
 
 func TestHighlightEdgeCases(t *testing.T) {

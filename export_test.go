@@ -4,14 +4,14 @@
 package color
 
 var (
-	Colors = colors
-	Ti, TiErr     = ti, tiErr
-	Modes = modes
+	Colors    = colors
+	Ti, TiErr = ti, tiErr
+	Modes     = modes
 )
 
 const (
 	ErrInvalid = errInvalid
 	ErrMissing = errMissing
 	ErrBadAttr = errBadAttr
-	ErrShort = errShort
+	ErrShort   = errShort
 )

@@ -11,26 +11,6 @@ import (
 	"github.com/nhooyr/terminfo/cap"
 )
 
-const (
-	errInvalid = "%%!h(INVALID)" // invalid character in the verb
-	errMissing = "%%!h(MISSING)" // no attributes in the verb
-	errShort   = "%%!h(SHORT)"   // string ended before the verb
-	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the verb
-)
-
-// highlighter holds the state of the scanner.
-type highlighter struct {
-	s     string        // string being scanned
-	pos   int           // position in s
-	buf   *bytes.Buffer // where result is built
-	color bool          // color or strip the highlight verbs
-	fg    bool          // foreground or background color attribute
-}
-
-// Global terminfo struct.
-// TODO no global pls.
-var ti, tiErr = terminfo.OpenEnv()
-
 // Highlight replaces the highlight verbs in s with the appropriate control sequences and
 // then returns the resulting string.
 // It is a thin wrapper around Run.
@@ -53,6 +33,22 @@ func Run(s string, color bool) string {
 	return hl.run()
 }
 
+const (
+	errInvalid = "%%!h(INVALID)" // invalid character in the verb
+	errMissing = "%%!h(MISSING)" // no attributes in the verb
+	errShort   = "%%!h(SHORT)"   // string ended before the verb
+	errBadAttr = "%%!h(BADATTR)" // unknown attribute in the verb
+)
+
+// highlighter holds the state of the scanner.
+type highlighter struct {
+	s     string        // string being scanned
+	pos   int           // position in s
+	buf   *bytes.Buffer // where result is built
+	color bool          // color or strip the highlight verbs
+	fg    bool          // foreground or background color attribute
+}
+
 // highlighterPool allows the reuse of highlighters to avoid allocations.
 var highlighterPool = sync.Pool{
 	New: func() interface{} {
@@ -62,6 +58,10 @@ var highlighterPool = sync.Pool{
 		return hl
 	},
 }
+
+// Global terminfo struct.
+// TODO no global pls.
+var ti, tiErr = terminfo.OpenEnv()
 
 // getHighlighter returns a new initialized highlighter from the pool.
 func getHighlighter(s string, color bool) (hl *highlighter) {

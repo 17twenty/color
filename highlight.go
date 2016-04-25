@@ -68,9 +68,10 @@ func getHighlighter(s string, color bool) (hl *highlighter) {
 	hl = highlighterPool.Get().(*highlighter)
 	hl.s = s
 	if tiErr != nil {
-		color = false
+		hl.color = false
+	} else {
+		hl.color = color
 	}
-	hl.color = color
 	return
 }
 
@@ -139,7 +140,6 @@ func (hl *highlighter) scanAttribute() (string, error) {
 // scanText scans until the next verb.
 func scanText(hl *highlighter) stateFn {
 	ppos := hl.pos
-	// Find next verb.
 	for {
 		ch, err := hl.get()
 		if err != nil {

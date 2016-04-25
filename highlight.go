@@ -11,28 +11,6 @@ import (
 	"github.com/nhooyr/terminfo/cap"
 )
 
-// Highlight replaces the highlight verbs in s with the appropriate control sequences and
-// then returns the resulting string.
-// It is a thin wrapper around Run.
-func Highlight(s string) string {
-	return Run(s, true)
-}
-
-// Strip removes all highlight verbs in s and then returns the resulting string.
-// It is a thin wrapper around Run.
-func Strip(s string) string {
-	return Run(s, false)
-}
-
-// Run runs a highlighter with s as the input and then returns the output. The color argument
-// determines whether the highlight verbs will be replaced with their appropriate control
-// sequences or instead stripped.
-func Run(s string, color bool) string {
-	hl := getHighlighter(s, color)
-	defer hl.free()
-	return hl.run()
-}
-
 const (
 	errInvalid = "%%!h(INVALID)" // invalid character in the verb
 	errMissing = "%%!h(MISSING)" // no attributes in the verb
@@ -80,6 +58,28 @@ func (hl *highlighter) free() {
 	hl.buf.Reset()
 	hl.pos = 0
 	highlighterPool.Put(hl)
+}
+
+// Highlight replaces the highlight verbs in s with the appropriate control sequences and
+// then returns the resulting string.
+// It is a thin wrapper around Run.
+func Highlight(s string) string {
+	return Run(s, true)
+}
+
+// Strip removes all highlight verbs in s and then returns the resulting string.
+// It is a thin wrapper around Run.
+func Strip(s string) string {
+	return Run(s, false)
+}
+
+// Run runs a highlighter with s as the input and then returns the output. The color argument
+// determines whether the highlight verbs will be replaced with their appropriate control
+// sequences or instead stripped.
+func Run(s string, color bool) string {
+	hl := getHighlighter(s, color)
+	defer hl.free()
+	return hl.run()
 }
 
 // stateFn represents the state of the scanner as a function that returns the next state.

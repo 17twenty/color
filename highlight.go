@@ -8,7 +8,7 @@ import (
 	"unicode"
 
 	"github.com/nhooyr/terminfo"
-	"github.com/nhooyr/terminfo/caps"
+	"github.com/nhooyr/terminfo/cap"
 )
 
 const (
@@ -166,7 +166,7 @@ func scanVerb(hl *highlighter) stateFn {
 	hl.pos++
 	switch ch {
 	case 'r':
-		hl.writeAttr(ti.StringCaps[caps.ExitAttributeMode])
+		hl.writeAttr(ti.StringCaps[cap.ExitAttributeMode])
 		return scanText
 	case 'h':
 		// Ensure next character is '['.
@@ -237,12 +237,12 @@ func startAttribute(hl *highlighter) stateFn {
 
 // modes maps mode names to their string capacity positions.
 var modes = map[string]int{
-	"reset":     caps.ExitAttributeMode,
-	"bold":      caps.EnterBoldMode,
-	"underline": caps.EnterUnderlineMode,
-	"reverse":   caps.EnterReverseMode,
-	"blink":     caps.EnterBlinkMode,
-	"dim":       caps.EnterDimMode,
+	"reset":     cap.ExitAttributeMode,
+	"bold":      cap.EnterBoldMode,
+	"underline": cap.EnterUnderlineMode,
+	"reverse":   cap.EnterReverseMode,
+	"blink":     cap.EnterBlinkMode,
+	"dim":       cap.EnterDimMode,
 }
 
 // scanAttribute scans a mode attribute.
@@ -262,22 +262,22 @@ func scanMode(hl *highlighter) stateFn {
 
 // colors maps color names to their integer values.
 var colors = map[string]int{
-	"Black":         caps.Black,
-	"Red":           caps.Red,
-	"Green":         caps.Green,
-	"Yellow":        caps.Yellow,
-	"Blue":          caps.Blue,
-	"Magenta":       caps.Magenta,
-	"Cyan":          caps.Cyan,
-	"White":         caps.White,
-	"BrightBlack":   caps.BrightBlack,
-	"BrightRed":     caps.BrightRed,
-	"BrightGreen":   caps.BrightGreen,
-	"BrightYellow":  caps.BrightYellow,
-	"BrightBlue":    caps.BrightBlue,
-	"BrightMagenta": caps.BrightMagenta,
-	"BrightCyan":    caps.BrightCyan,
-	"BrightWhite":   caps.BrightWhite,
+	"Black":         cap.Black,
+	"Red":           cap.Red,
+	"Green":         cap.Green,
+	"Yellow":        cap.Yellow,
+	"Blue":          cap.Blue,
+	"Magenta":       cap.Magenta,
+	"Cyan":          cap.Cyan,
+	"White":         cap.White,
+	"BrightBlack":   cap.BrightBlack,
+	"BrightRed":     cap.BrightRed,
+	"BrightGreen":   cap.BrightGreen,
+	"BrightYellow":  cap.BrightYellow,
+	"BrightBlue":    cap.BrightBlue,
+	"BrightMagenta": cap.BrightMagenta,
+	"BrightCyan":    cap.BrightCyan,
+	"BrightWhite":   cap.BrightWhite,
 }
 
 // scanColor scans a named color attribute.

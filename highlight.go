@@ -5,7 +5,6 @@ import (
 	"io"
 	"strconv"
 	"sync"
-	"unicode"
 
 	"github.com/nhooyr/terminfo"
 	"github.com/nhooyr/terminfo/caps"
@@ -229,14 +228,14 @@ func startAttribute(hl *highlighter) stateFn {
 		hl.buf.WriteString(errShort)
 		return nil
 	}
-	if unicode.IsNumber(rune(ch)) {
+	if ch >= '0' && ch <= '9' {
 		return scanColor256
 	}
 	return scanColor
 }
 
 // modes maps mode names to their string capsacity positions.
-var modes = map[string]int{
+var modes = map[string]int16{
 	"reset":     caps.ExitAttributeMode,
 	"bold":      caps.EnterBoldMode,
 	"underline": caps.EnterUnderlineMode,

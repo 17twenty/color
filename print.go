@@ -11,9 +11,7 @@ import (
 // color if the writer is a terminal, otherwise it prints normally. Use a Printer if you want
 // full control over when to print in color or you want to avoid the repetitive terminal checks.
 func Fprintfh(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	// TODO FIX
-	// return fmt.Fprintf(w, Run(format, IsTerminal(w)))
-	return 0, nil
+	return fmt.Fprintf(w, Run(format, IsTerminal(w)))
 }
 
 var stdout = NewPrinter(os.Stdout, IsTerminal(os.Stdout))

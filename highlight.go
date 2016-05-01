@@ -37,7 +37,6 @@ var highlighterPool = sync.Pool{
 }
 
 // Global terminfo struct.
-// TODO no global pls.
 var ti, tiErr = terminfo.LoadEnv()
 
 // getHighlighter returns a new initialized highlighter from the pool.
@@ -113,9 +112,7 @@ func (hl *highlighter) writeFrom(ppos int) {
 }
 
 func (hl *highlighter) writeAttr(a string) {
-	if hl.color {
-		hl.buf.WriteString(a)
-	}
+	hl.buf.WriteString(a)
 }
 
 // scanAttribute returns the string from the current character to
@@ -165,7 +162,9 @@ func scanVerb(hl *highlighter) stateFn {
 	hl.pos++
 	switch ch {
 	case 'r':
-		hl.writeAttr(ti.Strings[caps.ExitAttributeMode])
+		if hl.color {
+			hl.writeAttr(ti.Strings[caps.ExitAttributeMode])
+		}
 		return scanText
 	case 'h':
 		// Ensure next character is '['.
@@ -252,7 +251,9 @@ func scanMode(hl *highlighter) stateFn {
 		return nil
 	}
 	if n, ok := modes[a]; ok {
-		hl.writeAttr(ti.Strings[n])
+		if hl.color {
+			hl.writeAttr(ti.Strings[n])
+		}
 		return endAttribute
 	}
 	hl.buf.WriteString(errBadAttr)
@@ -287,10 +288,12 @@ func scanColor(hl *highlighter) stateFn {
 		return nil
 	}
 	if c, ok := colors[a]; ok {
-		if hl.fg {
-			hl.writeAttr(ti.Color(c, -1))
-		} else {
-			hl.writeAttr(ti.Color(-1, c))
+		if hl.color {
+			if hl.fg {
+				hl.writeAttr(ti.Color(c, -1))
+			} else {
+				hl.writeAttr(ti.Color(-1, c))
+			}
 		}
 		return endAttribute
 	}
@@ -310,10 +313,12 @@ func scanColor256(hl *highlighter) stateFn {
 		hl.buf.WriteString(errBadAttr)
 		return nil
 	}
-	if hl.fg {
-		hl.writeAttr(ti.Color(t, -1))
-	} else {
-		hl.writeAttr(ti.Color(-1, t))
+	if hl.color {
+		if hl.fg {
+			hl.writeAttr(ti.Color(t, -1))
+		} else {
+			hl.writeAttr(ti.Color(-1, t))
+		}
 	}
 	return endAttribute
 }

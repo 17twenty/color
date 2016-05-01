@@ -21,26 +21,35 @@ func NewLogger(out io.Writer, prefix string, flag int, color bool) *Logger {
 	return &Logger{log.New(out, Run(prefix, color), flag), color}
 }
 
-// Printfh first calls l.Prepare to process the highlight verbs and then
-// calls l.Logger.Printf to print to the logger.
-func (l *Logger) Printfh(format string, v ...interface{}) {
-	l.Logger.Printf(l.Prepare(format), v...)
+// Printf first processes the highlight verbs in format and then calls
+// l.Logger.Printf with the processed format and the other arguments.
+func (l *Logger) Printf(format string, v ...interface{}) {
+	l.Logger.Printf(Run(format, l.color), v...)
 }
 
-// Fatalfh is equivalent to l.Printfh() followed by a call to os.Exit(1).
-func (l *Logger) Fatalfh(format string, v ...interface{}) {
-	l.Logger.Fatalf(l.Prepare(format), v...)
+// Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
+func (l *Logger) Fatalf(format string, v ...interface{}) {
+	l.Logger.Fatalf(Run(format, l.color), v...)
 }
 
-// Panicfh is equivalent to l.Printfh() followed by a call to panic().
-func (l *Logger) Panicfh(format string, v ...interface{}) {
-	l.Logger.Panicf(l.Prepare(format), v...)
+// Panicf is equivalent to l.Printf() followed by a call to panic().
+func (l *Logger) Panicf(format string, v ...interface{}) {
+	l.Logger.Panicf(Run(format, l.color), v...)
 }
 
-// Prepare returns the format string with the highlight verbs processed.
-// It is a thin wrapper around Run.
-func (l *Logger) Prepare(format string) string {
-	return Run(format, l.color)
+// Eprintf is the same as l.Printf but takes a prepared format struct.
+func (l *Logger) Eprintf(f *Format, v ...interface{}) {
+	l.Logger.Printf(f.Get(l.color), v...)
+}
+
+// Efatalf is the same as l.Fatalf but takes a prepared format struct.
+func (l *Logger) Efatalf(f *Format, v ...interface{}) {
+	l.Logger.Fatalf(f.Get(l.color), v...)
+}
+
+// Epanicf is the same as l.Panicf but takes a prepared format struct.
+func (l *Logger) Epanicf(f *Format, v ...interface{}) {
+	l.Logger.Panicf(f.Get(l.color), v...)
 }
 
 // SetOutput panics if called. You cannot change the output writer once the Logger is created.

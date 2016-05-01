@@ -2,8 +2,6 @@
 
 Color adds verbs to `fmt.Printf` for producing colored output.
 
-__note: this is under heavy development and things will change__
-
 __note: if you have any ideas for a better prepare API, please let me know__
 
 ## Install

@@ -38,7 +38,7 @@ var highlighterPool = sync.Pool{
 
 // Global terminfo struct.
 // TODO no global pls.
-var ti, tiErr = terminfo.OpenEnv()
+var ti, tiErr = terminfo.LoadEnv()
 
 // getHighlighter returns a new initialized highlighter from the pool.
 func getHighlighter(s string, color bool) *highlighter {

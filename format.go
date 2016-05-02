@@ -1,5 +1,9 @@
 package color
 
+import (
+	"fmt"
+)
+
 type Format struct {
 	colored  string
 	stripped string
@@ -14,6 +18,12 @@ func (f *Format) Get(color bool) string {
 		return f.colored
 	}
 	return f.stripped
+}
+
+// TODO: add a method like this that takes a Format and Printf's it into a new Format using the
+// current format's strings as the format string.
+func (f *Format) Printf(a ...interface{}) *Format {
+	return &Format{fmt.Sprintf(f.colored, a...), fmt.Sprintf(f.stripped, a...)}
 }
 
 func Prepare(f string) *Format {

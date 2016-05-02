@@ -39,8 +39,8 @@ var highlighterPool = sync.Pool{
 // Global terminfo struct.
 var ti, tiErr = terminfo.LoadEnv()
 
-// getHighlighter returns a new initialized highlighter from the pool.
-func getHighlighter(s string, color bool) *highlighter {
+// newHighlighter returns a new initialized highlighter from the pool.
+func newHighlighter(s string, color bool) *highlighter {
 	hl := highlighterPool.Get().(*highlighter)
 	hl.s = s
 	if tiErr != nil {
@@ -75,7 +75,7 @@ func Strip(s string) string {
 // determines whether the highlight verbs will be replaced with their appropriate control
 // sequences or instead stripped.
 func Run(s string, color bool) string {
-	hl := getHighlighter(s, color)
+	hl := newHighlighter(s, color)
 	defer hl.free()
 	return hl.run()
 }

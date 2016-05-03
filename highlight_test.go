@@ -1,14 +1,11 @@
-package color_test
+package color
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/nhooyr/color"
 	"github.com/nhooyr/terminfo/caps"
 )
-
-var ti, tiErr = color.Ti, color.TiErr
 
 func exp(s string) string {
 	if tiErr != nil {
@@ -25,9 +22,9 @@ func expF(f string, s string) string {
 }
 
 func TestModes(t *testing.T) {
-	for k, v := range color.Modes {
+	for k, v := range modes {
 		exp := expF(ti.Strings[v]+"%s"+ti.Strings[caps.ExitAttributeMode], "hi")
-		r := color.Highlight(fmt.Sprintf("%%h[%s]hi%%r", k))
+		r := Highlight(fmt.Sprintf("%%h[%s]hi%%r", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
@@ -35,14 +32,14 @@ func TestModes(t *testing.T) {
 }
 
 func TestColors(t *testing.T) {
-	for k, v := range color.Colors {
+	for k, v := range colors {
 		exp := expF(ti.Color(v, -1)+"%s", "hi")
-		r := color.Highlight(fmt.Sprintf("%%h[fg%s]hi", k))
+		r := Highlight(fmt.Sprintf("%%h[fg%s]hi", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 		exp = expF(ti.Color(-1, v)+"%s", "hi")
-		r = color.Highlight(fmt.Sprintf("%%h[bg%s]hi", k))
+		r = Highlight(fmt.Sprintf("%%h[bg%s]hi", k))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
@@ -52,12 +49,12 @@ func TestColors(t *testing.T) {
 func TestColors256(t *testing.T) {
 	for i := 0; i < 256; i++ {
 		exp := expF(ti.Color(i, -1)+"%s"+ti.Strings[caps.ExitAttributeMode], "hi")
-		r := color.Highlight(fmt.Sprintf("%%h[fg%d]hi%%r", i))
+		r := Highlight(fmt.Sprintf("%%h[fg%d]hi%%r", i))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
 		exp = expF(ti.Color(-1, i)+"%s"+ti.Strings[caps.ExitAttributeMode], "hi")
-		r = color.Highlight(fmt.Sprintf("%%h[bg%d]hi%%r", i))
+		r = Highlight(fmt.Sprintf("%%h[bg%d]hi%%r", i))
 		if r != exp {
 			t.Errorf("Expected %q but result was %q", exp, r)
 		}
@@ -71,39 +68,39 @@ var combinations = map[string]string{
 
 func TestCombinations(t *testing.T) {
 	for k, v := range combinations {
-		if r := color.Highlight(k); r != v {
+		if r := Highlight(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)
 		}
 	}
 }
 
 var highlightEdgeCases = map[string]string{
-	"%h[fgBrightBlack+%h[fgBlue]": exp(ti.Color(caps.BrightBlack, -1)) + color.ErrBadAttr,
-	"%h[":                   color.ErrShort,
-	"%h{":                   color.ErrInvalid,
-	"%h[]":                  color.ErrMissing,
+	"%h[fgBrightBlack+%h[fgBlue]": exp(ti.Color(caps.BrightBlack, -1)) + errBadAttr,
+	"%h[":                   errShort,
+	"%h{":                   errInvalid,
+	"%h[]":                  errMissing,
 	"%%h[fgRed]":            "%%h[fgRed]",
 	"%[bg232]":              "%[bg232]",
-	"%h[fg132":              color.ErrShort,
-	"%h[fgMagenta[]":        color.ErrBadAttr,
-	"%h[fgGreen+lold[]":     exp(ti.Color(caps.Green, -1)) + color.ErrBadAttr,
-	"%h[fgYellow+%#bgBlue]": exp(ti.Color(caps.Yellow, -1)) + color.ErrBadAttr,
-	"%h][fgRed+%#bgBlue]":   color.ErrInvalid,
-	"%h[fgRed+":             exp(ti.Color(caps.Red, -1)) + color.ErrShort,
+	"%h[fg132":              errShort,
+	"%h[fgMagenta[]":        errBadAttr,
+	"%h[fgGreen+lold[]":     exp(ti.Color(caps.Green, -1)) + errBadAttr,
+	"%h[fgYellow+%#bgBlue]": exp(ti.Color(caps.Yellow, -1)) + errBadAttr,
+	"%h][fgRed+%#bgBlue]":   errInvalid,
+	"%h[fgRed+":             exp(ti.Color(caps.Red, -1)) + errShort,
 	"%%h%h[fgRed]%%":        "%%h" + exp(ti.Color(caps.Red, -1)) + "%%",
-	"%h[dsadadssadas]":      color.ErrBadAttr,
+	"%h[dsadadssadas]":      errBadAttr,
 	"%":                     "%",
-	"%h[fgsadas]":           color.ErrBadAttr,
-	"%h[fgCyan+%h[bgBlue]":  exp(ti.Color(caps.Cyan, -1)) + color.ErrBadAttr,
+	"%h[fgsadas]":           errBadAttr,
+	"%h[fgCyan+%h[bgBlue]":  exp(ti.Color(caps.Cyan, -1)) + errBadAttr,
 	"lmaokai":               "lmaokai",
-	"%h[fgRed]%h[]":         exp(ti.Color(caps.Red, -1)) + color.ErrMissing,
-	"%h[bgGjo]%h[bgGreen]":  color.ErrBadAttr,
-	"%h[fg23a]":             color.ErrBadAttr,
+	"%h[fgRed]%h[]":         exp(ti.Color(caps.Red, -1)) + errMissing,
+	"%h[bgGjo]%h[bgGreen]":  errBadAttr,
+	"%h[fg23a]":             errBadAttr,
 }
 
 func TestHighlightEdgeCases(t *testing.T) {
 	for k, v := range highlightEdgeCases {
-		if r := color.Highlight(k); r != v {
+		if r := Highlight(k); r != v {
 			t.Errorf("Expected %q from %q but result was %q", v, k, r)
 		}
 	}
@@ -117,7 +114,7 @@ var stripEdgeCases = map[string]string{
 
 func TestStripEdgeCases(t *testing.T) {
 	for k, v := range stripEdgeCases {
-		if r := color.Strip(k); r != v {
+		if r := Strip(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)
 		}
 	}
@@ -146,7 +143,7 @@ var result interface{}
 func BenchmarkHighlight(b *testing.B) {
 	var r string
 	for i := 0; i < b.N; i++ {
-		r = color.Highlight(s)
+		r = Highlight(s)
 	}
 	result = r
 }
@@ -154,7 +151,7 @@ func BenchmarkHighlight(b *testing.B) {
 func BenchmarkStrip(b *testing.B) {
 	var r string
 	for i := 0; i < b.N; i++ {
-		r = color.Strip(s)
+		r = Strip(s)
 	}
 	result = r
 }

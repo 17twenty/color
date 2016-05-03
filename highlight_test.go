@@ -138,20 +138,14 @@ const s = `%h[fgBlack]hi%r
 %h[fgBrightBlack+bgCyan+bold+underline+fg32+bg69]hi%r
 %h[fg32+bg123+bold+underline+bgBlue+fgBrightGreen+bgWhite]hi%r`
 
-var result interface{}
-
 func BenchmarkHighlight(b *testing.B) {
-	var r string
 	for i := 0; i < b.N; i++ {
-		r = Highlight(s)
+		Highlight(s)
 	}
-	result = r
 }
 
 func BenchmarkStrip(b *testing.B) {
-	var r string
 	for i := 0; i < b.N; i++ {
-		r = Strip(s)
+		Strip(s)
 	}
-	result = r
 }

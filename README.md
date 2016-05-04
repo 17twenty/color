@@ -2,6 +2,8 @@
 
 Color adds verbs to `fmt.Printf` for producing colored output.
 
+__note: things may change__
+
 ## Install
 ```
 go get github.com/nhooyr/color

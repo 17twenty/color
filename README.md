@@ -56,7 +56,7 @@ color.Eprintf(panicFormat, "dsda")
 ```
 
 ### Printer
-A `Printer` wraps around an `io.Writer`, but unlike `color.Fprintf`, it gives you full control over whether color output is enabled.
+A `Printer` writes to an `io.Writer`.
 
 ```go
 // "hi" with red foreground.

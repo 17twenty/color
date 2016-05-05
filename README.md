@@ -40,7 +40,6 @@ color.Printf("%h[fgGreen+bold]panic:%r %s\n", "rip")
 
 // Underlined "panic:" with a gray background then normal "rip".
 color.Printf("%h[bg8+underline]panic:%r %s\n", "rip")
-)
 ```
 
 ### Preparing Strings
@@ -54,7 +53,6 @@ panicFormat := color.Prepare("%h[fgMaroon+bold]panic:%r %s\n")
 color.Eprintf(panicFormat, "rip")
 color.Eprintf(panicFormat, "yippie")
 color.Eprintf(panicFormat, "dsda")
-)
 ```
 
 ### Printer
@@ -74,7 +72,6 @@ p.Eprintf(redFormat, "hi")
 // Otherwise it will be a normal "hi".
 p = color.NewPrinter(os.Stderr, color.IsTerminal(os.Stderr))
 p.Eprintf(redFormat, "hi")
-)
 ```
 
 ### `*log.Logger` wrapper
@@ -92,7 +89,6 @@ l.Eprintf(redFormat, "hi")
 // Otherwise it will be a normal "hi".
 l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, color.IsTerminal(os.Stderr))
 l.Efatalf(redFormat, "hi")
-)
 ```
 
 ### How does reset behave?

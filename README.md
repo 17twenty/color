@@ -111,3 +111,4 @@ color.Printf("%r%s", "hello")
 - [ ] Windows support
 - [x] Respect $TERM
 - [ ] Fully wrap \*log.Logger, perhaps a format string that defines the prefix, date, content etc. Perhaps another package?
+- [ ] color.Format docs

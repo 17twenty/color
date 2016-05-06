@@ -74,7 +74,7 @@ p = color.NewPrinter(os.Stderr, color.IsTerminal(os.Stderr))
 p.Printfp(redFormat, "hi")
 ```
 
-### `*log.Logger` wrapper
+### Logger, very similar to log.Logger
 ```go
 redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 // "hi" with a red foreground.
@@ -110,5 +110,5 @@ color.Printf("%r%s", "hello")
 - [ ] True color support (needs work in my terminfo package)
 - [ ] Windows support
 - [x] Respect $TERM
-- [ ] Fully wrap \*log.Logger, perhaps a format string that defines the prefix, date, content etc. Perhaps another package?
-- [ ] color.Format docs
+- [x] Seperate log package
+- [x] color.Format docs

@@ -59,9 +59,9 @@ color.Printfp(panicFormat, "dsda")
 A `Printer` writes to an `io.Writer`.
 
 ```go
+redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 // "hi" with red foreground.
 p := color.NewPrinter(os.Stderr, true)
-redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 p.Printfp(redFormat, "hi")
 
 // normal "hi", the highlight verbs are ignored.
@@ -76,9 +76,9 @@ p.Printfp(redFormat, "hi")
 
 ### `*log.Logger` wrapper
 ```go
+redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 // "hi" with a red foreground.
 l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, true)
-redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 l.Printfp(redFormat, "hi")
 
 // normal "hi", the highlight verbs are ignored.

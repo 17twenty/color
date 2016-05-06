@@ -49,9 +49,9 @@ func ExamplePrepare() {
 }
 
 func ExamplePrinter() {
+	redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 	// "hi" with red foreground.
 	p := color.NewPrinter(os.Stderr, true)
-	redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 	p.Printfp(redFormat, "hi")
 
 	// normal "hi", the highlight verbs are ignored.
@@ -65,9 +65,9 @@ func ExamplePrinter() {
 }
 
 func ExampleLogger() {
+	redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 	// "hi" with a red foreground.
 	l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, true)
-	redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 	l.Printfp(redFormat, "hi")
 
 	// normal "hi", the highlight verbs are ignored.

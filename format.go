@@ -18,7 +18,7 @@ func (f *Format) Get(color bool) string {
 	return f.stripped
 }
 
-// Append appends f2's strings to f's and returns the resulting Format.
+// Append appends f2 to f and returns the resulting Format.
 func (f *Format) Append(f2 *Format) *Format {
 	return &Format{f.colored + f2.colored, f.stripped + f2.stripped}
 }

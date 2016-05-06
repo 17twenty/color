@@ -37,18 +37,18 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.Logger.Panicf(Run(format, l.color), v...)
 }
 
-// Eprintf is the same as l.Printf but takes a prepared format struct.
-func (l *Logger) Eprintf(f *Format, v ...interface{}) {
+// Printfp is the same as l.Printf but takes a prepared format struct.
+func (l *Logger) Printfp(f *Format, v ...interface{}) {
 	l.Logger.Printf(f.Get(l.color), v...)
 }
 
-// Efatalf is the same as l.Fatalf but takes a prepared format struct.
-func (l *Logger) Efatalf(f *Format, v ...interface{}) {
+// Fatalfp is the same as l.Fatalf but takes a prepared format struct.
+func (l *Logger) Fatalfp(f *Format, v ...interface{}) {
 	l.Logger.Fatalf(f.Get(l.color), v...)
 }
 
-// Epanicf is the same as l.Panicf but takes a prepared format struct.
-func (l *Logger) Epanicf(f *Format, v ...interface{}) {
+// Panicfp is the same as l.Panicf but takes a prepared format struct.
+func (l *Logger) Panicfp(f *Format, v ...interface{}) {
 	l.Logger.Panicf(f.Get(l.color), v...)
 }
 

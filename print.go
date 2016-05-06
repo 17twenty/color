@@ -14,15 +14,15 @@ func Printf(format string, a ...interface{}) (n int, err error) {
 	return stdout.Printf(format, a...)
 }
 
-// Eprintf is the same as Printf but takes a prepared format struct.
-func Eprintf(f *Format, a ...interface{}) (n int, err error) {
-	return stdout.Eprintf(f, a...)
+// Printfp is the same as Printf but takes a prepared format struct.
+func Printfp(f *Format, a ...interface{}) (n int, err error) {
+	return stdout.Printfp(f, a...)
 }
 
 // Printer prints to a writer using highlight verbs.
 type Printer struct {
-	w     io.Writer
-	color bool // dictates whether highlight verbs are processed or stripped
+	w     io.Writer // underlying writer
+	color bool      // dictates whether highlight verbs are processed or stripped
 }
 
 // NewPrinter creates a new Printer that writes to out.
@@ -38,7 +38,7 @@ func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, Run(format, p.color), a...)
 }
 
-// Eprintf is the same as p.Printf but takes a prepared format struct.
-func (p *Printer) Eprintf(f *Format, a ...interface{}) (n int, err error) {
+// Printfp is the same as p.Printf but takes a prepared format struct.
+func (p *Printer) Printfp(f *Format, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, f.Get(p.color), a...)
 }

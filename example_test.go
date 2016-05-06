@@ -43,41 +43,41 @@ func ExamplePrepare() {
 
 	// If os.Stdout is a terminal, each will print a bolded "panic:" in red foreground
 	// and some normal text after. Otherwise each will print normally.
-	color.Eprintf(panicFormat, "rip")
-	color.Eprintf(panicFormat, "yippie")
-	color.Eprintf(panicFormat, "dsda")
+	color.Printfp(panicFormat, "rip")
+	color.Printfp(panicFormat, "yippie")
+	color.Printfp(panicFormat, "dsda")
 }
 
 func ExamplePrinter() {
 	// "hi" with red foreground.
 	p := color.NewPrinter(os.Stderr, true)
 	redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
-	p.Eprintf(redFormat, "hi")
+	p.Printfp(redFormat, "hi")
 
 	// normal "hi", the highlight verbs are ignored.
 	p = color.NewPrinter(os.Stderr, false)
-	p.Eprintf(redFormat, "hi")
+	p.Printfp(redFormat, "hi")
 
 	// If os.Stderr is a terminal, this will print in color.
 	// Otherwise it will be a normal "hi".
 	p = color.NewPrinter(os.Stderr, color.IsTerminal(os.Stderr))
-	p.Eprintf(redFormat, "hi")
+	p.Printfp(redFormat, "hi")
 }
 
 func ExampleLogger() {
 	// "hi" with a red foreground.
 	l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, true)
 	redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
-	l.Eprintf(redFormat, "hi")
+	l.Printfp(redFormat, "hi")
 
 	// normal "hi", the highlight verbs are ignored.
 	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, false)
-	l.Eprintf(redFormat, "hi")
+	l.Printfp(redFormat, "hi")
 
 	// If os.Stderr is a terminal, this will print in color.
 	// Otherwise it will be a normal "hi".
 	l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, color.IsTerminal(os.Stderr))
-	l.Efatalf(redFormat, "hi")
+	l.Fatalfp(redFormat, "hi")
 }
 
 func Example_reset() {

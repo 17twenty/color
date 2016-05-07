@@ -65,22 +65,6 @@ func ExamplePrinter() {
 	p.Printfp(redFormat, "hi")
 }
 
-func ExampleLogger() {
-	redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
-
-	// If os.Stderr is a terminal, this will print in color.
-	// Otherwise it will be a normal "hi".
-	log.Printfp(redFormat, "hi")
-
-	// normal "hi", the highlight verbs are ignored.
-	log.SetColor(false)
-	log.Printfp(redFormat, "hi")
-
-	// "hi" with a red foreground.
-	log.SetColor(true)
-	log.Fatalfp(redFormat, "hi")
-}
-
 func Example_reset() {
 	// "rip" will be printed with a navy foreground and gray background
 	// because we never reset the highlighting after "panic:". The navy foreground is

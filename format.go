@@ -1,8 +1,6 @@
 package color
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Format represents a format string with the highlight verbs fully parsed.
 type Format struct {
@@ -18,19 +16,20 @@ func (f *Format) Get(color bool) string {
 	return f.stripped
 }
 
-// Append appends f2 to f and returns the resulting Format.
+// Append appends f2's strings to f's and then returns the resulting Format.
 func (f *Format) Append(f2 *Format) *Format {
 	return &Format{f.colored + f2.colored, f.stripped + f2.stripped}
 }
 
-// Eprintf printfs the arguments into f and returns the resulting Format.
-func (f *Format) Eprintf(a ...interface{}) *Format {
-	return &Format{fmt.Sprintf(f.colored, a...), fmt.Sprintf(f.stripped, a...)}
+// AppendString appends s to both of f's strings and then returns the resulting Format.
+func (f *Format) AppendString(s string) *Format {
+	return &Format{f.colored + s, f.stripped + s}
 }
 
-// Eprintfp printfs f2 into f and returns the resulting Format.
-func (f *Format) Eprintfp(f2 *Format) *Format {
-	return &Format{fmt.Sprintf(f.colored, f2.colored), fmt.Sprintf(f.stripped, f2.stripped)}
+// Eprintf calls fmt.Sprintf using f's strings as the format strings
+// and then returns the resulting Format.
+func (f *Format) Eprintf(a ...interface{}) *Format {
+	return &Format{fmt.Sprintf(f.colored, a...), fmt.Sprintf(f.stripped, a...)}
 }
 
 // Prepare returns a Format structure using f as the base string.

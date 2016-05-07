@@ -53,6 +53,14 @@ panicFormat := color.Prepare("%h[fgRed+bold]panic:%r %s\n")
 color.Printfp(panicFormat, "foo")
 color.Printfp(panicFormat, "bar")
 color.Printfp(panicFormat, "foo")
+
+staticMessage := color.Prepare("%h[fgBlue+bold]HELLO%r")
+
+// Each will print "HELLO", but if standard output is a terminal,
+// "HELLO" will be printed in bold with a blue foreground.
+color.Println(staticMessage)
+color.Println(staticMessage)
+color.Println(staticMessage)
 ```
 
 ### Printer

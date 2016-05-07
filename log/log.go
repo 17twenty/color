@@ -4,7 +4,7 @@ It defines a Logger type with methods for formatting and printing output.
 
 It also defines a global standard Logger that writes to standard error. Color output
 will only be enabled if standard error is a terminal.
-Use the helper functions Printf[p], Fatalf[p], Panicf[p], and SetOutput to use it.
+Use the helper functions Printf[p], Fatalf[p], Panicf[p], and SetOutput to access it.
 */
 package log
 

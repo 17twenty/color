@@ -5,7 +5,7 @@ import (
 	"github.com/nhooyr/color/log"
 )
 
-func ExampleLogger() {
+func Example() {
 	redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
 
 	// If os.Stderr is a terminal, this will print in color.

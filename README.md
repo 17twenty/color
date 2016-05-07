@@ -122,3 +122,4 @@ color.Printf("%r%s", "foo")
 - [x] Seperate log package
 - [x] color.Format docs
 - [x] A better way to combine `color.Format`s
+- [ ] Logging/Printing/Format tests

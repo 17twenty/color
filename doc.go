@@ -26,11 +26,11 @@ Everything else is handled by the fmt package. You should read its documentation
 
 Preparing Strings
 
-While this package is heavily optimized, processing the highlighting verbs is still very expensive. Thus, it makes more sense to process the verbs once and store the result in a structure.
+While this package is heavily optimized, processing the highlighting verbs is still very expensive. Thus, it makes more sense to process the verbs once and store the results in a structure.
 
-The structure stores the colored and stripped versions of the base format string. In the colored string, the highlight verbs are replaced with their control sequences. In contrast, the highlight verbs are completely removed in the stripped string. Both are stored because if color output is enabled, the colored string is used, and if color output is disabled, the stripped string is used.
+This structure is named Format, and it holds the colored and stripped versions of the base format string. In the colored string, the highlight verbs are replaced with their control sequences. In contrast, the highlight verbs are completely removed in the stripped string. If color output is enabled, the colored string is used, but if color output is disabled, then the stripped string is used.
 
-Use Prepare to create the Format structures and use the Printfp like functions to print them. See Prepare below for an example.
+Use the Prepare function to create the Format structures and then use the Printfp like functions to print them. See Prepare below for an example.
 
 Attributes Reference
 

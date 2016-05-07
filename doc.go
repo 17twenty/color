@@ -27,7 +27,9 @@ Everything else is handled by the fmt package. You should read its documentation
 Preparing Strings
 
 While this package is very heavily optimized, processing the highlighting verbs is still expensive. Thus, it makes more sense to process the verbs once and then store the results in a Format structure.
+
 A structure is used over a simple string because it is necessary to store the colored and stripped versions of the base format string. In the colored string, the highlight verbs are replaced with their control sequences. In the stripped string, the highlight verbs are completely removed from the string.
+
 Use Prepare to create the Format structures and use the Printfp like functions to print the Format structures. See the Prepare example.
 
 Attributes Reference

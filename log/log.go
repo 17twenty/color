@@ -39,10 +39,38 @@ func (l *Logger) Printf(format string, v ...interface{}) {
 	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
 }
 
+// Print calls fmt.Fprint to print to the underlying writer.
+func (l *Logger) Print(v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	fmt.Fprint(l.out, v...)
+}
+
+// Println calls fmt.Fprintln to print to the underlying writer.
+func (l *Logger) Println(v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	fmt.Fprintln(l.out, v...)
+}
+
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
 func (l *Logger) Fatalf(format string, v ...interface{}) {
 	l.mu.Lock()
 	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
+	os.Exit(1)
+}
+
+// Fatal is equivalent to l.Print() followed by a call to os.Exit(1).
+func (l *Logger) Fatal(v ...interface{}) {
+	l.mu.Lock()
+	fmt.Fprint(l.out, v...)
+	os.Exit(1)
+}
+
+// Fatalln is equivalent to l.Println() followed by a call to os.Exit(1).
+func (l *Logger) Fatalln(v ...interface{}) {
+	l.mu.Lock()
+	fmt.Fprintln(l.out, v...)
 	os.Exit(1)
 }
 
@@ -51,6 +79,22 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	s := fmt.Sprintf(format, v...)
+	io.WriteString(l.out, s)
+	panic(s)
+}
+
+// Panic is equivalent to l.Print() followed by a call to panic().
+func (l *Logger) Panic(v ...interface{}) {
+	l.mu.Lock()
+	s := fmt.Sprint(v...)
+	io.WriteString(l.out, s)
+	panic(s)
+}
+
+// Panicln is equivalent to l.Println() followed by a call to panic().
+func (l *Logger) Panicln(v ...interface{}) {
+	l.mu.Lock()
+	s := fmt.Sprintln(v...)
 	io.WriteString(l.out, s)
 	panic(s)
 }
@@ -99,14 +143,44 @@ func Printf(format string, v ...interface{}) {
 	std.Printf(format, v...)
 }
 
+// Print calls the standard Logger's Printf method.
+func Print(format string, v ...interface{}) {
+	std.Print(v...)
+}
+
+// Println calls the standard Logger's Println method.
+func Println(format string, v ...interface{}) {
+	std.Println(v...)
+}
+
 // Fatalf calls the standard Logger's Fatalf method.
 func Fatalf(format string, v ...interface{}) {
 	std.Fatalf(format, v...)
 }
 
+// Fatal calls the standard Logger's Fatal method.
+func Fatal(format string, v ...interface{}) {
+	std.Fatal(v...)
+}
+
+// Fatalln calls the standard Logger's Fatalln method.
+func Fatalln(format string, v ...interface{}) {
+	std.Fatalln(v...)
+}
+
 // Panicf calls the standard Logger's Panicf method.
 func Panicf(format string, v ...interface{}) {
 	std.Panicf(format, v...)
+}
+
+// Panic calls the standard Logger's Panic method.
+func Panic(format string, v ...interface{}) {
+	std.Panic(v...)
+}
+
+// Panicln calls the standard Logger's Panicln method.
+func Panicln(format string, v ...interface{}) {
+	std.Panicln(v...)
 }
 
 // Printfp calls the standard Logger's Printfp method.

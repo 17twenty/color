@@ -40,6 +40,16 @@ func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, Run(format, p.color), a...)
 }
 
+// Print calls fmt.Fprint to print to the underlying writer.
+func (p *Printer) Print(a ...interface{}) (n int, err error) {
+	return fmt.Fprint(p.w, a...)
+}
+
+// Println calls fmt.Fprintln to print to the underlying writer.
+func (p *Printer) Println(a ...interface{}) (n int, err error) {
+	return fmt.Fprintln(p.w, a...)
+}
+
 // Printfp is the same as p.Printf but takes a prepared format struct.
 func (p *Printer) Printfp(f *Format, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, f.Get(p.color), a...)

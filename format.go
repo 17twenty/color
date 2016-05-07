@@ -21,13 +21,13 @@ func (f *Format) Append(f2 *Format) *Format {
 	return &Format{f.colored + f2.colored, f.stripped + f2.stripped}
 }
 
-// AppendString appends s to both of f's strings and then returns the resulting Format.
+// AppendString appends s to f's strings and then returns the resulting Format.
 func (f *Format) AppendString(s string) *Format {
 	return &Format{f.colored + s, f.stripped + s}
 }
 
-// Eprintf calls fmt.Sprintf using f's strings as the format strings
-// and then returns the resulting Format.
+// Eprintf calls fmt.Sprintf using f's strings and the rest of the arguments.
+// It then returns the resulting Format.
 func (f *Format) Eprintf(a ...interface{}) *Format {
 	return &Format{fmt.Sprintf(f.colored, a...), fmt.Sprintf(f.stripped, a...)}
 }

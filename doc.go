@@ -31,7 +31,7 @@ While this package is heavily optimized, processing the highlighting verbs is st
 
 A structure named Format is used for storage. It holds the colored and stripped versions of the base format string. In the colored string, the highlight verbs are replaced with their control sequences. In contrast, the highlight verbs are completely removed in the stripped string. Why both? If color output is enabled, the colored string is used, but if color output is disabled, then the stripped string is used.
 
-Use the Prepare function to create the Format structures and then use the Printfp like functions to print them. See Prepare below for an example.
+Use the Prepare function to create the Format structures. Then, use the Printfp like functions to use them as the base format strings, or send them as part of the variadic to any print function and they will be expanded to their appropiate strings. See Prepare below for an example.
 
 Attributes Reference
 

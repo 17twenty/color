@@ -75,7 +75,7 @@ p = color.New(os.Stderr, false)
 p.Printfp(redFormat, "bar")
 ```
 
-### 'github.com/nhooyr/color/log'
+### `github.com/nhooyr/color/log`
 ```go
 redFormat := color.Prepare("%h[fgRed]%s%r\n")
 

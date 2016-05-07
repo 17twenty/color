@@ -10,22 +10,22 @@ import (
 
 var std = New(os.Stdout, IsTerminal(os.Stdout))
 
-// Printf calls the standard Printer's Printf method.
+// Printf calls the standard output Printer's Printf method.
 func Printf(format string, a ...interface{}) (n int, err error) {
 	return std.Printf(format, a...)
 }
 
-// Printfp calls the standard Printer's Printfp method.
+// Printfp calls the standard output Printer's Printfp method.
 func Printfp(f *Format, a ...interface{}) (n int, err error) {
 	return std.Printfp(f, a...)
 }
 
-// Print calls the standard Printer's Print method.
+// Print calls the standard output Printer's Print method.
 func Print(a ...interface{}) (n int, err error) {
 	return std.Print(a...)
 }
 
-// Println calls the standard Printer's Println method.
+// Println calls the standard output Printer's Println method.
 func Println(a ...interface{}) (n int, err error) {
 	return std.Println(a...)
 }

@@ -60,35 +60,38 @@ A `Printer` writes to an `io.Writer`.
 
 ```go
 redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
-// "hi" with red foreground.
-p := color.NewPrinter(os.Stderr, true)
-p.Printfp(redFormat, "hi")
-
-// normal "hi", the highlight verbs are ignored.
-p = color.NewPrinter(os.Stderr, false)
-p.Printfp(redFormat, "hi")
 
 // If os.Stderr is a terminal, this will print in color.
 // Otherwise it will be a normal "hi".
-p = color.NewPrinter(os.Stderr, color.IsTerminal(os.Stderr))
+p = color.New(os.Stderr, color.IsTerminal(os.Stderr))
+p.Printfp(redFormat, "hi")
+
+// "hi" with red foreground.
+p := color.New(os.Stderr, true)
+p.Printfp(redFormat, "hi")
+
+// normal "hi", the highlight verbs are ignored.
+p = color.New(os.Stderr, false)
 p.Printfp(redFormat, "hi")
 ```
 
-### Logger, very similar to log.Logger
+### Logger
+Import `github.com/nhooyr/color/log` to use it.
+
 ```go
 redFormat := color.Prepare("%h[fgMaroon]%s%r\n")
-// "hi" with a red foreground.
-l := color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, true)
-l.Printfp(redFormat, "hi")
-
-// normal "hi", the highlight verbs are ignored.
-l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, false)
-l.Printfp(redFormat, "hi")
 
 // If os.Stderr is a terminal, this will print in color.
 // Otherwise it will be a normal "hi".
-l = color.NewLogger(os.Stderr, "%h[bold]color:%r ", log.LstdFlags, color.IsTerminal(os.Stderr))
-l.Efatalf(redFormat, "hi")
+log.Printfp(redFormat, "hi")
+
+// normal "hi", the highlight verbs are ignored.
+log.SetColor(false)
+log.Printfp(redFormat, "hi")
+
+// "hi" with a red foreground.
+log.SetColor(true)
+log.Fatalfp(redFormat, "hi")
 ```
 
 ### How does reset behave?

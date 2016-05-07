@@ -1,8 +1,10 @@
 /*
 Package log implements a simple logging package with support for highlight verbs.
 It defines a Logger type with methods for formatting and printing output.
-It also defines a global standard Logger that writes to standard error.
-Use the helper functions Printf[p], Fatalf[p], Panicf[p], and SetOutput to access it.
+
+It also defines a global standard Logger that writes to standard error. Color output
+will only be enabled if standard error is a terminal.
+Use the helper functions Printf[p], Fatalf[p], Panicf[p], and SetOutput to use it.
 */
 package log
 
@@ -29,8 +31,8 @@ func New(out io.Writer, color bool) *Logger {
 	return &Logger{out: out, color: color}
 }
 
-// Printf first processes the highlight verbs in format and then calls
-// l.Logger.Printf with the processed format and the other arguments.
+// Printf processes the highlight verbs in format and then calls
+// fmt.Fprintf to print to the underlying writer.
 func (l *Logger) Printf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -76,49 +78,58 @@ func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
 	panic(s)
 }
 
-// SetOutput sets the output destination for the Logger.
+// SetOutput sets the output destination.
 func (l *Logger) SetOutput(w io.Writer) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.out = w
 }
 
+// SetColor sets whether colored output is enabled.
+func (l *Logger) SetColor(color bool) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.color = color
+}
+
 var std = New(os.Stderr, color.IsTerminal(os.Stderr))
 
-// Printf first processes the highlight verbs in format and then calls
-// l.Logger.Printf with the processed format and the other arguments.
+// Printf calls the standard Logger's Printf method.
 func Printf(format string, v ...interface{}) {
 	std.Printf(format, v...)
 }
 
-// Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
+// Fatalf calls the standard Logger's Fatalf method.
 func Fatalf(format string, v ...interface{}) {
 	std.Fatalf(format, v...)
 }
 
-// Panicf is equivalent to l.Printf() followed by a call to panic().
+// Panicf calls the standard Logger's Panicf method.
 func Panicf(format string, v ...interface{}) {
 	std.Panicf(format, v...)
 }
 
-// Printfp is the same as l.Printf but takes a prepared format struct.
+// Printfp calls the standard Logger's Printfp method.
 func Printfp(f *color.Format, v ...interface{}) {
 	std.Printfp(f, v...)
 }
 
-// Fatalfp is the same as l.Fatalf but takes a prepared format struct.
+// Fatalfp calls the standard Logger's Fatalfp method.
 func Fatalfp(f *color.Format, v ...interface{}) {
 	std.Fatalfp(f, v...)
 }
 
-// Panicfp is the same as l.Panicf but takes a prepared format struct.
+// Panicfp calls the standard Logger's Panicfp method.
 func Panicfp(f *color.Format, v ...interface{}) {
 	std.Panicfp(f, v...)
 }
 
-// SetOutput sets the output destination for the Logger.
+// SetOutput sets the output destination of the standard Logger.
 func SetOutput(w io.Writer) {
 	std.SetOutput(w)
 }
 
-//TODO Enable/Disable color methods
+// SetColor sets whether colored output is enabled for the standard Logger.
+func SetColor(color bool) {
+	std.SetColor(color)
+}

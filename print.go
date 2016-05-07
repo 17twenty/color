@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var std = NewPrinter(os.Stdout, IsTerminal(os.Stdout))
+var std = New(os.Stdout, IsTerminal(os.Stdout))
 
 // Printf formats according to a format specifier or highlight verb and writes to standard
 // output. It returns the number of bytes written and any write error encountered.
@@ -25,10 +25,9 @@ type Printer struct {
 	color bool      // dictates whether highlight verbs are processed or stripped
 }
 
-// TODO RENAME
-// NewPrinter creates a new Printer that writes to out.
+// New creates a new Printer that writes to out.
 // The color argument dictates whether color output is enabled.
-func NewPrinter(out io.Writer, color bool) *Printer {
+func New(out io.Writer, color bool) *Printer {
 	return &Printer{out, color}
 }
 

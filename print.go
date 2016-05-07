@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 var std = New(os.Stdout, IsTerminal(os.Stdout))
@@ -41,4 +43,9 @@ func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 // Printfp is the same as p.Printf but takes a prepared format struct.
 func (p *Printer) Printfp(f *Format, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(p.w, f.Get(p.color), a...)
+}
+
+// IsTerminal returns true if f is a terminal and false otherwise.
+func IsTerminal(f *os.File) bool {
+	return terminal.IsTerminal(int(f.Fd()))
 }

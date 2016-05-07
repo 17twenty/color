@@ -39,6 +39,13 @@ func (l *Logger) Printf(format string, v ...interface{}) {
 	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
 }
 
+// Printfp is the same as l.Printf but takes a prepared format struct.
+func (l *Logger) Printfp(f *color.Format, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	fmt.Fprintf(l.out, f.Get(l.color), v...)
+}
+
 // Print calls fmt.Fprint to print to the underlying writer.
 func (l *Logger) Print(v ...interface{}) {
 	l.mu.Lock()
@@ -57,6 +64,13 @@ func (l *Logger) Println(v ...interface{}) {
 func (l *Logger) Fatalf(format string, v ...interface{}) {
 	l.mu.Lock()
 	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
+	os.Exit(1)
+}
+
+// Fatalfp is the same as l.Fatalf but takes a prepared format struct.
+func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
+	l.mu.Lock()
+	fmt.Fprintf(l.out, f.Get(l.color), v...)
 	os.Exit(1)
 }
 
@@ -83,9 +97,19 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	panic(s)
 }
 
+// Panicfp is the same as l.Panicf but takes a prepared format struct.
+func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	s := fmt.Sprintf(f.Get(l.color), v...)
+	io.WriteString(l.out, s)
+	panic(s)
+}
+
 // Panic is equivalent to l.Print() followed by a call to panic().
 func (l *Logger) Panic(v ...interface{}) {
 	l.mu.Lock()
+	defer l.mu.Unlock()
 	s := fmt.Sprint(v...)
 	io.WriteString(l.out, s)
 	panic(s)
@@ -94,30 +118,8 @@ func (l *Logger) Panic(v ...interface{}) {
 // Panicln is equivalent to l.Println() followed by a call to panic().
 func (l *Logger) Panicln(v ...interface{}) {
 	l.mu.Lock()
+	defer l.mu.Unlock()
 	s := fmt.Sprintln(v...)
-	io.WriteString(l.out, s)
-	panic(s)
-}
-
-// Printfp is the same as l.Printf but takes a prepared format struct.
-func (l *Logger) Printfp(f *color.Format, v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	fmt.Fprintf(l.out, f.Get(l.color), v...)
-}
-
-// Fatalfp is the same as l.Fatalf but takes a prepared format struct.
-func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
-	l.mu.Lock()
-	fmt.Fprintf(l.out, f.Get(l.color), v...)
-	os.Exit(1)
-}
-
-// Panicfp is the same as l.Panicf but takes a prepared format struct.
-func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	s := fmt.Sprintf(f.Get(l.color), v...)
 	io.WriteString(l.out, s)
 	panic(s)
 }

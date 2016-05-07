@@ -8,6 +8,7 @@ Verbs:
 	%h[attr...]	replaced with a SGR code that sets all of the attributes in []
 			multiple attributes are + separated
 	%r		an abbreviation for %h[reset]
+	%a		used by Format's Insert methods to combine Formats
 
 Errors:
 

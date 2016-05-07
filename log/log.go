@@ -41,7 +41,8 @@ func (l *Logger) Printf(format string, v ...interface{}) {
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
 func (l *Logger) Fatalf(format string, v ...interface{}) {
-	l.Printf(format, v...)
+	l.mu.Lock()
+	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
 	os.Exit(1)
 }
 
@@ -64,8 +65,7 @@ func (l *Logger) Printfp(f *color.Format, v ...interface{}) {
 // Fatalfp is the same as l.Fatalf but takes a prepared format struct.
 func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
-	l.Printfp(f, v...)
+	fmt.Fprintf(l.out, f.Get(l.color), v...)
 	os.Exit(1)
 }
 

@@ -14,7 +14,7 @@ Errors:
 If an error occurs, the generated string will contain a description of the problem, as in these examples.
 
 	Invalid character in the highlight verb:
-		Printf("%h(fgMaroon)%s", "hi"):		%!h(INVALID)
+		Printf("%h(fgRed)%s", "hi"):		%!h(INVALID)
 	No attributes in the highlight verb:
 		Printf("%h[]%s", "hi"):			%!h(MISSING)
 	Unknown attribute in the highlight verb:

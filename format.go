@@ -1,6 +1,9 @@
 package color
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Format represents a format string with the highlight verbs fully parsed.
 type Format struct {
@@ -30,6 +33,16 @@ func (f *Format) AppendString(s string) *Format {
 // It then returns the resulting Format.
 func (f *Format) Eprintf(a ...interface{}) *Format {
 	return &Format{fmt.Sprintf(f.colored, a...), fmt.Sprintf(f.stripped, a...)}
+}
+
+// Insert replaces "%a" in f's strings with f2's strings.
+func (f *Format) Insert(f2 *Format) *Format {
+	return &Format{strings.Replace(f.colored, "%a", f2.colored, 1), strings.Replace(f.stripped, "%a", f2.stripped, 1)}
+}
+
+// InsertEmpty replaces "%a" in f's strings with "">
+func (f *Format) InsertEmpty() *Format {
+	return &Format{strings.Replace(f.colored, "%a", "", 1), strings.Replace(f.stripped, "%a", "", 1)}
 }
 
 // Prepare returns a Format structure using f as the base string.

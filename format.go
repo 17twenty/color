@@ -40,7 +40,7 @@ func (f *Format) Insert(f2 *Format) *Format {
 	return &Format{strings.Replace(f.colored, "%a", f2.colored, 1), strings.Replace(f.stripped, "%a", f2.stripped, 1)}
 }
 
-// InsertEmpty replaces "%a" in f's strings with "">
+// InsertEmpty replaces "%a" in f's strings with "".
 func (f *Format) InsertEmpty() *Format {
 	return &Format{strings.Replace(f.colored, "%a", "", 1), strings.Replace(f.stripped, "%a", "", 1)}
 }

@@ -113,4 +113,4 @@ color.Printf("%r%s", "foo")
 - [x] Respect $TERM
 - [x] Seperate log package
 - [x] color.Format docs
-- [ ] A better way to combine color.Format's
+- [ ] A better way to combine `color.Format`s

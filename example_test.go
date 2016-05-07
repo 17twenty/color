@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/nhooyr/color"
-	"github.com/nhooyr/color/log"
 )
 
 func Example_attributes() {
@@ -53,11 +52,11 @@ func ExamplePrinter() {
 
 	// If os.Stderr is a terminal, this will print in color.
 	// Otherwise it will be a normal "hi".
-	p = color.New(os.Stderr, color.IsTerminal(os.Stderr))
+	p := color.New(os.Stderr, color.IsTerminal(os.Stderr))
 	p.Printfp(redFormat, "hi")
 
 	// "hi" with red foreground.
-	p := color.New(os.Stderr, true)
+	p = color.New(os.Stderr, true)
 	p.Printfp(redFormat, "hi")
 
 	// normal "hi", the highlight verbs are ignored.

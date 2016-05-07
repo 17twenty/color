@@ -32,7 +32,8 @@ func (f *Format) Eprintfp(a ...interface{}) *Format {
 			m[i] = f
 		}
 	}
-	rf := &Format{fmt.Sprintf(f.colored, a...)}
+	rf := new(Format)
+	rf.colored = fmt.Sprintf(f.colored, a...)
 	for i, f := range m {
 		a[i] = f.Get(false)
 	}

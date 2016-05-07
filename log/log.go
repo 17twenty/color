@@ -33,9 +33,11 @@ func New(out io.Writer, color bool) *Logger {
 
 // Printf processes the highlight verbs in format and then calls
 // fmt.Fprintf to print to the underlying writer.
+// It will expand each Format in v to its appropiate string before calling fmt.Fprintf.
 func (l *Logger) Printf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	color.Replace(l.color, v)
 	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
 }
 
@@ -43,26 +45,32 @@ func (l *Logger) Printf(format string, v ...interface{}) {
 func (l *Logger) Printfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	color.Replace(l.color, v)
 	fmt.Fprintf(l.out, f.Get(l.color), v...)
 }
 
 // Print calls fmt.Fprint to print to the underlying writer.
+// It will expand each Format in v to its appropiate string before calling fmt.Fprint.
 func (l *Logger) Print(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	color.Replace(l.color, v)
 	fmt.Fprint(l.out, v...)
 }
 
 // Println calls fmt.Fprintln to print to the underlying writer.
+// It will expand each Format in v to its appropiate string before calling fmt.Fprintln.
 func (l *Logger) Println(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	color.Replace(l.color, v)
 	fmt.Fprintln(l.out, v...)
 }
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
 func (l *Logger) Fatalf(format string, v ...interface{}) {
 	l.mu.Lock()
+	color.Replace(l.color, v)
 	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
 	os.Exit(1)
 }
@@ -70,6 +78,7 @@ func (l *Logger) Fatalf(format string, v ...interface{}) {
 // Fatalfp is the same as l.Fatalf but takes a prepared format struct.
 func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
+	color.Replace(l.color, v)
 	fmt.Fprintf(l.out, f.Get(l.color), v...)
 	os.Exit(1)
 }
@@ -77,6 +86,7 @@ func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
 // Fatal is equivalent to l.Print() followed by a call to os.Exit(1).
 func (l *Logger) Fatal(v ...interface{}) {
 	l.mu.Lock()
+	color.Replace(l.color, v)
 	fmt.Fprint(l.out, v...)
 	os.Exit(1)
 }
@@ -84,6 +94,7 @@ func (l *Logger) Fatal(v ...interface{}) {
 // Fatalln is equivalent to l.Println() followed by a call to os.Exit(1).
 func (l *Logger) Fatalln(v ...interface{}) {
 	l.mu.Lock()
+	color.Replace(l.color, v)
 	fmt.Fprintln(l.out, v...)
 	os.Exit(1)
 }
@@ -92,6 +103,7 @@ func (l *Logger) Fatalln(v ...interface{}) {
 func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	color.Replace(l.color, v)
 	s := fmt.Sprintf(format, v...)
 	io.WriteString(l.out, s)
 	panic(s)
@@ -101,6 +113,7 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	color.Replace(l.color, v)
 	s := fmt.Sprintf(f.Get(l.color), v...)
 	io.WriteString(l.out, s)
 	panic(s)
@@ -110,6 +123,7 @@ func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
 func (l *Logger) Panic(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	color.Replace(l.color, v)
 	s := fmt.Sprint(v...)
 	io.WriteString(l.out, s)
 	panic(s)
@@ -119,6 +133,7 @@ func (l *Logger) Panic(v ...interface{}) {
 func (l *Logger) Panicln(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	color.Replace(l.color, v)
 	s := fmt.Sprintln(v...)
 	io.WriteString(l.out, s)
 	panic(s)

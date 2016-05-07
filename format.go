@@ -1,14 +1,16 @@
 package color
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
 // Format represents a format string with the highlight verbs fully parsed.
 type Format struct {
 	colored  string // highlight verbs replaced with their escape sequences
 	stripped string // highlight verbs stripped
+}
+
+// Prepare returns a Format structure using f as the base string.
+func Prepare(f string) *Format {
+	return &Format{Highlight(f), Strip(f)}
 }
 
 // Get returns the colored string if color is true, and the stripped string otherwise.
@@ -25,17 +27,11 @@ func (f *Format) Eprintf(a ...interface{}) *Format {
 	return &Format{fmt.Sprintf(f.colored, a...), fmt.Sprintf(f.stripped, a...)}
 }
 
-// Insert replaces "%a" in f's strings with f2's strings.
-func (f *Format) Insert(f2 *Format) *Format {
-	return &Format{strings.Replace(f.colored, "%a", f2.colored, 1), strings.Replace(f.stripped, "%a", f2.stripped, 1)}
-}
-
-// InsertEmpty replaces "%a" in f's strings with "".
-func (f *Format) InsertEmpty() *Format {
-	return &Format{strings.Replace(f.colored, "%a", "", 1), strings.Replace(f.stripped, "%a", "", 1)}
-}
-
-// Prepare returns a Format structure using f as the base string.
-func Prepare(f string) *Format {
-	return &Format{Highlight(f), Strip(f)}
+// Replace replaces each Format in a with its appropiate string according to color.
+func Replace(color bool, a []interface{}) {
+	for i, v := range a {
+		if f, ok := v.(*Format); ok {
+			a[i] = f.Get(color)
+		}
+	}
 }

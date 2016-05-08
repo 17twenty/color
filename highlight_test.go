@@ -22,6 +22,7 @@ func expF(f string, s string) string {
 }
 
 func TestModes(t *testing.T) {
+	t.Parallel()
 	for k, v := range modes {
 		exp := expF(ti.Strings[v]+"%s"+ti.Strings[caps.ExitAttributeMode], "hi")
 		r := Highlight(fmt.Sprintf("%%h[%s]hi%%r", k))
@@ -32,6 +33,7 @@ func TestModes(t *testing.T) {
 }
 
 func TestColors(t *testing.T) {
+	t.Parallel()
 	for k, v := range colors {
 		exp := expF(ti.Color(v, -1)+"%s", "hi")
 		r := Highlight(fmt.Sprintf("%%h[fg%s]hi", k))
@@ -47,6 +49,7 @@ func TestColors(t *testing.T) {
 }
 
 func TestColors256(t *testing.T) {
+	t.Parallel()
 	for i := 0; i < 256; i++ {
 		exp := expF(ti.Color(i, -1)+"%s"+ti.Strings[caps.ExitAttributeMode], "hi")
 		r := Highlight(fmt.Sprintf("%%h[fg%d]hi%%r", i))
@@ -67,6 +70,7 @@ var combinations = map[string]string{
 }
 
 func TestCombinations(t *testing.T) {
+	t.Parallel()
 	for k, v := range combinations {
 		if r := Highlight(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)
@@ -99,6 +103,7 @@ var highlightEdgeCases = map[string]string{
 }
 
 func TestHighlightEdgeCases(t *testing.T) {
+	t.Parallel()
 	for k, v := range highlightEdgeCases {
 		if r := Highlight(k); r != v {
 			t.Errorf("Expected %q from %q but result was %q", v, k, r)
@@ -113,6 +118,7 @@ var stripEdgeCases = map[string]string{
 }
 
 func TestStripEdgeCases(t *testing.T) {
+	t.Parallel()
 	for k, v := range stripEdgeCases {
 		if r := Strip(k); r != v {
 			t.Errorf("Expected %q but result was %q", v, r)

@@ -21,15 +21,14 @@ func (f *Format) Get(color bool) string {
 	return f.stripped
 }
 
-// Eprintf calls fmt.Sprintf using f's strings and the rest of the arguments.
-// It will expand each Format in a to its appropiate string before calling Sprintf.
-// It then returns the resulting Format.
+// Eprintf calls fmt.Sprintf with each of f's strings and the variadic arguments. It stores
+// the results into a new Format that is returnt.
+// It will expand each Format in a to its appropiate string before calling fmt.Sprintf.
 func (f *Format) Eprintf(a ...interface{}) *Format {
 	m := make(map[int]*Format)
 	for i, v := range a {
 		if f, ok := v.(*Format); ok {
-			a[i] = f.Get(true)
-			m[i] = f
+			a[i], m[i] = f.Get(true), f
 		}
 	}
 	rf := new(Format)
@@ -41,8 +40,8 @@ func (f *Format) Eprintf(a ...interface{}) *Format {
 	return rf
 }
 
-// Replace replaces each Format in a with its appropiate string according to color.
-func Replace(color bool, a []interface{}) {
+// Replace replaces each Format in a with its appropriate string according to color.
+func Replace(a []interface{}, color bool) {
 	for i, v := range a {
 		if f, ok := v.(*Format); ok {
 			a[i] = f.Get(color)

@@ -10,11 +10,11 @@ Verbs:
 	%r		an abbreviation for %h[reset]
 	%a		used by Format's Insert methods to combine Formats
 
-To print, you must first call Prepare with the format string. It will return a Format structure that represents the base string with the highlight verbs fully parsed. Why?
+To print, you must first call Prepare with the format string. It will return a Format structure that represents the format string with the highlight verbs fully parsed. Why?
 
 While this package is heavily optimized, processing the highlighting verbs is still very expensive. Thus, it makes more sense to process the verbs once and then store the results.
 
-The Formatstructure is used for storage. It holds the colored and stripped versions of the base format string. In the colored string, the highlight verbs are replaced with their control sequences. In contrast, the highlight verbs are completely removed in the stripped string. Why store both? If color output is enabled, the colored string is used, but if color output is disabled, then the stripped string is used.
+The Format structure is used for storage. It holds the colored and stripped versions of the base format string. In the colored string, the highlight verbs are replaced with their control sequences. In contrast, the highlight verbs are completely removed in the stripped string. Why store both? If color output is enabled, the colored string is used, but if color output is disabled, then the stripped string is used.
 
 Errors:
 

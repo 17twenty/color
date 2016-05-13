@@ -21,7 +21,7 @@ color.Printf("%h[fgRed]red text: %s%r\n", "bar")
 color.Printf("%h[fgRed]red text: %s%r\n", "foo")
 ```
 
-The highlight verbs are parsed every single time `color.Printf` is called. However, they only need to be parsed once.
+The highlight verbs were parsed every single time `color.Printf` was called. However, they only need to be parsed once.
 
 Thus, now it works like this:
 

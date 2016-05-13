@@ -10,6 +10,8 @@ Verbs:
 	%r		an abbreviation for %h[reset]
 	%a		used by Format's Insert methods to combine Formats
 
+Preparing:
+
 Before printing, Prepare must be called with the format string. It will return a Format structure that represents the format string with the highlight verbs fully parsed. Why?
 
 While this package is heavily optimized, processing the highlighting verbs is still expensive. Thus, it makes more sense to process the verbs once and then store the results into a Format structure.

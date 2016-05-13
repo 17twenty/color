@@ -51,7 +51,7 @@ func Example_printing() {
 	// arguments to any Print like function.
 
 	// f is printed and used as the format.
-	color.Printf(f, "ola")
+	color.Printf(f, "foo")
 
 	// f is simply printed.
 	color.Print(f)

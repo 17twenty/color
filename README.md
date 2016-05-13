@@ -10,7 +10,7 @@ go get github.com/nhooyr/color
 ```
 
 ## Examples
-See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
+See [godoc](https://godoc.org/github.com/nhooyr/color) for more information, especially for a better understanding of `color.Prepare`.
 
 ### Setting Attributes
 ```go
@@ -50,7 +50,7 @@ f = color.Prepare("%h[bg8+underline]panic:%r %s\n")
 color.Printf(f, "bar")
 ```
 
-### The Two Methods of Printing
+### Printing
 ```go
 f := color.Prepare("%h[fgBrightMagenta+underline]panic:%r %s\n")
 
@@ -59,7 +59,7 @@ f := color.Prepare("%h[fgBrightMagenta+underline]panic:%r %s\n")
 // arguments to any Print like function.
 
 // f is printed and used as the format.
-color.Printf(f, "ola")
+color.Printf(f, "foo")
 
 // f is simply printed.
 color.Print(f)

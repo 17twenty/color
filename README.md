@@ -21,7 +21,10 @@ color.Printf("%h[fgRed]red text: %s%r\n", "bar")
 color.Printf("%h[fgRed]red text: %s%r\n", "foo")
 ```
 
-but now it works like this
+The highlight verbs were parsed every single time `color.Printf` was called but they only had to be parsed once.
+
+The solution is to call `color.Prepare` with the format string first. This will parse the highlight verbs once and store the result into a `color.Format` structure.
+This allows allows reptiive printing with minimal overhead.
 
 ```go
 f := color.Prepare("%h[fgRed]red text: %s%r\n")
@@ -29,10 +32,6 @@ color.Printf(f, "bar")
 color.Printf(f, "foo")
 color.Printf(f, "bar")
 ```
-
-In the previous API, the highlight verbs were parsed every single time you call `color.Printf`.
-
-In contrast, with `color.Prepare`, they are only parsed once and then stored into a `color.Format` which allows repetitive printing with minimal overhead.
 
 ### Setting Attributes
 ```go

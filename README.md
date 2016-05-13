@@ -2,7 +2,7 @@
 
 Color extends `fmt.Printf` with verbs for producing colored output.
 
-__note: things may change but it looks pretty stable. If you have any new ideas, let me know ASAP__
+__note: things may change but it looks pretty stable. If you have any new ideas, let me know__
 
 ## Install
 ```

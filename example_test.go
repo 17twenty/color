@@ -46,10 +46,14 @@ func Example_mixing() {
 func Example_printing() {
 	f := color.Prepare("%h[fgBrightMagenta+underline]panic:%r %s\n")
 
-	// f is expanded and used as the format string.
+	// There are two methods of printing a color.Format, either as the
+	// format to a Printf like function, or as one of the variadic
+	// arguments to any Print like function.
+
+	// f is printed and used as the format.
 	color.Printf(f, "ola")
 
-	// f is expanded, but simply printed.
+	// f is simply printed.
 	color.Print(f)
 }
 

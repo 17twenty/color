@@ -30,7 +30,9 @@ color.Printf(f, "foo")
 color.Printf(f, "bar")
 ```
 
-In the previous API, the highlight verbs were parsed every single time you call `color.Printf` whereas with `color.Prepare`, they are only parsed once and then stored into a `color.Format` which allows repetitive printing with minimal overhead.
+In the previous API, the highlight verbs were parsed every single time you call `color.Printf`.
+
+In contrast, with `color.Prepare`, they are only parsed once and then stored into a `color.Format` which allows repetitive printing with minimal overhead.
 
 ### Setting Attributes
 ```go

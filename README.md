@@ -13,7 +13,7 @@ go get github.com/nhooyr/color
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
 ####  Why Prepare?
-Previously. `color.Printf` worked like this:
+Previously, `color.Printf` worked like this:
 
 ```go
 color.Printf("%h[fgRed]red text: %s%r\n", "foo")

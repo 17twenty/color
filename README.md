@@ -32,7 +32,7 @@ color.Printf(f, "foo")
 color.Printf(f, "bar")
 ```
 
-`color.Prepare` parses the highlight verbs once and stores the result into a `color.Format` structure. This allows repetitive printing with minimal overhead.
+`color.Prepare` parses the highlight verbs and stores the result in a `color.Format` structure. This allows repetitive printing with minimal overhead.
 
 ### Setting Attributes
 ```go

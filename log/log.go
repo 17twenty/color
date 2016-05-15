@@ -37,7 +37,7 @@ func New(out io.Writer, color bool) *Logger {
 func (l *Logger) Printf(f interface{}, a ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
+	color.ExpandFormats(a, l.color)
 	switch v := f.(type) {
 	case string:
 		fmt.Fprintf(l.out, color.Run(v, l.color), a...)
@@ -53,7 +53,7 @@ func (l *Logger) Printf(f interface{}, a ...interface{}) {
 func (l *Logger) Print(a ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
+	color.ExpandFormats(a, l.color)
 	fmt.Fprint(l.out, a...)
 }
 
@@ -62,7 +62,7 @@ func (l *Logger) Print(a ...interface{}) {
 func (l *Logger) Println(a ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
+	color.ExpandFormats(a, l.color)
 	fmt.Fprintln(l.out, a...)
 }
 
@@ -75,7 +75,7 @@ func (l *Logger) Fatalf(f interface{}, a ...interface{}) {
 // Fatal is equivalent to l.Print() followed by a call to os.Exit(1).
 func (l *Logger) Fatal(a ...interface{}) {
 	l.mu.Lock()
-	color.Replace(a, l.color)
+	color.ExpandFormats(a, l.color)
 	fmt.Fprint(l.out, a...)
 	os.Exit(1)
 }
@@ -83,7 +83,7 @@ func (l *Logger) Fatal(a ...interface{}) {
 // Fatalln is equivalent to l.Println() followed by a call to os.Exit(1).
 func (l *Logger) Fatalln(a ...interface{}) {
 	l.mu.Lock()
-	color.Replace(a, l.color)
+	color.ExpandFormats(a, l.color)
 	fmt.Fprintln(l.out, a...)
 	os.Exit(1)
 }
@@ -92,7 +92,7 @@ func (l *Logger) Fatalln(a ...interface{}) {
 func (l *Logger) Panicf(f interface{}, a ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
+	color.ExpandFormats(a, l.color)
 	var s string
 	switch v := f.(type) {
 	case string:
@@ -110,7 +110,7 @@ func (l *Logger) Panicf(f interface{}, a ...interface{}) {
 func (l *Logger) Panic(a ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
+	color.ExpandFormats(a, l.color)
 	s := fmt.Sprint(a...)
 	io.WriteString(l.out, s)
 	panic(s)
@@ -120,7 +120,7 @@ func (l *Logger) Panic(a ...interface{}) {
 func (l *Logger) Panicln(an ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(an, l.color)
+	color.ExpandFormats(an, l.color)
 	s := fmt.Sprintln(an...)
 	io.WriteString(l.out, s)
 	panic(s)
@@ -143,7 +143,7 @@ func (l *Logger) SetColor(color bool) {
 var std = New(os.Stderr, color.IsTerminal(os.Stderr))
 
 // Printf calls the standard Logger's Printf method.
-func Printf(f *color.Format, a ...interface{}) {
+func Printf(f interface{}, a ...interface{}) {
 	std.Printf(f, a...)
 }
 
@@ -158,7 +158,7 @@ func Println(a ...interface{}) {
 }
 
 // Fatalf calls the standard Logger's Fatalf method.
-func Fatalf(f *color.Format, a ...interface{}) {
+func Fatalf(f interface{}, a ...interface{}) {
 	std.Fatalf(f, a...)
 }
 
@@ -173,7 +173,7 @@ func Fatalln(a ...interface{}) {
 }
 
 // Panicf calls the standard Logger's Panicf method.
-func Panicf(f *color.Format, a ...interface{}) {
+func Panicf(f interface{}, a ...interface{}) {
 	std.Panicf(f, a...)
 }
 

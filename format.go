@@ -40,8 +40,8 @@ func (f *Format) Eprintf(a ...interface{}) *Format {
 	return rf
 }
 
-// Replace replaces each Format in a with its appropriate string according to color.
-func Replace(a []interface{}, color bool) {
+// ExpandFormat replaces each Format in a with its appropriate string according to color.
+func ExpandFormats(a []interface{}, color bool) {
 	for i, v := range a {
 		if f, ok := v.(*Format); ok {
 			a[i] = f.Get(color)

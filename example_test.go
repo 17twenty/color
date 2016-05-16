@@ -1,7 +1,6 @@
 package color_test
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/nhooyr/color"
@@ -67,21 +66,7 @@ func ExamplePrinter() {
 	p = color.New(os.Stderr, true)
 	p.Printfp(redFormat, "foo")
 
-	// normal "bar", the highlight verbs are ignored.
+	// Normal "bar", the highlight verbs are ignored.
 	p = color.New(os.Stderr, false)
 	p.Printfp(redFormat, "bar")
-}
-
-func Example_reset() {
-	// "hello" will be printed with a black foreground and bright green background
-	// because we never reset the highlighting after "panic:". The black foreground is
-	// carried on from "panic:".
-	color.Printf("%h[fgBlack+bgBrightRed]panic: %h[bgBrightGreen]%s", "hello")
-
-	// The attributes carry onto anything written to the terminal until reset.
-	// This prints "world" in the same attributes as above.
-	fmt.Println("world")
-
-	// Resets the highlighting and then prints "hello" normally.
-	color.Printf("%r%s", "foo")
 }

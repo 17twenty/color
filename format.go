@@ -28,8 +28,7 @@ func (f *Format) Eprintfp(a ...interface{}) *Format {
 	m := make(map[int]*Format)
 	for i, v := range a {
 		if f, ok := v.(*Format); ok {
-			a[i] = f.Get(true)
-			m[i] = f
+			a[i], m[i] = f.Get(true), f
 		}
 	}
 	rf := new(Format)
@@ -41,8 +40,8 @@ func (f *Format) Eprintfp(a ...interface{}) *Format {
 	return rf
 }
 
-// Replace replaces each Format in a with its appropiate string according to color.
-func Replace(color bool, a []interface{}) {
+// ExpandFormats replaces each Format in a with its appropiate string according to color.
+func ExpandFormats(color bool, a []interface{}) {
 	for i, v := range a {
 		if f, ok := v.(*Format); ok {
 			a[i] = f.Get(color)

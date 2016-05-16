@@ -12,7 +12,7 @@ func Example() {
 	// Otherwise it will be a normal "foo".
 	log.Printfp(redFormat, "foo")
 
-	// normal "bar", the highlight verbs are ignored.
+	// Normal "bar", the highlight verbs are ignored.
 	log.SetColor(false)
 	log.Printfp(redFormat, "bar")
 

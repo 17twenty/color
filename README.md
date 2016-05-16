@@ -2,7 +2,7 @@
 
 Color extends `fmt.Printf` with verbs for producing colored output.
 
-__note: things may change but it looks pretty stable. If you have any new ideas, let me know ASAP__
+__note: things may change but it looks pretty stable. Email me know if you have any new ideas.__
 
 ## Install
 ```
@@ -42,7 +42,7 @@ color.Printf("%h[fgGreen+bold]panic:%r %s\n", "foo")
 color.Printf("%h[bg8+underline]panic:%r %s\n", "bar")
 ```
 
-### Preparing Strings
+### Preparing
 ```go
 // Prepare only processes the highlight verbs in the string,
 // letting you print it repeatedly with performance.
@@ -78,7 +78,7 @@ p.Printfp(redFormat, "bar")
 p = color.New(os.Stderr, true)
 p.Printfp(redFormat, "foo")
 
-// normal "bar", the highlight verbs are ignored.
+// Normal "bar", the highlight verbs are ignored.
 p = color.New(os.Stderr, false)
 p.Printfp(redFormat, "bar")
 ```
@@ -91,7 +91,7 @@ redFormat := color.Prepare("%h[fgRed]%s%r\n")
 // Otherwise it will be a normal "foo".
 log.Printfp(redFormat, "foo")
 
-// normal "bar", the highlight verbs are ignored.
+// Normal "bar", the highlight verbs are ignored.
 log.SetColor(false)
 log.Printfp(redFormat, "bar")
 
@@ -100,23 +100,8 @@ log.SetColor(true)
 log.Fatalfp(redFormat, "foo")
 ```
 
-### How does reset behave?
-```go
-// "hello" will be printed with a black foreground and bright green background
-// because we never reset the highlighting after "panic:". The black foreground is
-// carried on from "panic:".
-color.Printf("%h[fgBlack+bgBrightRed]panic: %h[bgBrightGreen]%s", "hello")
-
-// The attributes carry onto anything written to the terminal until reset.
-// This prints "world" in the same attributes as above.
-fmt.Println("world")
-
-// Resets the highlighting and then prints "hello" normally.
-color.Printf("%r%s", "foo")
-```
-
 ## TODO
-- [ ] True color support (needs work in my terminfo package)
+- [ ] True color support
 - [ ] Windows support
 - [x] Respect $TERM
 - [x] Seperate log package

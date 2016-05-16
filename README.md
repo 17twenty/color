@@ -120,7 +120,7 @@ color.Printf(f, "foo")
 ```
 
 ## TODO
-- [ ] True color support
+- [ ] True color support (needs work in my terminfo package)
 - [ ] Windows support
 - [x] Respect $TERM
 - [x] Seperate log package

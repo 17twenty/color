@@ -11,7 +11,7 @@ import (
 // Printer prints to a writer using highlight verbs.
 type Printer struct {
 	out   io.Writer // underlying writer
-	color bool      // dictates whether highlight verbs are processed or stripped
+	color bool      // enable color output
 }
 
 // New creates a new Printer that writes to out.
@@ -22,7 +22,7 @@ func New(out io.Writer, color bool) *Printer {
 
 // Printf first processes the highlight verbs in format and then calls
 // fmt.Fprintf with the processed format and the other arguments.
-// It will expand each Format in a to its appropiate string before calling Printf.
+// It will expand each Format in a to its appropiate string before calling fmt.Fprintf.
 // It returns the number of bytes written an any write error encountered.
 func (p *Printer) Printf(format string, a ...interface{}) (n int, err error) {
 	ExpandFormats(p.color, a)
@@ -36,14 +36,14 @@ func (p *Printer) Printfp(f *Format, a ...interface{}) (n int, err error) {
 }
 
 // Print calls fmt.Fprint to print to the underlying writer.
-// It will expand each Format in a to its appropiate string before calling Print.
+// It will expand each Format in a to its appropiate string before calling fmt.Fprint.
 func (p *Printer) Print(a ...interface{}) (n int, err error) {
 	ExpandFormats(p.color, a)
 	return fmt.Fprint(p.out, a...)
 }
 
 // Println calls fmt.Fprintln to print to the underlying writer.
-// It will expand each Format in a to its appropiate string before calling Println.
+// It will expand each Format in a to its appropiate string before calling fmt.Fprintln.
 func (p *Printer) Println(a ...interface{}) (n int, err error) {
 	ExpandFormats(p.color, a)
 	return fmt.Fprintln(p.out, a...)

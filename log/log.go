@@ -17,7 +17,7 @@ import (
 	"github.com/nhooyr/color"
 )
 
-// Logger is a very simple logger similar to log.Logger but it supports the highlight verbs.
+// Logger is a very simple logger that supports highlight verbs.
 type Logger struct {
 	mu    sync.Mutex // ensures atomic writes
 	out   io.Writer  // destination for output
@@ -160,6 +160,11 @@ func Printf(format string, v ...interface{}) {
 	std.Printf(format, v...)
 }
 
+// Printfp calls the standard Logger's Printfp method.
+func Printfp(f *color.Format, v ...interface{}) {
+	std.Printfp(f, v...)
+}
+
 // Print calls the standard Logger's Printf method.
 func Print(v ...interface{}) {
 	std.Print(v...)
@@ -170,14 +175,14 @@ func Println(v ...interface{}) {
 	std.Println(v...)
 }
 
-// Printfp calls the standard Logger's Printfp method.
-func Printfp(f *color.Format, v ...interface{}) {
-	std.Printfp(f, v...)
-}
-
 // Fatalf calls the standard Logger's Fatalf method.
 func Fatalf(format string, v ...interface{}) {
 	std.Fatalf(format, v...)
+}
+
+// Fatalfp calls the standard Logger's Fatalfp method.
+func Fatalfp(f *color.Format, v ...interface{}) {
+	std.Fatalfp(f, v...)
 }
 
 // Fatal calls the standard Logger's Fatal method.
@@ -190,14 +195,14 @@ func Fatalln(v ...interface{}) {
 	std.Fatalln(v...)
 }
 
-// Fatalfp calls the standard Logger's Fatalfp method.
-func Fatalfp(f *color.Format, v ...interface{}) {
-	std.Fatalfp(f, v...)
-}
-
 // Panicf calls the standard Logger's Panicf method.
 func Panicf(format string, v ...interface{}) {
 	std.Panicf(format, v...)
+}
+
+// Panicfp calls the standard Logger's Panicfp method.
+func Panicfp(f *color.Format, v ...interface{}) {
+	std.Panicfp(f, v...)
 }
 
 // Panic calls the standard Logger's Panic method.
@@ -208,11 +213,6 @@ func Panic(v ...interface{}) {
 // Panicln calls the standard Logger's Panicln method.
 func Panicln(v ...interface{}) {
 	std.Panicln(v...)
-}
-
-// Panicfp calls the standard Logger's Panicfp method.
-func Panicfp(f *color.Format, v ...interface{}) {
-	std.Panicfp(f, v...)
 }
 
 // SetOutput sets the output destination of the standard Logger.

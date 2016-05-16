@@ -18,7 +18,7 @@ It holds the colored and stripped versions of the base format string. In the col
 
 There are two methods to print these Format structures. One, the Printf like functions take a Format structure that they will appropriately expand and use as the format string. Two, every Print like function's variadic arguments can contain Format structures; they will be expanded to their appropriate strings.
 
-See Example (Printing) for an example of both methods.
+See Example (Printing)
 
 Errors:
 

@@ -12,8 +12,8 @@ go get github.com/nhooyr/color
 ## Examples
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
-####  Why Prepare?
-Previously, `color.Printf` directly took a string but this was removed because the highlight verbs only need to be parsed once.
+####  Why `color.Prepare`?
+Previously, the `color.Printf` directly took a string but this was removed because the highlight verbs only need to be parsed once.
 `color.Prepare` parses them once and stores them in a `color.Format` structure to allow repetitive printing with minimal overhead.
 
 ### Setting Attributes

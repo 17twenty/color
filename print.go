@@ -25,22 +25,27 @@ func New(out io.Writer, color bool) *Printer {
 // It will expand each Format in v to its appropiate string before calling fmt.Fprintf.
 // It returns the number of bytes written an any write error encountered.
 func (p *Printer) Printf(f *Format, a ...interface{}) (n int, err error) {
-	Replace(a, p.color)
+	Replace(p.color, a)
 	return fmt.Fprintf(p.out, f.Get(p.color), a...)
 }
 
 // Print calls fmt.Fprint to print to the underlying writer.
 // It will expand each Format in a to its appropiate string before calling Print.
 func (p *Printer) Print(a ...interface{}) (n int, err error) {
-	Replace(a, p.color)
+	Replace(p.color, a)
 	return fmt.Fprint(p.out, a...)
 }
 
 // Println calls fmt.Fprintln to print to the underlying writer.
 // It will expand each Format in a to its appropiate string before calling Println.
 func (p *Printer) Println(a ...interface{}) (n int, err error) {
-	Replace(a, p.color)
+	Replace(p.color, a)
 	return fmt.Fprintln(p.out, a...)
+}
+
+// IsTerminal returns true if f is a terminal and false otherwise.
+func IsTerminal(f *os.File) bool {
+	return terminal.IsTerminal(int(f.Fd()))
 }
 
 var std = New(os.Stdout, IsTerminal(os.Stdout))
@@ -58,9 +63,4 @@ func Print(a ...interface{}) (n int, err error) {
 // Println calls the standard output Printer's Println method.
 func Println(a ...interface{}) (n int, err error) {
 	return std.Println(a...)
-}
-
-// IsTerminal returns true if f is a terminal and false otherwise.
-func IsTerminal(f *os.File) bool {
-	return terminal.IsTerminal(int(f.Fd()))
 }

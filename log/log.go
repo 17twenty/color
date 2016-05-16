@@ -4,7 +4,7 @@ It defines a Logger type with methods for formatting and printing output.
 
 It also defines a global standard Logger that writes to standard error. Color output
 will only be enabled if standard error is a terminal.
-Use the helper functions Printf, Fatalf, Panicf, SetOutput and SetColor to access it.
+Use the helper functions Printf[p], Fatalf[p], Panicf[p], and SetOutput to access it.
 */
 package log
 
@@ -37,7 +37,7 @@ func New(out io.Writer, color bool) *Logger {
 func (l *Logger) Printf(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	fmt.Fprintf(l.out, f.Get(l.color), v...)
 }
 
@@ -46,7 +46,7 @@ func (l *Logger) Printf(f *color.Format, v ...interface{}) {
 func (l *Logger) Print(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	fmt.Fprint(l.out, v...)
 }
 
@@ -55,14 +55,14 @@ func (l *Logger) Print(v ...interface{}) {
 func (l *Logger) Println(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	fmt.Fprintln(l.out, v...)
 }
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
 func (l *Logger) Fatalf(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	fmt.Fprintf(l.out, f.Get(l.color), v...)
 	os.Exit(1)
 }
@@ -70,7 +70,7 @@ func (l *Logger) Fatalf(f *color.Format, v ...interface{}) {
 // Fatal is equivalent to l.Print() followed by a call to os.Exit(1).
 func (l *Logger) Fatal(v ...interface{}) {
 	l.mu.Lock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	fmt.Fprint(l.out, v...)
 	os.Exit(1)
 }
@@ -78,7 +78,7 @@ func (l *Logger) Fatal(v ...interface{}) {
 // Fatalln is equivalent to l.Println() followed by a call to os.Exit(1).
 func (l *Logger) Fatalln(v ...interface{}) {
 	l.mu.Lock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	fmt.Fprintln(l.out, v...)
 	os.Exit(1)
 }
@@ -87,7 +87,7 @@ func (l *Logger) Fatalln(v ...interface{}) {
 func (l *Logger) Panicf(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	s := fmt.Sprintf(f.Get(l.color), v...)
 	io.WriteString(l.out, s)
 	panic(s)
@@ -97,7 +97,7 @@ func (l *Logger) Panicf(f *color.Format, v ...interface{}) {
 func (l *Logger) Panic(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	s := fmt.Sprint(v...)
 	io.WriteString(l.out, s)
 	panic(s)
@@ -107,7 +107,7 @@ func (l *Logger) Panic(v ...interface{}) {
 func (l *Logger) Panicln(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(v, l.color)
+	color.Replace(l.color, v)
 	s := fmt.Sprintln(v...)
 	io.WriteString(l.out, s)
 	panic(s)

@@ -6,17 +6,17 @@ import (
 )
 
 func Example() {
-	f := color.Prepare("%h[fgRed]%s%r\n")
+	redFormat := color.Prepare("%h[fgRed]%s%r\n")
 
 	// If os.Stderr is a terminal, this will print in color.
 	// Otherwise it will be a normal "foo".
-	log.Printf(f, "foo")
+	log.Printfp(redFormat, "foo")
 
-	// Normal "bar", the highlight verbs are ignored.
+	// normal "bar", the highlight verbs are ignored.
 	log.SetColor(false)
-	log.Printf(f, "bar")
+	log.Printfp(redFormat, "bar")
 
 	// "foo" with a red foreground.
 	log.SetColor(true)
-	log.Fatalf(f, "foo")
+	log.Fatalfp(redFormat, "foo")
 }

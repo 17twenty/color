@@ -1,15 +1,12 @@
 package color
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
 
 	"golang.org/x/crypto/ssh/terminal"
 )
-
-var ErrBadFormat = errors.New("color: format is not a string or *color.Format ")
 
 // Printer prints to a writer using highlight verbs.
 type Printer struct {
@@ -27,15 +24,9 @@ func New(out io.Writer, color bool) *Printer {
 // string and the variadic arguments to write to out.
 // It will expand each Format in v to its appropiate string before calling fmt.Fprintf.
 // It returns the number of bytes written an any write error encountered.
-func (p *Printer) Printf(f interface{}, a ...interface{}) (n int, err error) {
+func (p *Printer) Printf(f *Format, a ...interface{}) (n int, err error) {
 	Replace(a, p.color)
-	switch v := f.(type) {
-	case string:
-		return fmt.Fprintf(p.out, Run(v, p.color), a...)
-	case *Format:
-		return fmt.Fprintf(p.out, v.Get(p.color), a...)
-	}
-	panic(ErrBadFormat)
+	return fmt.Fprintf(p.out, f.Get(p.color), a...)
 }
 
 // Print calls fmt.Fprint to print to the underlying writer.

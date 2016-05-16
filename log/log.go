@@ -33,95 +33,82 @@ func New(out io.Writer, color bool) *Logger {
 
 // Printf expands f to its appropiate string and then calls fmt.Fprintf with the resulting
 // string and the variadic arguments to write to out.
-// It will expand each Format in a to its appropiate string before calling fmt.Fprintf.
-func (l *Logger) Printf(f interface{}, a ...interface{}) {
+// It will expand each Format in v to its appropiate string before calling fmt.Fprintf.
+func (l *Logger) Printf(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
-	switch v := f.(type) {
-	case string:
-		fmt.Fprintf(l.out, color.Run(v, l.color), a...)
-	case *color.Format:
-		fmt.Fprintf(l.out, v.Get(l.color), a...)
-	default:
-		panic(color.ErrBadFormat)
-	}
+	color.Replace(v, l.color)
+	fmt.Fprintf(l.out, f.Get(l.color), v...)
 }
 
 // Print calls fmt.Fprint to print to the underlying writer.
-// It will expand each Format in a to its appropiate string before calling fmt.Fprint.
-func (l *Logger) Print(a ...interface{}) {
+// It will expand each Format in v to its appropiate string before calling fmt.Fprint.
+func (l *Logger) Print(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
-	fmt.Fprint(l.out, a...)
+	color.Replace(v, l.color)
+	fmt.Fprint(l.out, v...)
 }
 
 // Println calls fmt.Fprintln to print to the underlying writer.
-// It will expand each Format in a to its appropiate string before calling fmt.Fprintln.
-func (l *Logger) Println(a ...interface{}) {
+// It will expand each Format in v to its appropiate string before calling fmt.Fprintln.
+func (l *Logger) Println(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
-	fmt.Fprintln(l.out, a...)
+	color.Replace(v, l.color)
+	fmt.Fprintln(l.out, v...)
 }
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
-func (l *Logger) Fatalf(f interface{}, a ...interface{}) {
-	l.Printf(f, a...)
+func (l *Logger) Fatalf(f *color.Format, v ...interface{}) {
+	l.mu.Lock()
+	color.Replace(v, l.color)
+	fmt.Fprintf(l.out, f.Get(l.color), v...)
 	os.Exit(1)
 }
 
 // Fatal is equivalent to l.Print() followed by a call to os.Exit(1).
-func (l *Logger) Fatal(a ...interface{}) {
+func (l *Logger) Fatal(v ...interface{}) {
 	l.mu.Lock()
-	color.Replace(a, l.color)
-	fmt.Fprint(l.out, a...)
+	color.Replace(v, l.color)
+	fmt.Fprint(l.out, v...)
 	os.Exit(1)
 }
 
 // Fatalln is equivalent to l.Println() followed by a call to os.Exit(1).
-func (l *Logger) Fatalln(a ...interface{}) {
+func (l *Logger) Fatalln(v ...interface{}) {
 	l.mu.Lock()
-	color.Replace(a, l.color)
-	fmt.Fprintln(l.out, a...)
+	color.Replace(v, l.color)
+	fmt.Fprintln(l.out, v...)
 	os.Exit(1)
 }
 
 // Panicf is equivalent to l.Printf() followed by a call to panic().
-func (l *Logger) Panicf(f interface{}, a ...interface{}) {
+func (l *Logger) Panicf(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
-	var s string
-	switch v := f.(type) {
-	case string:
-		s = fmt.Sprintf(color.Run(v, l.color), a...)
-	case *color.Format:
-		s = fmt.Sprintf(v.Get(l.color), a...)
-	default:
-		panic(color.ErrBadFormat)
-	}
+	color.Replace(v, l.color)
+	s := fmt.Sprintf(f.Get(l.color), v...)
 	io.WriteString(l.out, s)
 	panic(s)
 }
 
 // Panic is equivalent to l.Print() followed by a call to panic().
-func (l *Logger) Panic(a ...interface{}) {
+func (l *Logger) Panic(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(a, l.color)
-	s := fmt.Sprint(a...)
+	color.Replace(v, l.color)
+	s := fmt.Sprint(v...)
 	io.WriteString(l.out, s)
 	panic(s)
 }
 
 // Panicln is equivalent to l.Println() followed by a call to panic().
-func (l *Logger) Panicln(an ...interface{}) {
+func (l *Logger) Panicln(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	color.Replace(an, l.color)
-	s := fmt.Sprintln(an...)
+	color.Replace(v, l.color)
+	s := fmt.Sprintln(v...)
 	io.WriteString(l.out, s)
 	panic(s)
 }
@@ -143,48 +130,48 @@ func (l *Logger) SetColor(color bool) {
 var std = New(os.Stderr, color.IsTerminal(os.Stderr))
 
 // Printf calls the standard Logger's Printf method.
-func Printf(f *color.Format, a ...interface{}) {
-	std.Printf(f, a...)
+func Printf(f *color.Format, v ...interface{}) {
+	std.Printf(f, v...)
 }
 
 // Print calls the standard Logger's Printf method.
-func Print(a ...interface{}) {
-	std.Print(a...)
+func Print(v ...interface{}) {
+	std.Print(v...)
 }
 
 // Println calls the standard Logger's Println method.
-func Println(a ...interface{}) {
-	std.Println(a...)
+func Println(v ...interface{}) {
+	std.Println(v...)
 }
 
 // Fatalf calls the standard Logger's Fatalf method.
-func Fatalf(f *color.Format, a ...interface{}) {
-	std.Fatalf(f, a...)
+func Fatalf(f *color.Format, v ...interface{}) {
+	std.Fatalf(f, v...)
 }
 
 // Fatal calls the standard Logger's Fatal method.
-func Fatal(a ...interface{}) {
-	std.Fatal(a...)
+func Fatal(v ...interface{}) {
+	std.Fatal(v...)
 }
 
 // Fatalln calls the standard Logger's Fatalln method.
-func Fatalln(a ...interface{}) {
-	std.Fatalln(a...)
+func Fatalln(v ...interface{}) {
+	std.Fatalln(v...)
 }
 
 // Panicf calls the standard Logger's Panicf method.
-func Panicf(f *color.Format, a ...interface{}) {
-	std.Panicf(f, a...)
+func Panicf(f *color.Format, v ...interface{}) {
+	std.Panicf(f, v...)
 }
 
 // Panic calls the standard Logger's Panic method.
-func Panic(a ...interface{}) {
-	std.Panic(a...)
+func Panic(v ...interface{}) {
+	std.Panic(v...)
 }
 
 // Panicln calls the standard Logger's Panicln method.
-func Panicln(a ...interface{}) {
-	std.Panicln(a...)
+func Panicln(v ...interface{}) {
+	std.Panicln(v...)
 }
 
 // SetOutput sets the output destination of the standard Logger.

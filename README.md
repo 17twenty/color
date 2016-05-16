@@ -149,4 +149,3 @@ color.Printf(f, "foo")
 - [x] color.Format docs
 - [x] A better way to combine `color.Format`s
 - [ ] Logging/Printing/Format tests
-- [ ] printf takes a string and ``*color.Format` now, needs to be in docs

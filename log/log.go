@@ -31,10 +31,18 @@ func New(out io.Writer, color bool) *Logger {
 	return &Logger{out: out, color: color}
 }
 
-// Printf expands f to its appropiate string and then calls fmt.Fprintf with the resulting
-// string and the variadic arguments to write to out.
+// Printf processes the highlight verbs in format and then calls
+// fmt.Fprintf to print to the underlying writer.
 // It will expand each Format in v to its appropiate string before calling fmt.Fprintf.
-func (l *Logger) Printf(f *color.Format, v ...interface{}) {
+func (l *Logger) Printf(format string, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	color.Replace(l.color, v)
+	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
+}
+
+// Printfp is the same as l.Printf but takes a prepared format struct.
+func (l *Logger) Printfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	color.Replace(l.color, v)
@@ -60,7 +68,15 @@ func (l *Logger) Println(v ...interface{}) {
 }
 
 // Fatalf is equivalent to l.Printf() followed by a call to os.Exit(1).
-func (l *Logger) Fatalf(f *color.Format, v ...interface{}) {
+func (l *Logger) Fatalf(format string, v ...interface{}) {
+	l.mu.Lock()
+	color.Replace(l.color, v)
+	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
+	os.Exit(1)
+}
+
+// Fatalfp is the same as l.Fatalf but takes a prepared format struct.
+func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	color.Replace(l.color, v)
 	fmt.Fprintf(l.out, f.Get(l.color), v...)
@@ -84,7 +100,17 @@ func (l *Logger) Fatalln(v ...interface{}) {
 }
 
 // Panicf is equivalent to l.Printf() followed by a call to panic().
-func (l *Logger) Panicf(f *color.Format, v ...interface{}) {
+func (l *Logger) Panicf(format string, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	color.Replace(l.color, v)
+	s := fmt.Sprintf(format, v...)
+	io.WriteString(l.out, s)
+	panic(s)
+}
+
+// Panicfp is the same as l.Panicf but takes a prepared format struct.
+func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	color.Replace(l.color, v)
@@ -130,48 +156,63 @@ func (l *Logger) SetColor(color bool) {
 var std = New(os.Stderr, color.IsTerminal(os.Stderr))
 
 // Printf calls the standard Logger's Printf method.
-func Printf(f *color.Format, v ...interface{}) {
-	std.Printf(f, v...)
+func Printf(format string, v ...interface{}) {
+	std.Printf(format, v...)
 }
 
 // Print calls the standard Logger's Printf method.
-func Print(v ...interface{}) {
+func Print(format string, v ...interface{}) {
 	std.Print(v...)
 }
 
 // Println calls the standard Logger's Println method.
-func Println(v ...interface{}) {
+func Println(format string, v ...interface{}) {
 	std.Println(v...)
 }
 
 // Fatalf calls the standard Logger's Fatalf method.
-func Fatalf(f *color.Format, v ...interface{}) {
-	std.Fatalf(f, v...)
+func Fatalf(format string, v ...interface{}) {
+	std.Fatalf(format, v...)
 }
 
 // Fatal calls the standard Logger's Fatal method.
-func Fatal(v ...interface{}) {
+func Fatal(format string, v ...interface{}) {
 	std.Fatal(v...)
 }
 
 // Fatalln calls the standard Logger's Fatalln method.
-func Fatalln(v ...interface{}) {
+func Fatalln(format string, v ...interface{}) {
 	std.Fatalln(v...)
 }
 
 // Panicf calls the standard Logger's Panicf method.
-func Panicf(f *color.Format, v ...interface{}) {
-	std.Panicf(f, v...)
+func Panicf(format string, v ...interface{}) {
+	std.Panicf(format, v...)
 }
 
 // Panic calls the standard Logger's Panic method.
-func Panic(v ...interface{}) {
+func Panic(format string, v ...interface{}) {
 	std.Panic(v...)
 }
 
 // Panicln calls the standard Logger's Panicln method.
-func Panicln(v ...interface{}) {
+func Panicln(format string, v ...interface{}) {
 	std.Panicln(v...)
+}
+
+// Printfp calls the standard Logger's Printfp method.
+func Printfp(f *color.Format, v ...interface{}) {
+	std.Printfp(f, v...)
+}
+
+// Fatalfp calls the standard Logger's Fatalfp method.
+func Fatalfp(f *color.Format, v ...interface{}) {
+	std.Fatalfp(f, v...)
+}
+
+// Panicfp calls the standard Logger's Panicfp method.
+func Panicfp(f *color.Format, v ...interface{}) {
+	std.Panicfp(f, v...)
 }
 
 // SetOutput sets the output destination of the standard Logger.

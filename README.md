@@ -13,24 +13,8 @@ go get github.com/nhooyr/color
 See [godoc](https://godoc.org/github.com/nhooyr/color) for more information.
 
 ####  Why Prepare?
-Previously. color.Printf worked like this
-
-```go
-color.Printf("%h[fgRed]red text: %s%r\n", "foo")
-color.Printf("%h[fgRed]red text: %s%r\n", "bar")
-color.Printf("%h[fgRed]red text: %s%r\n", "foo")
-```
-
-but now it works like this
-
-```go
-f := color.Prepare("%h[fgRed]red text: %s%r\n")
-color.Printf(f, "bar")
-color.Printf(f, "foo")
-color.Printf(f, "bar")
-```
-
-In the previous API, the highlight verbs were parsed every single time you call `color.Printf` whereas with `color.Prepare`, they are only parsed once, stored into a `color.Format` which allows repetitive printing with minimal overhead.
+Previously, `color.Printf` took a string (`color.Println("%h[fgRed]red text%r"`) but this was removed because the highlight verbs only need to be parsed once.
+`color.Prepare` parses them once and stores them in a `color.Format` structure to allow repetitive printing with minimal overhead.
 
 ### Setting Attributes
 ```go

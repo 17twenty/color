@@ -50,17 +50,6 @@ f = color.Prepare("%h[bg8+underline]panic:%r %s\n")
 color.Printf(f, "bar")
 ```
 
-### The Two Methods of Printing
-```go
-f := color.Prepare("%h[fgBrightMagenta+underline]panic:%r %s\n")
-
-// f is expanded and used as the format string.
-color.Printf(f, "ola")
-
-// f is expanded, but simply printed.
-color.Print(f)
-```
-
 ### Printer
 A `Printer` writes to an `io.Writer`.
 

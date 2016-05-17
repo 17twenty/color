@@ -20,21 +20,8 @@ import (
 // Logger is a very simple logger, similar to log.logger but it supports highlight verbs.
 type Logger struct {
 	mu    sync.Mutex  // ensures atomic writes
-	out   *lineWriter // destination for output
+	out   *lineWriter // ensures that the output is written on lines
 	color bool        // enable color output
-}
-
-// lineWriter ensures that each Write to the underlying writer will end on a newline.
-type lineWriter struct {
-	w io.Writer
-}
-
-// Write writes to the underlying writer but ensures that the write ends on a newline.
-func (lw *lineWriter) Write(p []byte) (n int, err error) {
-	if len(p) == 0 || p[len(p)-1] != '\n' {
-		return lw.w.Write(append(p, '\n'))
-	}
-	return lw.w.Write(p)
 }
 
 // New creates a new Logger. The out argument sets the
@@ -118,7 +105,7 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
 	s := fmt.Sprintf(format, v...)
-	l.out.Write([]byte(s))
+	l.out.WriteString(s)
 	panic(s)
 }
 
@@ -128,7 +115,7 @@ func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
 	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
 	s := fmt.Sprintf(f.Get(l.color), v...)
-	l.out.Write([]byte(s))
+	l.out.WriteString(s)
 	panic(s)
 }
 
@@ -138,7 +125,7 @@ func (l *Logger) Panic(v ...interface{}) {
 	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
 	s := fmt.Sprint(v...)
-	l.out.Write([]byte(s))
+	l.out.WriteString(s)
 	panic(s)
 }
 
@@ -148,7 +135,7 @@ func (l *Logger) Panicln(v ...interface{}) {
 	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
 	s := fmt.Sprintln(v...)
-	l.out.Write([]byte(s))
+	l.out.WriteString(s)
 	panic(s)
 }
 
@@ -164,6 +151,30 @@ func (l *Logger) SetColor(color bool) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.color = color
+}
+
+// lineWriter ensures that each Write to the underlying writer will end on a newline.
+type lineWriter struct {
+	w io.Writer // underlying writer
+}
+
+// Write writes to the underlying writer but ensures that the write ends on a newline.
+func (lw *lineWriter) Write(p []byte) (n int, err error) {
+	if len(p) == 0 || p[len(p)-1] != '\n' {
+		return lw.w.Write(append(p, '\n'))
+	}
+	return lw.w.Write(p)
+}
+
+// WriteString is the same as lw.Write but takes a string.
+func (lw *lineWriter) WriteString(s string) (n int, err error) {
+	if len(s) == 0 || s[len(s)-1] == '\n' {
+		p := make([]byte, len(s))
+		copy(p, s)
+		p[len(s)] = '\n'
+		return lw.w.Write(p)
+	}
+	return lw.w.Write([]byte(s))
 }
 
 var std = New(os.Stderr, color.IsTerminal(os.Stderr))

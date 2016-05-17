@@ -174,8 +174,7 @@ func (lw *lineWriter) WriteString(s string) (n int, err error) {
 		p[len(s)] = '\n'
 		return lw.w.Write(p)
 	}
-	// TODO Maybe support io.stringWriter
-	return lw.w.Write([]byte(s))
+	return io.WriteString(lw.w, s)
 }
 
 var std = New(os.Stderr, color.IsTerminal(os.Stderr))

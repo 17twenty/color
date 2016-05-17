@@ -20,7 +20,7 @@ import (
 // Logger is a very simple logger, similar to log.logger but it supports highlight verbs.
 type Logger struct {
 	mu    sync.Mutex  // ensures atomic writes
-	out   *lineWriter // ensures that the output is written on lines
+	out   *lineWriter // ensures output is written on separate lines
 	color bool        // enable color output
 }
 
@@ -174,6 +174,7 @@ func (lw *lineWriter) WriteString(s string) (n int, err error) {
 		p[len(s)] = '\n'
 		return lw.w.Write(p)
 	}
+	// TODO Maybe support io.stringWriter
 	return lw.w.Write([]byte(s))
 }
 

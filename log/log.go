@@ -17,18 +17,31 @@ import (
 	"github.com/nhooyr/color"
 )
 
-// Logger is a very simple logger that supports highlight verbs.
+// Logger is a very simple logger, similar to log.logger but it supports highlight verbs.
 type Logger struct {
-	mu    sync.Mutex // ensures atomic writes
-	out   io.Writer  // destination for output
-	color bool       // enable color output
+	mu    sync.Mutex  // ensures atomic writes
+	out   *lineWriter // destination for output
+	color bool        // enable color output
+}
+
+// lineWriter ensures that each Write to the underlying writer will end on a newline.
+type lineWriter struct {
+	w io.Writer
+}
+
+// Write writes to the underlying writer but ensures that the write ends on a newline.
+func (lw *lineWriter) Write(p []byte) (n int, err error) {
+	if len(p) == 0 || p[len(p)-1] != '\n' {
+		return lw.w.Write(append(p, '\n'))
+	}
+	return lw.w.Write(p)
 }
 
 // New creates a new Logger. The out argument sets the
 // destination to which log data will be written.
 // The color argument dictates whether color output is enabled.
 func New(out io.Writer, color bool) *Logger {
-	return &Logger{out: out, color: color}
+	return &Logger{out: &lineWriter{out}, color: color}
 }
 
 // Printf processes the highlight verbs in format and then calls
@@ -105,7 +118,7 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
 	s := fmt.Sprintf(format, v...)
-	io.WriteString(l.out, s)
+	l.out.Write([]byte(s))
 	panic(s)
 }
 
@@ -115,7 +128,7 @@ func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
 	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
 	s := fmt.Sprintf(f.Get(l.color), v...)
-	io.WriteString(l.out, s)
+	l.out.Write([]byte(s))
 	panic(s)
 }
 
@@ -125,7 +138,7 @@ func (l *Logger) Panic(v ...interface{}) {
 	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
 	s := fmt.Sprint(v...)
-	io.WriteString(l.out, s)
+	l.out.Write([]byte(s))
 	panic(s)
 }
 
@@ -135,7 +148,7 @@ func (l *Logger) Panicln(v ...interface{}) {
 	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
 	s := fmt.Sprintln(v...)
-	io.WriteString(l.out, s)
+	l.out.Write([]byte(s))
 	panic(s)
 }
 
@@ -143,7 +156,7 @@ func (l *Logger) Panicln(v ...interface{}) {
 func (l *Logger) SetOutput(out io.Writer) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.out = out
+	l.out.w = out
 }
 
 // SetColor sets whether colored output is enabled.

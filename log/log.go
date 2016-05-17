@@ -168,8 +168,8 @@ func (lw *lineWriter) Write(p []byte) (n int, err error) {
 
 // WriteString is the same as lw.Write but takes a string.
 func (lw *lineWriter) WriteString(s string) (n int, err error) {
-	if len(s) == 0 || s[len(s)-1] == '\n' {
-		p := make([]byte, len(s))
+	if len(s) == 0 || s[len(s)-1] != '\n' {
+		p := make([]byte, len(s)+1)
 		copy(p, s)
 		p[len(s)] = '\n'
 		return lw.w.Write(p)

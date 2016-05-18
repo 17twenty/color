@@ -105,7 +105,7 @@ Add the following to `after/syntax/go.vim` to highlight the highlight verbs with
 ```vim
 syn match goFormatSpecifier /%[-#0 +]*\%(\*\|\d\+\)\=\%(\.\%(\*\|\d\+\)\)*\%([vTtbcdoqxXUeEfgGspr]\|h\[[a-zA-Z+0-9]\+\]\)/ contained containedin=goString
 ```
-![syntax highlighting](https://i.imgur.com/qraMRxp.png)
+![syntax highlighting](https://i.imgur.com/yFZnJXg.png)
 
 ## TODO
 - [ ] True color support

@@ -100,6 +100,12 @@ log.SetColor(true)
 log.Fatalfp(redFormat, "foo")
 ```
 
+## Vim syntax highlighting
+Add the following to `after/syntax/go.vim` to highlight the highlight verbs in strings.
+```vim
+syn match goFormatSpecifier /%[-#0 +]*\%(\*\|\d\+\)\=\%(\.\%(\*\|\d\+\)\)*\%([vTtbcdoqxXUeEfgGspr]\|h\[[a-zA-Z+0-9]\+\]\)/ contained containedin=goString
+```
+
 ## TODO
 - [ ] True color support
 - [ ] Windows support

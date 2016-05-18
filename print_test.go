@@ -3,7 +3,6 @@ package color
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"testing"
 )
 

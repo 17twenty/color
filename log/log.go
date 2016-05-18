@@ -27,8 +27,8 @@ type Logger struct {
 // New creates a new Logger. The out argument sets the
 // destination to which log data will be written.
 // The color argument dictates whether color output is enabled.
-func New(out io.Writer, color bool) *Logger {
-	return &Logger{out: &lineWriter{out}, color: color}
+func New(w io.Writer, color bool) *Logger {
+	return &Logger{out: &lineWriter{w}, color: color}
 }
 
 // Printf processes the highlight verbs in format and then calls
@@ -140,10 +140,10 @@ func (l *Logger) Panicln(v ...interface{}) {
 }
 
 // SetOutput sets the output destination.
-func (l *Logger) SetOutput(out io.Writer) {
+func (l *Logger) SetOutput(w io.Writer) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.out.w = out
+	l.out.w = w
 }
 
 // SetColor sets whether colored output is enabled.

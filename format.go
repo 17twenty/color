@@ -22,7 +22,7 @@ func (f *Format) Get(color bool) string {
 }
 
 // Eprintfp calls fmt.Sprintf using f's strings and the rest of the arguments.
-// It will expand each Format in a to its appropiate string before calling Sprintf.
+// It will expand each Format in a to its appropriate string before calling Sprintf.
 // It then returns the resulting Format.
 func (f *Format) Eprintfp(a ...interface{}) *Format {
 	m := make(map[int]*Format)
@@ -40,7 +40,7 @@ func (f *Format) Eprintfp(a ...interface{}) *Format {
 	return rf
 }
 
-// ExpandFormats replaces each Format in a with its appropiate string according to color.
+// ExpandFormats replaces each Format in a with its appropriate string according to color.
 func ExpandFormats(color bool, a []interface{}) {
 	for i, v := range a {
 		if f, ok := v.(*Format); ok {

@@ -13,7 +13,7 @@ Preparing Strings:
 
 While this package is heavily optimized, processing the highlighting verbs is still very expensive. Thus, it makes more sense to process the verbs once and then store the results into a Format structure. The format structure, holds two strings, one for when colored output is enabled and the other for when it is disabled.
 
-Use the Prepare function to create Format structures. Then, use the Printfp like functions to use them as the base format strings, or send them as part of the variadic arguments to any Print function and they will be expanded to their appropiate strings. See Prepare below for an example.
+Use the Prepare function to create Format structures. Then, use the Printfp like functions to use them as the base format strings, or send them as part of the variadic arguments to any Print function and they will be expanded to their appropriate strings. See Prepare below for an example.
 
 Errors:
 

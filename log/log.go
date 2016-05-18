@@ -33,7 +33,7 @@ func New(w io.Writer, color bool) *Logger {
 
 // Printf processes the highlight verbs in format and then calls
 // fmt.Fprintf to print to the underlying writer.
-// It will expand each Format in v to its appropiate string before calling fmt.Fprintf.
+// It will expand each Format in v to its appropriate string before calling fmt.Fprintf.
 func (l *Logger) Printf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -50,7 +50,7 @@ func (l *Logger) Printfp(f *color.Format, v ...interface{}) {
 }
 
 // Print calls fmt.Fprint to print to the underlying writer.
-// It will expand each Format in v to its appropiate string before calling fmt.Fprint.
+// It will expand each Format in v to its appropriate string before calling fmt.Fprint.
 func (l *Logger) Print(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -59,7 +59,7 @@ func (l *Logger) Print(v ...interface{}) {
 }
 
 // Println calls fmt.Fprintln to print to the underlying writer.
-// It will expand each Format in v to its appropiate string before calling fmt.Fprintln.
+// It will expand each Format in v to its appropriate string before calling fmt.Fprintln.
 func (l *Logger) Println(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()

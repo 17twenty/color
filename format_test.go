@@ -7,6 +7,7 @@ import (
 )
 
 func TestPrepare(t *testing.T) {
+	t.Parallel()
 	f := Prepare("%h[fgBlue]foo")
 	exp := ti.Color(caps.Blue, -1) + "foo"
 	r := f.Get(true)
@@ -21,6 +22,7 @@ func TestPrepare(t *testing.T) {
 }
 
 func TestEprintf(t *testing.T) {
+	t.Parallel()
 	f := Prepare("%h[fgRed]panic: %s: %s").Eprintfp("bar", Prepare("%h[fgGreen]rip"))
 	exp := ti.Color(caps.Red, -1) + "panic: bar: " + ti.Color(caps.Green, -1) + "rip"
 	r := f.Get(true)
@@ -35,6 +37,7 @@ func TestEprintf(t *testing.T) {
 }
 
 func TestExpandFormats(t *testing.T) {
+	t.Parallel()
 	a := [3]interface{}{
 		Prepare("%h[bgMagenta]foo"),
 		"bar",
@@ -48,7 +51,7 @@ func TestExpandFormats(t *testing.T) {
 		t.Errorf("Expected %q but result was %q", exp, r)
 	}
 	exp[0] = "foo"
-	r[0] = a[0]
+	r = a
 	ExpandFormats(false, r[:])
 	if exp != r {
 		t.Errorf("Expected %q but result was %q", exp, r)

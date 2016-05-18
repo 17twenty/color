@@ -81,6 +81,8 @@ func TestCombinations(t *testing.T) {
 var highlightEdgeCases = map[string]string{
 	"%h[fgBrightBlack+%h[fgBlue]": exp(ti.Color(caps.BrightBlack, -1)) + errBadAttr,
 	"%h[":                   errShort,
+	"%h[f":                  errShort,
+	"%h[fg":                 errShort,
 	"%h{":                   errInvalid,
 	"%h[]":                  errMissing,
 	"%%h[fgRed]":            "%%h[fgRed]",

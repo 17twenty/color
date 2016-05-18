@@ -90,7 +90,7 @@ func TestPrintln(t *testing.T) {
 func TestPanic(t *testing.T) {
 	t.Parallel()
 	var b bytes.Buffer
-	SetOutput(&b)
+	l := New(&b, false)
 	exp := "foohi"
 	defer func() {
 		if r, ok := recover().(string); !ok || r != exp {
@@ -99,6 +99,22 @@ func TestPanic(t *testing.T) {
 			t.Errorf("Expected %q but result was %q", exp+"\n", b.String())
 		}
 	}()
-	Panic("foo", "hi")
+	l.Panic("foo", "hi")
+	panic("Impossible")
+}
+
+func TestPanicln(t *testing.T) {
+	t.Parallel()
+	var b bytes.Buffer
+	SetOutput(&b)
+	exp := "foo hi\n"
+	defer func() {
+		if r, ok := recover().(string); !ok || r != exp {
+			t.Errorf("Expected %q but result was %q", exp, r)
+		} else if b.String() != exp {
+			t.Errorf("Expected %q but result was %q", exp, b.String())
+		}
+	}()
+	Panicln("foo", "hi")
 	panic("Impossible")
 }

@@ -115,3 +115,4 @@ syn match goFormatSpecifier /%[-#0 +]*\%(\*\|\d\+\)\=\%(\.\%(\*\|\d\+\)\)*\%([vT
 - [x] color.Format docs
 - [x] A better way to combine `color.Format`s
 - [x] Logging/Printing/Format tests
+- [ ] cleanup above tests

@@ -21,7 +21,7 @@ func (f *Format) Get(color bool) string {
 	return f.stripped
 }
 
-// Eprintf calls fmt.Sprintf using f's strings and the rest of the arguments.
+// Eprintfp calls fmt.Sprintf using f's strings and the rest of the arguments.
 // It will expand each Format in a to its appropiate string before calling Sprintf.
 // It then returns the resulting Format.
 func (f *Format) Eprintfp(a ...interface{}) *Format {

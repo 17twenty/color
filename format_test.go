@@ -44,7 +44,7 @@ func TestExpandFormats(t *testing.T) {
 		3,
 	}
 	exp := a
-	exp[0]= ti.Color(-1, caps.Magenta) + "foo"
+	exp[0] = ti.Color(-1, caps.Magenta) + "foo"
 	r := a
 	ExpandFormats(true, r[:])
 	if exp != r {

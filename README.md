@@ -42,7 +42,7 @@ color.Printf("%h[fgGreen+bold]panic:%r %s\n", "foo")
 color.Printf("%h[bg8+underline]panic:%r %s\n", "bar")
 ```
 
-### Preparing
+### Prepare
 ```go
 // Prepare only processes the highlight verbs in the string,
 // letting you print it repeatedly with performance.

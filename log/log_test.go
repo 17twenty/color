@@ -3,9 +3,11 @@ package log
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"testing"
 
 	"github.com/nhooyr/color"
+	"github.com/uber-common/zap"
 )
 
 func TestPrintfAndPrintfp(t *testing.T) {
@@ -21,10 +23,11 @@ func TestPrintfAndPrintfp(t *testing.T) {
 		t.Errorf("Expected %q but result was %q", exp, b.String())
 	}
 	b.Reset()
-	l.Printf(f, f2)
+	l.Printfp(f, f2)
 	if b.String() != exp {
 		t.Errorf("Expected %q but result was %q", exp, b.String())
 	}
+	b.Reset()
 	l.SetColor(false)
 	exp = fmt.Sprintf(f.Get(false), f2.Get(false)) + "\n"
 	l.Printf(s, f2)
@@ -32,7 +35,7 @@ func TestPrintfAndPrintfp(t *testing.T) {
 		t.Errorf("Expected %q but result was %q", exp, b.String())
 	}
 	b.Reset()
-	l.Printf(f, f2)
+	l.Printfp(f, f2)
 	if b.String() != exp {
 		t.Errorf("Expected %q but result was %q", exp, b.String())
 	}
@@ -61,6 +64,7 @@ func TestPrintAndPrintln(t *testing.T) {
 	if b.String() != exp {
 		t.Errorf("Expected %q but result was %q", exp, b.String())
 	}
+	b.Reset()
 	exp = f.Get(false) + " foo\n"
 	l.Println(f, "foo")
 	if b.String() != exp {
@@ -98,4 +102,29 @@ func TestPanicln(t *testing.T) {
 	}()
 	Panicln("foo", "hi")
 	panic("Impossible")
+}
+
+func BenchmarkPrintln(b *testing.B) {
+	l := New(ioutil.Discard, true)
+	for i := 0; i < b.N; i++ {
+		l.Println("LOL")
+	}
+}
+
+func BenchmarkPrintlnParallel(b *testing.B) {
+	l := New(ioutil.Discard, true)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			l.Println("foo")
+		}
+	})
+}
+
+func BenchmarkZap(b *testing.B) {
+	l := zap.NewJSON(zap.Output(zap.AddSync(ioutil.Discard)))
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			l.Info("foo")
+		}
+	})
 }

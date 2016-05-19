@@ -19,16 +19,17 @@ import (
 
 // Logger is a very simple logger, similar to log.logger but it supports highlight verbs.
 type Logger struct {
-	mu    sync.Mutex  // ensures atomic writes
-	out   *lineWriter // ensures output is written on separate lines
-	color bool        // enable color output
+	mu    sync.Mutex
+	color bool // enable color output
+
+	out *lineWriter // ensures output is written on separate lines
 }
 
 // New creates a new Logger. The out argument sets the
 // destination to which log data will be written.
 // The color argument dictates whether color output is enabled.
 func New(w io.Writer, color bool) *Logger {
-	return &Logger{out: &lineWriter{w}, color: color}
+	return &Logger{out: &lineWriter{w: w}, color: color}
 }
 
 // Printf processes the highlight verbs in format and then calls
@@ -36,25 +37,27 @@ func New(w io.Writer, color bool) *Logger {
 // It will expand each Format in v to its appropriate string before calling fmt.Fprintf.
 func (l *Logger) Printf(format string, v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
-	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
+	format = color.Run(format, l.color)
+	l.mu.Unlock()
+	fmt.Fprintf(l.out, format, v...)
 }
 
 // Printfp is the same as l.Printf but takes a prepared format struct.
 func (l *Logger) Printfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
-	fmt.Fprintf(l.out, f.Get(l.color), v...)
+	format := f.Get(l.color)
+	l.mu.Unlock()
+	fmt.Fprintf(l.out, format, v...)
 }
 
 // Print calls fmt.Fprint to print to the underlying writer.
 // It will expand each Format in v to its appropriate string before calling fmt.Fprint.
 func (l *Logger) Print(v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
+	l.mu.Unlock()
 	fmt.Fprint(l.out, v...)
 }
 
@@ -62,8 +65,8 @@ func (l *Logger) Print(v ...interface{}) {
 // It will expand each Format in v to its appropriate string before calling fmt.Fprintln.
 func (l *Logger) Println(v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
+	l.mu.Unlock()
 	fmt.Fprintln(l.out, v...)
 }
 
@@ -71,7 +74,9 @@ func (l *Logger) Println(v ...interface{}) {
 func (l *Logger) Fatalf(format string, v ...interface{}) {
 	l.mu.Lock()
 	color.ExpandFormats(l.color, v)
-	fmt.Fprintf(l.out, color.Run(format, l.color), v...)
+	format = color.Run(format, l.color)
+	l.mu.Unlock()
+	fmt.Fprintf(l.out, format, v...)
 	os.Exit(1)
 }
 
@@ -79,7 +84,9 @@ func (l *Logger) Fatalf(format string, v ...interface{}) {
 func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	color.ExpandFormats(l.color, v)
-	fmt.Fprintf(l.out, f.Get(l.color), v...)
+	format := f.Get(l.color)
+	l.mu.Unlock()
+	fmt.Fprintf(l.out, format, v...)
 	os.Exit(1)
 }
 
@@ -87,6 +94,7 @@ func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
 func (l *Logger) Fatal(v ...interface{}) {
 	l.mu.Lock()
 	color.ExpandFormats(l.color, v)
+	l.mu.Unlock()
 	fmt.Fprint(l.out, v...)
 	os.Exit(1)
 }
@@ -95,6 +103,7 @@ func (l *Logger) Fatal(v ...interface{}) {
 func (l *Logger) Fatalln(v ...interface{}) {
 	l.mu.Lock()
 	color.ExpandFormats(l.color, v)
+	l.mu.Unlock()
 	fmt.Fprintln(l.out, v...)
 	os.Exit(1)
 }
@@ -102,8 +111,9 @@ func (l *Logger) Fatalln(v ...interface{}) {
 // Panicf is equivalent to l.Printf() followed by a call to panic().
 func (l *Logger) Panicf(format string, v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
+	format = color.Run(format, l.color)
+	l.mu.Unlock()
 	s := fmt.Sprintf(format, v...)
 	l.out.WriteString(s)
 	panic(s)
@@ -112,9 +122,10 @@ func (l *Logger) Panicf(format string, v ...interface{}) {
 // Panicfp is the same as l.Panicf but takes a prepared format struct.
 func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
-	s := fmt.Sprintf(f.Get(l.color), v...)
+	format := f.Get(l.color)
+	l.mu.Unlock()
+	s := fmt.Sprintf(format, v...)
 	l.out.WriteString(s)
 	panic(s)
 }
@@ -122,8 +133,8 @@ func (l *Logger) Panicfp(f *color.Format, v ...interface{}) {
 // Panic is equivalent to l.Print() followed by a call to panic().
 func (l *Logger) Panic(v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
+	l.mu.Unlock()
 	s := fmt.Sprint(v...)
 	l.out.WriteString(s)
 	panic(s)
@@ -132,8 +143,8 @@ func (l *Logger) Panic(v ...interface{}) {
 // Panicln is equivalent to l.Println() followed by a call to panic().
 func (l *Logger) Panicln(v ...interface{}) {
 	l.mu.Lock()
-	defer l.mu.Unlock()
 	color.ExpandFormats(l.color, v)
+	l.mu.Unlock()
 	s := fmt.Sprintln(v...)
 	l.out.WriteString(s)
 	panic(s)
@@ -141,8 +152,8 @@ func (l *Logger) Panicln(v ...interface{}) {
 
 // SetOutput sets the output destination.
 func (l *Logger) SetOutput(w io.Writer) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+	l.out.Lock()
+	defer l.out.Unlock()
 	l.out.w = w
 }
 
@@ -155,11 +166,14 @@ func (l *Logger) SetColor(color bool) {
 
 // lineWriter ensures that each Write to the underlying writer will end on a newline.
 type lineWriter struct {
-	w io.Writer // underlying writer
+	sync.Mutex           // ensures atomic writes
+	w          io.Writer // underlying writer
 }
 
 // Write writes to the underlying writer but ensures that the write ends on a newline.
 func (lw *lineWriter) Write(p []byte) (n int, err error) {
+	lw.Lock()
+	defer lw.Unlock()
 	if len(p) == 0 || p[len(p)-1] != '\n' {
 		return lw.w.Write(append(p, '\n'))
 	}
@@ -168,6 +182,8 @@ func (lw *lineWriter) Write(p []byte) (n int, err error) {
 
 // WriteString is the same as lw.Write but takes a string.
 func (lw *lineWriter) WriteString(s string) (n int, err error) {
+	lw.Lock()
+	defer lw.Unlock()
 	if len(s) == 0 || s[len(s)-1] != '\n' {
 		p := make([]byte, len(s)+1)
 		copy(p, s)

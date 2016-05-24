@@ -19,10 +19,10 @@ import (
 
 // Logger is a very simple logger, similar to log.logger but it supports highlight verbs.
 type Logger struct {
+	out *lineWriter // ensures output is written on separate lines
+
 	mu    sync.Mutex
 	color bool // enable color output
-
-	out *lineWriter // ensures output is written on separate lines
 }
 
 // New creates a new Logger. The out argument sets the
@@ -75,7 +75,6 @@ func (l *Logger) Fatalf(format string, v ...interface{}) {
 	l.mu.Lock()
 	color.ExpandFormats(l.color, v)
 	format = color.Run(format, l.color)
-	l.mu.Unlock()
 	fmt.Fprintf(l.out, format, v...)
 	os.Exit(1)
 }
@@ -85,7 +84,6 @@ func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
 	l.mu.Lock()
 	color.ExpandFormats(l.color, v)
 	format := f.Get(l.color)
-	l.mu.Unlock()
 	fmt.Fprintf(l.out, format, v...)
 	os.Exit(1)
 }
@@ -94,7 +92,6 @@ func (l *Logger) Fatalfp(f *color.Format, v ...interface{}) {
 func (l *Logger) Fatal(v ...interface{}) {
 	l.mu.Lock()
 	color.ExpandFormats(l.color, v)
-	l.mu.Unlock()
 	fmt.Fprint(l.out, v...)
 	os.Exit(1)
 }
@@ -103,7 +100,6 @@ func (l *Logger) Fatal(v ...interface{}) {
 func (l *Logger) Fatalln(v ...interface{}) {
 	l.mu.Lock()
 	color.ExpandFormats(l.color, v)
-	l.mu.Unlock()
 	fmt.Fprintln(l.out, v...)
 	os.Exit(1)
 }

@@ -2,7 +2,9 @@
 
 Color extends `fmt.Printf` with verbs for producing colored output.
 
-__note: things may change but it looks pretty stable. Email me if you have any new ideas.__
+It has full terminfo support with [github.com/nhooyr/terminfo](https://github.com/nhooyr/terminfo)!
+
+__note: things may change but it looks pretty stable. email me if you have any new ideas.__
 
 ## Install
 ```

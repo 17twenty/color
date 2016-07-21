@@ -1,80 +1,73 @@
 /*
-	Package color extends fmt.Printf with verbs for producing colored output.
+Package color extends fmt.Printf with verbs for producing colored output.
 
-	Highlight verbs:
+Printing
 
-		%h[attr...]		replaced with a SGR code that sets all of the attributes in []
-					multiple attributes are + separated
+Verbs:
 
-		%r			an abbreviation for %h[reset]
+	%h[attr...]	replaced with a SGR code that sets all of the attributes in []
+			multiple attributes are + separated
+	%r		an abbreviation for %h[reset]
 
-	Multiple highlight verbs do not reset preceeding verbs, they add onto them.
-	For example, if you set the foreground to green in the first verb, then set the background to red in the second, any text following the second will have a green foreground and a red background.
+Preparing Strings:
 
-	Attributes Reference
+While this package is heavily optimized, processing the highlighting verbs is still very expensive. Thus, it makes more sense to process the verbs once and then store the results into a Format structure. The format structure, holds two strings, one for when colored output is enabled and the other for when it is disabled.
 
-	Standard Colors:
-		%h[fgBlack]
-		%h[fgRed]
-		%h[fgGreen]
-		%h[fgYellow]
-		%h[fgBlue]
-		%h[fgMagenta]
-		%h[fgCyan]
-		%h[fgWhite]
-		%h[fgDefault]
-		%h[bgBlack]
-		%h[bgRed]
-		%h[bgGreen]
-		%h[bgYellow]
-		%h[bgBlue]
-		%h[bgMagenta]
-		%h[bgCyan]
-		%h[bgWhite]
-		%h[bgDefault]
+Use the Prepare function to create Format structures. Then, use the Printfp like functions to use them as the base format strings, or send them as part of the variadic arguments to any Print function and they will be expanded to their appropriate strings. See Prepare below for an example.
 
-	Bright Colors:
-		%h[fgBrighBlack]
-		%h[fgBrightRed]
-		%h[fgBrightGreen]
-		%h[fgBrightYellow]
-		%h[fgBrightBlue]
-		%h[fgBrightMagenta]
-		%h[fgBrightCyan]
-		%h[fgBrightWhite]
-		%h[bgBrighBlack]
-		%h[bgBrightRed]
-		%h[bgBrightGreen]
-		%h[bgBrightYellow]
-		%h[bgBrightBlue]
-		%h[bgBrightMagenta]
-		%h[bgBrightCyan]
-		%h[bgBrightWhite]
+Errors:
 
-	256 Colors:
-		%h[fgxxx]
-		%h[bgxxx]
-	Where xxx is any number from 0-255
+If an error occurs, the generated string will contain a description of the problem, as in these examples.
 
-	Others:
-		%h[reset] or the %r verb
-		%h[bold]
-		%h[faint]
-		%h[italic]
-		%h[underline]
-		%h[blink]
-		%h[inverse]
-		%h[invisible]
-		%h[crossedOut]
-		%h[doubleUnderline]
-		%h[normal]
-		%h[notItalic]
-		%h[notUnderlined]
-		%h[steady]
-		%h[positive]
-		%h[visible]
-		%h[notCrossedOut]
+	Invalid character in the highlight verb:
+		Printf("%h(fgRed)%s", "hi"):		%!h(INVALID)
+	No attributes in the highlight verb:
+		Printf("%h[]%s", "hi"):			%!h(MISSING)
+	Unknown attribute in the highlight verb:
+		Printf("%h[fgGdsds]%s", "hi"):		%!h(BADATTR)
+	String ended before the verb:
+		Printf("%h[fg", "hi"):			%!h(SHORT)
 
-	See http://goo.gl/LRLA7o for a more in depth explanation of the attributes. Scroll down till you see the SGR section
+Everything else is handled by the fmt package. You should read its documentation.
+
+Attributes Reference
+
+Named Colors:
+	%h[xgBlack]
+	%h[xgRed]
+	%h[xgGreen]
+	%h[xgYellow]
+	%h[xgBlue]
+	%h[xgMagenta]
+	%h[xgCyan]
+	%h[xgWhite]
+	%h[xgBrightBlack]
+	%h[xgBrightRed]
+	%h[xgBrightGreen]
+	%h[xgBrightYellow]
+	%h[xgBrightBlue]
+	%h[xgBrightMagenta]
+	%h[xgBrightCyan]
+	%h[xgBrightWhite]
+
+	Where 'x' is either 'f' or 'b'.
+
+256 Colors:
+	%h[fgx]
+	%h[bgx]
+
+	Where x is any number from 0-255.
+
+Modes:
+	%h[reset] or the %r verb
+	%h[bold]
+	%h[underline]
+	%h[reverse]
+	%h[blink]
+	%h[dim]
+
+See http://goo.gl/LRLA7o for information on the attributes. Scroll down to the SGR section.
+
+See http://goo.gl/fvtHLs and ISO-8613-3 (according to above document) for more information on 256 colors.
 */
 package color
